@@ -7,6 +7,7 @@ import { CalculationDisplay } from './components/CalculationDisplay';
 import { PointsDistribution } from './components/PointsDistribution';
 import { RatingsChart } from './components/RatingsChart';
 import { FormatComparison } from './components/FormatComparison';
+import TerminologyGuide from './components/TerminologyGuide';
 import type { PlayerWithName, PlayerResultWithName } from './utils/calculations';
 import { calculateTournamentResults } from './utils/calculations';
 import { exampleTournaments, generatePlayerNames } from './data/examples';
@@ -80,6 +81,9 @@ function App() {
             </button>
           </div>
         </div>
+
+        {/* Terminology Guide */}
+        <TerminologyGuide />
 
         {/* Input Section */}
         <div className="grid grid-cols-1 gap-6 mb-8">
