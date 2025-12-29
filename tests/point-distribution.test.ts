@@ -5,6 +5,7 @@ import {
   calculatePlayerPoints,
   distributePoints,
   getPointsForPosition,
+  calculatePositionPercentage,
 } from '../src/point-distribution.js';
 import type { PlayerResult } from '../src/types.js';
 
@@ -116,5 +117,108 @@ describe('getPointsForPosition', () => {
     const linearPoints = calculateLinearPoints(1, 10, 100);
     const dynamicPoints = calculateDynamicPoints(1, 10, 100);
     expect(points).toBeCloseTo(linearPoints + dynamicPoints, 2);
+  });
+});
+
+describe('calculatePositionPercentage', () => {
+  it('should return 1.0 for first place (100%)', () => {
+    const percentage = calculatePositionPercentage(1, 10, 10);
+    expect(percentage).toBeCloseTo(1.0, 2);
+  });
+
+  it('should return percentage between 0 and 1', () => {
+    const percentage = calculatePositionPercentage(5, 10, 10);
+    expect(percentage).toBeGreaterThan(0);
+    expect(percentage).toBeLessThanOrEqual(1);
+  });
+
+  it('should decrease as position gets worse', () => {
+    const first = calculatePositionPercentage(1, 10, 10);
+    const fifth = calculatePositionPercentage(5, 10, 10);
+    const tenth = calculatePositionPercentage(10, 10, 10);
+
+    expect(first).toBeGreaterThan(fifth);
+    expect(fifth).toBeGreaterThan(tenth);
+  });
+
+  it('should match calculatePlayerPoints divided by 100', () => {
+    const position = 3;
+    const playerCount = 20;
+    const ratedPlayerCount = 15;
+
+    const percentage = calculatePositionPercentage(position, playerCount, ratedPlayerCount);
+    const points = calculatePlayerPoints(position, playerCount, ratedPlayerCount, 100);
+
+    expect(percentage).toBeCloseTo(points / 100, 5);
+  });
+
+  it('should handle small tournament (3 players)', () => {
+    const first = calculatePositionPercentage(1, 3, 3);
+    const second = calculatePositionPercentage(2, 3, 3);
+    const third = calculatePositionPercentage(3, 3, 3);
+
+    expect(first).toBeGreaterThan(second);
+    expect(second).toBeGreaterThan(third);
+    expect(third).toBeGreaterThan(0);
+  });
+
+  it('should handle large tournament (100 players)', () => {
+    const first = calculatePositionPercentage(1, 100, 80);
+    const fiftieth = calculatePositionPercentage(50, 100, 80);
+
+    expect(first).toBeCloseTo(1.0, 2);
+    expect(fiftieth).toBeLessThan(0.5);
+  });
+
+  it('should handle different rated player counts', () => {
+    const lowRated = calculatePositionPercentage(10, 50, 10);
+    const highRated = calculatePositionPercentage(10, 50, 40);
+
+    // Both should be valid percentages
+    expect(lowRated).toBeGreaterThan(0);
+    expect(highRated).toBeGreaterThan(0);
+  });
+
+  it('should return same percentage for position 1 regardless of tournament size', () => {
+    const small = calculatePositionPercentage(1, 5, 5);
+    const medium = calculatePositionPercentage(1, 20, 20);
+    const large = calculatePositionPercentage(1, 100, 100);
+
+    // All first place finishes should get ~100%
+    expect(small).toBeCloseTo(1.0, 1);
+    expect(medium).toBeCloseTo(1.0, 1);
+    expect(large).toBeCloseTo(1.0, 1);
+  });
+
+  it('should handle last place in tournament', () => {
+    const percentage = calculatePositionPercentage(10, 10, 8);
+    expect(percentage).toBeGreaterThan(0);
+    expect(percentage).toBeLessThan(0.2); // Last place should be small percentage
+  });
+
+  it('should account for dynamic range limit (64 players)', () => {
+    // Position outside dynamic range should get only linear points
+    const insideRange = calculatePositionPercentage(32, 100, 100);
+    const outsideRange = calculatePositionPercentage(70, 100, 100);
+
+    expect(insideRange).toBeGreaterThan(outsideRange);
+  });
+
+  it('should handle edge case with 1 rated player', () => {
+    const percentage = calculatePositionPercentage(1, 10, 1);
+    expect(percentage).toBeGreaterThan(0);
+    expect(percentage).toBeLessThanOrEqual(1);
+  });
+
+  it('should handle all rated players', () => {
+    const percentage = calculatePositionPercentage(5, 20, 20);
+    expect(percentage).toBeGreaterThan(0);
+    expect(percentage).toBeLessThan(1);
+  });
+
+  it('should handle no rated players', () => {
+    const percentage = calculatePositionPercentage(1, 10, 0);
+    // Should still award linear points
+    expect(percentage).toBeGreaterThan(0);
   });
 });

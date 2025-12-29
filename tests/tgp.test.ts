@@ -3,10 +3,12 @@ import {
   calculateQualifyingTGP,
   calculateFinalsTGP,
   calculateTGP,
+  calculateUnlimitedCardTGP,
   calculateFlipFrenzyTGP,
   validateFinalsEligibility,
 } from '../src/tgp.js';
 import type { TGPConfig } from '../src/types.js';
+import { TGP } from '../src/constants.js';
 
 describe('calculateQualifyingTGP', () => {
   it('should return 0 for no qualifying', () => {
@@ -184,6 +186,111 @@ describe('calculateTGP', () => {
     // Finals: 12 * 4% * 2 = 96%
     // Total: 124%
     expect(tgp).toBeCloseTo(1.24, 2);
+  });
+});
+
+describe('calculateUnlimitedCardTGP', () => {
+  it('should calculate TGP with 4X multiplier when hours >= 20', () => {
+    const tgp = calculateUnlimitedCardTGP(5, 20, 10);
+    // Qualifying: 5 * 4% * 4 (card multiplier) = 80%
+    // Time bonus: 20 * 1% = 20%
+    // Qualifying total: 100%
+    // Finals: 10 * 4% = 40%
+    // Total: 140%
+    expect(tgp).toBeCloseTo(1.4, 2);
+  });
+
+  it('should apply 4X multiplier only when hours meet minimum threshold', () => {
+    const tgp = calculateUnlimitedCardTGP(5, 19, 10);
+    // Qualifying: 5 * 4% = 20% (no 4X multiplier)
+    // Time bonus: 19 * 1% = 19%
+    // Qualifying total: 39%
+    // Finals: 10 * 4% = 40%
+    // Total: 79%
+    expect(tgp).toBeCloseTo(0.79, 2);
+  });
+
+  it('should cap time bonus at 20%', () => {
+    const tgp = calculateUnlimitedCardTGP(5, 50, 10);
+    // Qualifying: 5 * 4% * 4 = 80%
+    // Time bonus: capped at 20% (not 50%)
+    // Qualifying total: 100%
+    // Finals: 10 * 4% = 40%
+    // Total: 140%
+    expect(tgp).toBeCloseTo(1.4, 2);
+  });
+
+  it('should cap total TGP at 200%', () => {
+    const tgp = calculateUnlimitedCardTGP(25, 30, 25);
+    // Qualifying: 25 * 4% * 4 = 400%
+    // Time bonus: 20% (capped)
+    // Qualifying total: 420%
+    // Finals: 25 * 4% = 100%
+    // Total: 520%, capped at 200%
+    expect(tgp).toBe(2.0);
+  });
+
+  it('should handle zero meaningful games', () => {
+    const tgp = calculateUnlimitedCardTGP(0, 20, 10);
+    // Qualifying: 0 * 4% * 4 = 0%
+    // Time bonus: 20%
+    // Finals: 10 * 4% = 40%
+    // Total: 60%
+    expect(tgp).toBeCloseTo(0.6, 2);
+  });
+
+  it('should handle zero finals games', () => {
+    const tgp = calculateUnlimitedCardTGP(5, 20, 0);
+    // Qualifying: 5 * 4% * 4 = 80%
+    // Time bonus: 20%
+    // Total: 100%
+    expect(tgp).toBeCloseTo(1.0, 2);
+  });
+
+  it('should handle minimum hours for multiplier threshold', () => {
+    const tgpWith = calculateUnlimitedCardTGP(5, 20, 0);
+    const tgpWithout = calculateUnlimitedCardTGP(5, 19, 0);
+
+    // With multiplier: 5 * 4% * 4 + 20% = 100%
+    expect(tgpWith).toBeCloseTo(1.0, 2);
+    // Without multiplier: 5 * 4% + 19% = 39%
+    expect(tgpWithout).toBeCloseTo(0.39, 2);
+  });
+
+  it('should correctly combine qualifying and finals', () => {
+    const tgp = calculateUnlimitedCardTGP(10, 20, 15);
+    // Qualifying: 10 * 4% * 4 = 160%
+    // Time bonus: 20%
+    // Qualifying total: 180%
+    // Finals: 15 * 4% = 60%
+    // Total: 240%, capped at 200%
+    expect(tgp).toBe(2.0);
+  });
+
+  it('should use MIN_HOURS_FOR_MULTIPLIER constant correctly', () => {
+    const minHours = TGP.UNLIMITED_QUALIFYING.MIN_HOURS_FOR_MULTIPLIER;
+    const tgp = calculateUnlimitedCardTGP(5, minHours, 10);
+    // Should apply 4X multiplier
+    expect(tgp).toBeGreaterThan(0.8); // With multiplier should be higher
+  });
+
+  it('should handle decimal hours', () => {
+    const tgp = calculateUnlimitedCardTGP(5, 20.5, 10);
+    // Qualifying: 5 * 4% * 4 = 80%
+    // Time bonus: 20% (capped)
+    // Finals: 10 * 4% = 40%
+    // Total: 140%
+    expect(tgp).toBeCloseTo(1.4, 2);
+  });
+
+  it('should handle decimal games', () => {
+    const tgp = calculateUnlimitedCardTGP(5.5, 20, 10.5);
+    // Qualifying: 5.5 * 4% * 4 = 88%
+    // Time bonus: 20%
+    // Qualifying total: 108%
+    // Finals: 10.5 * 4% = 42%
+    // Total: 150%
+    expect(tgp).toBeCloseTo(1.5, 2);
   });
 });
 
