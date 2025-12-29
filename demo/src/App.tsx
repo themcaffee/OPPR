@@ -12,8 +12,6 @@ import type { PlayerWithName, PlayerResultWithName } from './utils/calculations'
 import { calculateTournamentResults } from './utils/calculations';
 import { exampleTournaments, generatePlayerNames } from './data/examples';
 
-type Tab = 'results' | 'comparison';
-
 function App() {
   // Initialize with local tournament example
   const initialPlayers = useMemo(() => {
@@ -28,7 +26,6 @@ function App() {
   const [results, setResults] = useState<PlayerResultWithName[]>([]);
   const [tgpConfig, setTgpConfig] = useState<TGPConfig>(exampleTournaments.local.tgpConfig);
   const [eventBooster, setEventBooster] = useState<'none' | 'certified' | 'certified-plus' | 'major'>('none');
-  const [activeTab, setActiveTab] = useState<Tab>('results');
 
   // Calculate tournament results
   const calculation = useMemo(() => {
@@ -55,31 +52,8 @@ function App() {
           <p className="text-gray-600 text-sm">
             This demo showcases the Open Pinball Player Ranking System. Input a table of players
             with their ratings and rankings, configure tournament settings, and see how points are
-            calculated and distributed. Use the tabs below to view results or compare different
-            tournament formats.
+            calculated and distributed.
           </p>
-          <div className="mt-4 flex gap-2">
-            <button
-              onClick={() => setActiveTab('results')}
-              className={`px-4 py-2 rounded-md transition-colors ${
-                activeTab === 'results'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Tournament Results
-            </button>
-            <button
-              onClick={() => setActiveTab('comparison')}
-              className={`px-4 py-2 rounded-md transition-colors ${
-                activeTab === 'comparison'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Format Comparison
-            </button>
-          </div>
         </div>
 
         {/* Terminology Guide */}
@@ -101,35 +75,31 @@ function App() {
           <ResultsInput players={players} results={results} onResultsChange={setResults} />
         </div>
 
-        {/* Tab Content */}
-        {activeTab === 'results' ? (
-          <>
-            {/* Calculation Display */}
-            <div className="mb-8">
-              <CalculationDisplay calculation={calculation} />
-            </div>
+        {/* Tournament Results */}
+        {/* Calculation Display */}
+        <div className="mb-8">
+          <CalculationDisplay calculation={calculation} />
+        </div>
 
-            {/* Points Distribution */}
-            <div className="mb-8">
-              <PointsDistribution calculation={calculation} maxRows={20} />
-            </div>
+        {/* Points Distribution */}
+        <div className="mb-8">
+          <PointsDistribution calculation={calculation} maxRows={20} />
+        </div>
 
-            {/* Ratings Chart */}
-            <div className="mb-8">
-              <RatingsChart results={results} maxPlayers={10} />
-            </div>
-          </>
-        ) : (
-          /* Format Comparison */
-          <div className="mb-8">
-            <FormatComparison
-              players={players}
-              results={results}
-              baseConfig={tgpConfig}
-              eventBooster={eventBooster}
-            />
-          </div>
-        )}
+        {/* Ratings Chart */}
+        <div className="mb-8">
+          <RatingsChart results={results} maxPlayers={10} />
+        </div>
+
+        {/* Format Comparison */}
+        <div className="mb-8">
+          <FormatComparison
+            players={players}
+            results={results}
+            baseConfig={tgpConfig}
+            eventBooster={eventBooster}
+          />
+        </div>
       </main>
 
       {/* Footer */}
