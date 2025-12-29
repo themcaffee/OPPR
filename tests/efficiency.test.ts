@@ -7,7 +7,7 @@ import {
   analyzeEfficiencyTrend,
   getEfficiencyStats,
 } from '../src/efficiency.js';
-import type { PlayerEvent, Tournament, Player } from '../src/types.js';
+import type { PlayerEvent, Tournament } from '../src/types.js';
 
 describe('calculateEventEfficiency', () => {
   it('should calculate efficiency correctly', () => {

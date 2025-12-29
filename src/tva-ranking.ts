@@ -1,5 +1,6 @@
 import { TVA } from './constants.js';
 import type { Player } from './types.js';
+import { calculateRatingTVA } from './tva-rating.js';
 
 /**
  * Calculates a single player's contribution to the ranking-based TVA
@@ -85,9 +86,6 @@ export function calculateTotalTVA(players: Player[]): {
   rankingTVA: number;
   totalTVA: number;
 } {
-  // Import here to avoid circular dependency
-  const { calculateRatingTVA } = require('./tva-rating.js');
-
   const ratingTVA = calculateRatingTVA(players);
   const rankingTVA = calculateRankingTVA(players);
 
