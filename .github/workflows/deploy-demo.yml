@@ -1,8 +1,9 @@
 name: Deploy Demo to GitHub Pages
 
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - main
   workflow_dispatch: # Allow manual triggering
 
 permissions:
