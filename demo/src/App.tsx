@@ -112,6 +112,16 @@ function App() {
             <p className="text-xs text-gray-500 mt-2">
               Built with React, TypeScript, Tailwind CSS, and Recharts
             </p>
+            <p className="text-xs mt-3">
+              <a
+                href="https://github.com/themcaffee/OPPR"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition-colors underline"
+              >
+                View on GitHub
+              </a>
+            </p>
           </div>
         </div>
       </footer>
