@@ -15,10 +15,7 @@ import type { PlayerEvent } from './types.js';
  * // Returns 30 (player earned 30% of available points)
  * ```
  */
-export function calculateEventEfficiency(
-  pointsEarned: number,
-  firstPlaceValue: number
-): number {
+export function calculateEventEfficiency(pointsEarned: number, firstPlaceValue: number): number {
   if (firstPlaceValue === 0) return 0;
   return (pointsEarned / firstPlaceValue) * 100;
 }
@@ -181,8 +178,6 @@ export function getEfficiencyStats(events: PlayerEvent[]): {
     best: sortedEfficiencies[0] ?? 0,
     worst: sortedEfficiencies[sortedEfficiencies.length - 1] ?? 0,
     average: efficiencies.reduce((sum, eff) => sum + eff, 0) / efficiencies.length,
-    median:
-      sortedEfficiencies[Math.floor(sortedEfficiencies.length / 2)] ??
-      0,
+    median: sortedEfficiencies[Math.floor(sortedEfficiencies.length / 2)] ?? 0,
   };
 }

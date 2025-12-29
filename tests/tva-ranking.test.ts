@@ -54,8 +54,7 @@ describe('calculatePlayerRankingContribution', () => {
 
   it('should use correct formula constants', () => {
     const ranking = 5;
-    const expected =
-      Math.log(ranking) * TVA.RANKING.COEFFICIENT + TVA.RANKING.OFFSET;
+    const expected = Math.log(ranking) * TVA.RANKING.COEFFICIENT + TVA.RANKING.OFFSET;
     const contribution = calculatePlayerRankingContribution(ranking);
     expect(contribution).toBeCloseTo(Math.max(0, expected), 5);
   });
@@ -205,11 +204,7 @@ describe('getTopRankedPlayers', () => {
   });
 
   it('should filter out players with negative ranking', () => {
-    const players = [
-      createPlayer('1', 1),
-      createPlayer('2', -1),
-      createPlayer('3', 2),
-    ];
+    const players = [createPlayer('1', 1), createPlayer('2', -1), createPlayer('3', 2)];
 
     const topPlayers = getTopRankedPlayers(players, 10);
 
@@ -252,11 +247,7 @@ describe('getTopRankedPlayers', () => {
   });
 
   it('should not modify original array', () => {
-    const players = [
-      createPlayer('1', 10),
-      createPlayer('2', 1),
-      createPlayer('3', 5),
-    ];
+    const players = [createPlayer('1', 10), createPlayer('2', 1), createPlayer('3', 5)];
     const originalOrder = [...players];
 
     getTopRankedPlayers(players, 2);

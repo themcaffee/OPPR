@@ -40,11 +40,7 @@ export {
 } from './constants.js';
 
 // Export base value functions
-export {
-  calculateBaseValue,
-  countRatedPlayers,
-  isPlayerRated,
-} from './base-value.js';
+export { calculateBaseValue, countRatedPlayers, isPlayerRated } from './base-value.js';
 
 // Export TVA rating functions
 export {

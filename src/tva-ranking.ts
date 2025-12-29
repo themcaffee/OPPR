@@ -1,5 +1,6 @@
 import { TVA } from './constants.js';
 import type { Player } from './types.js';
+import { calculateRatingTVA } from './tva-rating.js';
 
 /**
  * Calculates a single player's contribution to the ranking-based TVA
@@ -16,8 +17,7 @@ export function calculatePlayerRankingContribution(ranking: number): number {
   // Ensure ranking is at least 1 to avoid invalid ln() calculations
   const validRanking = Math.max(1, ranking);
 
-  const contribution =
-    Math.log(validRanking) * TVA.RANKING.COEFFICIENT + TVA.RANKING.OFFSET;
+  const contribution = Math.log(validRanking) * TVA.RANKING.COEFFICIENT + TVA.RANKING.OFFSET;
 
   // Only count positive contributions
   return Math.max(0, contribution);
@@ -85,9 +85,6 @@ export function calculateTotalTVA(players: Player[]): {
   rankingTVA: number;
   totalTVA: number;
 } {
-  // Import here to avoid circular dependency
-  const { calculateRatingTVA } = require('./tva-rating.js');
-
   const ratingTVA = calculateRatingTVA(players);
   const rankingTVA = calculateRankingTVA(players);
 

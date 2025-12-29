@@ -7,7 +7,7 @@ import {
   analyzeEfficiencyTrend,
   getEfficiencyStats,
 } from '../src/efficiency.js';
-import type { PlayerEvent, Tournament, Player } from '../src/types.js';
+import type { PlayerEvent, Tournament } from '../src/types.js';
 
 describe('calculateEventEfficiency', () => {
   it('should calculate efficiency correctly', () => {
@@ -63,11 +63,7 @@ describe('calculateOverallEfficiency', () => {
   });
 
   it('should calculate overall efficiency correctly', () => {
-    const events: PlayerEvent[] = [
-      createEvent(30, 50),
-      createEvent(15, 40),
-      createEvent(40, 60),
-    ];
+    const events: PlayerEvent[] = [createEvent(30, 50), createEvent(15, 40), createEvent(40, 60)];
 
     const efficiency = calculateOverallEfficiency(events);
     // Total: 85 points / 150 available = 56.67%

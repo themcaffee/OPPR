@@ -9,7 +9,6 @@ import {
   type Player,
   type TGPConfig,
   type PlayerResult,
-  type TournamentValue,
 } from '../src/index.js';
 
 describe('Full Tournament Calculation Integration', () => {
