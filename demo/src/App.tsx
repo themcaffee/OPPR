@@ -82,14 +82,14 @@ function App() {
         </div>
 
         {/* Input Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <PlayerInput players={players} onPlayersChange={setPlayers} />
+        <div className="grid grid-cols-1 gap-6 mb-8">
           <TournamentConfig
             tgpConfig={tgpConfig}
             eventBooster={eventBooster}
             onTGPConfigChange={setTgpConfig}
             onEventBoosterChange={setEventBooster}
           />
+          <PlayerInput players={players} onPlayersChange={setPlayers} />
         </div>
 
         {/* Results Input */}
