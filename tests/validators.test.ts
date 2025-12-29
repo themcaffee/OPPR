@@ -44,12 +44,16 @@ describe('validateMinimumPlayers', () => {
 
   it('should throw for fewer than minimum players', () => {
     expect(() => validateMinimumPlayers(2)).toThrow(ValidationError);
-    expect(() => validateMinimumPlayers(2)).toThrow('Tournament must have at least 3 players (got 2)');
+    expect(() => validateMinimumPlayers(2)).toThrow(
+      'Tournament must have at least 3 players (got 2)'
+    );
   });
 
   it('should throw for zero players', () => {
     expect(() => validateMinimumPlayers(0)).toThrow(ValidationError);
-    expect(() => validateMinimumPlayers(0)).toThrow('Tournament must have at least 3 players (got 0)');
+    expect(() => validateMinimumPlayers(0)).toThrow(
+      'Tournament must have at least 3 players (got 0)'
+    );
   });
 
   it('should throw for negative player count', () => {
@@ -118,7 +122,9 @@ describe('validatePlayer', () => {
   });
 
   it('should throw for player with non-number type rating', () => {
-    expect(() => validatePlayer({ ...validPlayer, rating: 'invalid' as unknown as number })).toThrow(ValidationError);
+    expect(() =>
+      validatePlayer({ ...validPlayer, rating: 'invalid' as unknown as number })
+    ).toThrow(ValidationError);
   });
 
   it('should throw for player with negative ranking', () => {
@@ -129,13 +135,17 @@ describe('validatePlayer', () => {
   });
 
   it('should throw for player with non-number type ranking', () => {
-    expect(() => validatePlayer({ ...validPlayer, ranking: 'invalid' as unknown as number })).toThrow(ValidationError);
+    expect(() =>
+      validatePlayer({ ...validPlayer, ranking: 'invalid' as unknown as number })
+    ).toThrow(ValidationError);
   });
 
   it('should throw for player without isRated boolean', () => {
     const playerWithoutIsRated = { ...validPlayer } as unknown as Record<string, unknown>;
     delete playerWithoutIsRated.isRated;
-    expect(() => validatePlayer(playerWithoutIsRated as unknown as Player)).toThrow(ValidationError);
+    expect(() => validatePlayer(playerWithoutIsRated as unknown as Player)).toThrow(
+      ValidationError
+    );
     expect(() => validatePlayer(playerWithoutIsRated as unknown as Player)).toThrow(
       'Player player1 must have isRated boolean property'
     );
@@ -170,7 +180,9 @@ describe('validatePlayers', () => {
 
   it('should throw for non-array input', () => {
     expect(() => validatePlayers('not an array' as unknown as Player[])).toThrow(ValidationError);
-    expect(() => validatePlayers('not an array' as unknown as Player[])).toThrow('Players must be an array');
+    expect(() => validatePlayers('not an array' as unknown as Player[])).toThrow(
+      'Players must be an array'
+    );
   });
 
   it('should throw for empty array', () => {
@@ -219,7 +231,10 @@ describe('validateTGPConfig', () => {
 
   it('should not throw for config with zero meaningful games', () => {
     expect(() =>
-      validateTGPConfig({ ...validConfig, qualifying: { ...validConfig.qualifying, meaningfulGames: 0 } })
+      validateTGPConfig({
+        ...validConfig,
+        qualifying: { ...validConfig.qualifying, meaningfulGames: 0 },
+      })
     ).not.toThrow();
   });
 
@@ -382,9 +397,9 @@ describe('validateTournament', () => {
   });
 
   it('should throw for tournament with non-Date date', () => {
-    expect(() => validateTournament({ ...validTournament, date: '2024-01-15' as unknown as Date })).toThrow(
-      ValidationError
-    );
+    expect(() =>
+      validateTournament({ ...validTournament, date: '2024-01-15' as unknown as Date })
+    ).toThrow(ValidationError);
   });
 
   it('should throw for tournament with too few players', () => {
@@ -435,8 +450,12 @@ describe('validatePlayerResults', () => {
   });
 
   it('should throw for non-array input', () => {
-    expect(() => validatePlayerResults('not an array' as unknown as PlayerResult[])).toThrow(ValidationError);
-    expect(() => validatePlayerResults('not an array' as unknown as PlayerResult[])).toThrow('Results must be an array');
+    expect(() => validatePlayerResults('not an array' as unknown as PlayerResult[])).toThrow(
+      ValidationError
+    );
+    expect(() => validatePlayerResults('not an array' as unknown as PlayerResult[])).toThrow(
+      'Results must be an array'
+    );
   });
 
   it('should throw for empty array', () => {

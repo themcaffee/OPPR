@@ -17,8 +17,7 @@ export function calculatePlayerRankingContribution(ranking: number): number {
   // Ensure ranking is at least 1 to avoid invalid ln() calculations
   const validRanking = Math.max(1, ranking);
 
-  const contribution =
-    Math.log(validRanking) * TVA.RANKING.COEFFICIENT + TVA.RANKING.OFFSET;
+  const contribution = Math.log(validRanking) * TVA.RANKING.COEFFICIENT + TVA.RANKING.OFFSET;
 
   // Only count positive contributions
   return Math.max(0, contribution);

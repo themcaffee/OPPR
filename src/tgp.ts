@@ -20,7 +20,11 @@ export function calculateQualifyingTGP(config: TGPConfig): number {
   let gameValue = TGP.BASE_GAME_VALUE;
 
   // Apply multipliers based on format type
-  if (qualifying.type === 'unlimited' && qualifying.hours && qualifying.hours >= TGP.UNLIMITED_QUALIFYING.MIN_HOURS_FOR_MULTIPLIER) {
+  if (
+    qualifying.type === 'unlimited' &&
+    qualifying.hours &&
+    qualifying.hours >= TGP.UNLIMITED_QUALIFYING.MIN_HOURS_FOR_MULTIPLIER
+  ) {
     // Unlimited Best Game: 2X (8% per game)
     // Note: Card qualifying uses different multiplier
     gameValue = TGP.BASE_GAME_VALUE * TGP.MULTIPLIERS.UNLIMITED_BEST_GAME;
@@ -118,7 +122,8 @@ export function calculateTGP(config: TGPConfig): number {
   let totalTGP = qualifyingTGP + finalsTGP;
 
   // Determine maximum TGP based on whether there's a qualifying component
-  const hasSeparateQualifying = config.qualifying.type !== 'none' && config.qualifying.meaningfulGames > 0;
+  const hasSeparateQualifying =
+    config.qualifying.type !== 'none' && config.qualifying.meaningfulGames > 0;
   const maxTGP = hasSeparateQualifying ? TGP.MAX_WITH_FINALS : TGP.MAX_WITHOUT_FINALS;
 
   // Cap at maximum

@@ -109,11 +109,7 @@ export function distributePoints(
   const ratedPlayerCount = activeResults.filter((result) => result.player.isRated).length;
 
   return activeResults.map((result) => {
-    const linearPoints = calculateLinearPoints(
-      result.position,
-      totalPlayers,
-      firstPlaceValue
-    );
+    const linearPoints = calculateLinearPoints(result.position, totalPlayers, firstPlaceValue);
 
     const dynamicPoints = calculateDynamicPoints(
       result.position,

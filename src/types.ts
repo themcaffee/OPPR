@@ -44,7 +44,12 @@ export type GroupSize = 2 | 3 | 4;
 /**
  * Event booster classification
  */
-export type EventBoosterType = 'none' | 'certified' | 'certified-plus' | 'championship-series' | 'major';
+export type EventBoosterType =
+  | 'none'
+  | 'certified'
+  | 'certified-plus'
+  | 'championship-series'
+  | 'major';
 
 /**
  * Tournament Grading Percentage (TGP) calculation details

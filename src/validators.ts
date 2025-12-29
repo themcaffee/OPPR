@@ -198,10 +198,7 @@ export function validatePlayerResults(results: PlayerResult[]): void {
  * @param finalistCount - Number of finalists
  * @throws ValidationError if requirements not met
  */
-export function validateFinalsRequirements(
-  totalParticipants: number,
-  finalistCount: number
-): void {
+export function validateFinalsRequirements(totalParticipants: number, finalistCount: number): void {
   const percentage = finalistCount / totalParticipants;
 
   if (percentage < VALIDATION.MIN_PARTICIPATION_PERCENT * 0.2) {
