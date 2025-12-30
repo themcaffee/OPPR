@@ -105,9 +105,11 @@ export function validateTGPConfig(config: TGPConfig): void {
     throw new ValidationError('Qualifying hours cannot be negative');
   }
 
-  // Validate finals
-  if (config.finals.meaningfulGames < 0) {
-    throw new ValidationError('Finals meaningful games cannot be negative');
+  // Validate finals (skip validation if format type is 'none')
+  if (config.finals.formatType !== 'none') {
+    if (config.finals.meaningfulGames < 0) {
+      throw new ValidationError('Finals meaningful games cannot be negative');
+    }
   }
 
   // Validate ball count adjustment

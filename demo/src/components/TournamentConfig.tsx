@@ -18,6 +18,7 @@ const formatTypes = [
   'strike-format',
   'target-match-play',
   'hybrid',
+  'none',
 ] as const;
 
 const qualifyingTypes = ['unlimited', 'limited', 'hybrid', 'none'] as const;
@@ -151,7 +152,8 @@ export function TournamentConfig({
               value={tgpConfig.finals.meaningfulGames}
               onChange={(e) => updateFinals('meaningfulGames', Number(e.target.value))}
               min="0"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={tgpConfig.finals.formatType === 'none'}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
             />
           </div>
 
@@ -167,7 +169,8 @@ export function TournamentConfig({
               }
               min="0"
               placeholder="Auto"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={tgpConfig.finals.formatType === 'none'}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
             />
           </div>
 
@@ -177,18 +180,20 @@ export function TournamentConfig({
                 type="checkbox"
                 checked={tgpConfig.finals.fourPlayerGroups || false}
                 onChange={(e) => updateFinals('fourPlayerGroups', e.target.checked)}
-                className="mr-2 w-4 h-4 text-blue-600 rounded"
+                disabled={tgpConfig.finals.formatType === 'none'}
+                className="mr-2 w-4 h-4 text-blue-600 rounded disabled:opacity-50"
               />
-              <span className="text-sm text-gray-700">4-Player Groups (2.0x)</span>
+              <span className={`text-sm ${tgpConfig.finals.formatType === 'none' ? 'text-gray-400' : 'text-gray-700'}`}>4-Player Groups (2.0x)</span>
             </label>
             <label className="flex items-center">
               <input
                 type="checkbox"
                 checked={tgpConfig.finals.threePlayerGroups || false}
                 onChange={(e) => updateFinals('threePlayerGroups', e.target.checked)}
-                className="mr-2 w-4 h-4 text-blue-600 rounded"
+                disabled={tgpConfig.finals.formatType === 'none'}
+                className="mr-2 w-4 h-4 text-blue-600 rounded disabled:opacity-50"
               />
-              <span className="text-sm text-gray-700">3-Player Groups (1.5x)</span>
+              <span className={`text-sm ${tgpConfig.finals.formatType === 'none' ? 'text-gray-400' : 'text-gray-700'}`}>3-Player Groups (1.5x)</span>
             </label>
           </div>
         </div>
