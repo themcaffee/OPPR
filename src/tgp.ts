@@ -136,7 +136,9 @@ export function calculateTGP(config: TGPConfig): number {
   const hasSeparateFinals =
     config.finals.formatType !== 'none' && config.finals.meaningfulGames > 0;
   const maxTGP =
-    hasSeparateQualifying && hasSeparateFinals ? constants.TGP.MAX_WITH_FINALS : constants.TGP.MAX_WITHOUT_FINALS;
+    hasSeparateQualifying && hasSeparateFinals
+      ? constants.TGP.MAX_WITH_FINALS
+      : constants.TGP.MAX_WITHOUT_FINALS;
 
   // Cap at maximum
   totalTGP = Math.min(totalTGP, maxTGP);
