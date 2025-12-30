@@ -23,6 +23,83 @@ type DeepPartial<T> = {
 export type PartialOPPRConfig = DeepPartial<OPPRConfig>;
 
 /**
+ * Auto-calculate derived configuration values from core parameters
+ */
+function calculateDerivedValues(partial: PartialOPPRConfig): PartialOPPRConfig {
+  const derived: PartialOPPRConfig = { ...partial };
+
+  // Fixed constants that should never change
+  const FIXED_CONSTANTS = {
+    POINTS_PER_PLAYER: 0.5,
+    BASE_GAME_VALUE: 0.04,
+    PERFECT_RATING: 2000,
+    RATED_PLAYER_THRESHOLD: 5,
+    THREE_PLUS_BALL: 1,
+    NONE_BOOSTER: 1,
+    YEAR_0_TO_1: 1,
+    YEAR_3_PLUS: 0,
+    DAYS_PER_YEAR: 365,
+    Q: Math.LN10 / 400,
+  };
+
+  // Initialize nested objects if they don't exist
+  if (!derived.BASE_VALUE) derived.BASE_VALUE = {};
+  if (!derived.TGP) derived.TGP = {};
+  if (!derived.TGP.BALL_ADJUSTMENTS) derived.TGP.BALL_ADJUSTMENTS = {};
+  if (!derived.TVA) derived.TVA = {};
+  if (!derived.TVA.RATING) derived.TVA.RATING = {};
+  if (!derived.TVA.RANKING) derived.TVA.RANKING = {};
+  if (!derived.EVENT_BOOSTERS) derived.EVENT_BOOSTERS = {};
+  if (!derived.TIME_DECAY) derived.TIME_DECAY = {};
+  if (!derived.RATING) derived.RATING = {};
+
+  // Apply fixed constants
+  derived.BASE_VALUE.POINTS_PER_PLAYER = FIXED_CONSTANTS.POINTS_PER_PLAYER;
+  derived.BASE_VALUE.RATED_PLAYER_THRESHOLD = FIXED_CONSTANTS.RATED_PLAYER_THRESHOLD;
+  derived.TGP.BASE_GAME_VALUE = FIXED_CONSTANTS.BASE_GAME_VALUE;
+  derived.TGP.BALL_ADJUSTMENTS.THREE_PLUS_BALL = FIXED_CONSTANTS.THREE_PLUS_BALL;
+  derived.TVA.RATING.PERFECT_RATING = FIXED_CONSTANTS.PERFECT_RATING;
+  derived.EVENT_BOOSTERS.NONE = FIXED_CONSTANTS.NONE_BOOSTER;
+  derived.TIME_DECAY.YEAR_0_TO_1 = FIXED_CONSTANTS.YEAR_0_TO_1;
+  derived.TIME_DECAY.YEAR_3_PLUS = FIXED_CONSTANTS.YEAR_3_PLUS;
+  derived.TIME_DECAY.DAYS_PER_YEAR = FIXED_CONSTANTS.DAYS_PER_YEAR;
+  derived.RATING.Q = FIXED_CONSTANTS.Q;
+
+  // Get default config to fill in missing values
+  const defaults = getDefaultConfig();
+
+  // Calculate MAX_PLAYER_COUNT from MAX_BASE_VALUE
+  const maxBaseValue = partial.BASE_VALUE?.MAX_BASE_VALUE ?? defaults.BASE_VALUE.MAX_BASE_VALUE;
+  derived.BASE_VALUE.MAX_PLAYER_COUNT = maxBaseValue / FIXED_CONSTANTS.POINTS_PER_PLAYER;
+
+  // Calculate MAX_GAMES_FOR_200_PERCENT from MAX_WITH_FINALS
+  const maxWithFinals = partial.TGP?.MAX_WITH_FINALS ?? defaults.TGP.MAX_WITH_FINALS;
+  derived.TGP.MAX_GAMES_FOR_200_PERCENT = maxWithFinals / FIXED_CONSTANTS.BASE_GAME_VALUE;
+
+  // Calculate TVA Rating coefficients
+  const ratingMaxValue = partial.TVA?.RATING?.MAX_VALUE ?? defaults.TVA.RATING.MAX_VALUE;
+  const maxPlayersConsidered = partial.TVA?.MAX_PLAYERS_CONSIDERED ?? defaults.TVA.MAX_PLAYERS_CONSIDERED;
+
+  const perPlayerContribution = ratingMaxValue / maxPlayersConsidered;
+  const zeroRating = FIXED_CONSTANTS.PERFECT_RATING * (9 / 14); // 64.3% of perfect rating
+  const ratingCoefficient = perPlayerContribution / (FIXED_CONSTANTS.PERFECT_RATING - zeroRating);
+  const ratingOffset = zeroRating * ratingCoefficient;
+
+  derived.TVA.RATING.COEFFICIENT = ratingCoefficient;
+  derived.TVA.RATING.OFFSET = ratingOffset;
+  derived.TVA.RATING.MIN_EFFECTIVE_RATING = zeroRating;
+
+  // Calculate TVA Ranking coefficients (scale from defaults)
+  const rankingMaxValue = partial.TVA?.RANKING?.MAX_VALUE ?? defaults.TVA.RANKING.MAX_VALUE;
+  const rankingScale = rankingMaxValue / 50; // 50 is the baseline MAX_VALUE
+
+  derived.TVA.RANKING.COEFFICIENT = -0.211675054 * rankingScale;
+  derived.TVA.RANKING.OFFSET = 1.459827968 * rankingScale;
+
+  return derived;
+}
+
+/**
  * Hook for managing OPPR configuration with validation and persistence
  */
 export function useConfiguration() {
@@ -216,9 +293,15 @@ export function useConfiguration() {
   // Update configuration
   const updateConfig = useCallback((partial: PartialOPPRConfig) => {
     setUserOverrides(prev => {
+      // Merge user input with previous overrides
       const newOverrides = deepMerge(prev, partial);
+
+      // Auto-calculate derived values
+      const withDerived = calculateDerivedValues(newOverrides);
+
+      // Merge with defaults to get full config
       const defaults = getDefaultConfig();
-      const merged = deepMerge(defaults, newOverrides);
+      const merged = deepMerge(defaults, withDerived);
 
       // Validate the new configuration
       const errors = validateConfig(merged);
@@ -226,10 +309,10 @@ export function useConfiguration() {
 
       // Only apply if no validation errors
       if (errors.length === 0) {
-        configureOPPR(newOverrides);
+        configureOPPR(withDerived);
         setConfig(merged);
 
-        // Save to localStorage
+        // Save to localStorage (save user overrides, not derived values)
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(newOverrides));
         } catch (e) {
@@ -257,7 +340,8 @@ export function useConfiguration() {
 
   // Export configuration
   const exportConfig = useCallback(() => {
-    const dataStr = JSON.stringify(userOverrides, null, 2);
+    // Export full config including derived values for completeness
+    const dataStr = JSON.stringify(config, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
 
     const exportFileDefaultName = 'oppr-config.json';
@@ -266,7 +350,7 @@ export function useConfiguration() {
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
     linkElement.click();
-  }, [userOverrides]);
+  }, [config]);
 
   // Import configuration
   const importConfig = useCallback((file: File) => {
