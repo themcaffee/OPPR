@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import type { PlayerWithName } from '../utils/calculations';
 import { exampleTournaments, generatePlayerNames } from '../data/examples';
+import { parsePlayerCSV, ValidationError } from 'oppr';
 
 interface PlayerInputProps {
   players: PlayerWithName[];
@@ -7,6 +9,9 @@ interface PlayerInputProps {
 }
 
 export function PlayerInput({ players, onPlayersChange }: PlayerInputProps) {
+  const [showImportCSV, setShowImportCSV] = useState(false);
+  const [csvText, setCsvText] = useState('');
+  const [useRankingData, setUseRankingData] = useState(true);
 
   const handleAddPlayer = () => {
     const newId = String(players.length + 1);
@@ -51,6 +56,32 @@ export function PlayerInput({ players, onPlayersChange }: PlayerInputProps) {
     onPlayersChange(playersWithNames);
   };
 
+  const handleImportCSV = () => {
+    if (!csvText.trim()) {
+      alert('Please paste CSV data into the text area');
+      return;
+    }
+
+    try {
+      const parsedPlayers = parsePlayerCSV(csvText, { useRankingData });
+      const playersWithNames: PlayerWithName[] = parsedPlayers.map((p) => ({
+        ...p.player,
+        name: p.name,
+      }));
+      onPlayersChange(playersWithNames);
+
+      // Clear and hide the import UI after successful import
+      setCsvText('');
+      setShowImportCSV(false);
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        alert(`Import failed: ${error.message}`);
+      } else {
+        alert(`Import failed: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="flex justify-between items-center mb-4">
@@ -74,8 +105,61 @@ export function PlayerInput({ players, onPlayersChange }: PlayerInputProps) {
           >
             Load Major (400)
           </button>
+          <button
+            onClick={() => setShowImportCSV(!showImportCSV)}
+            className={`px-3 py-1 text-sm rounded ${
+              showImportCSV
+                ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+            }`}
+          >
+            {showImportCSV ? 'Hide Import' : 'Import from CSV'}
+          </button>
         </div>
       </div>
+
+      {showImportCSV && (
+        <div className="mb-4 p-4 bg-gray-50 rounded border border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Import Player Data from CSV</h3>
+          <p className="text-sm text-gray-600 mb-3">
+            Paste CSV data with columns: Name, ID, Rank, Rating (first line will be skipped as header)
+          </p>
+          <textarea
+            value={csvText}
+            onChange={(e) => setCsvText(e.target.value)}
+            placeholder="Paste CSV data here..."
+            className="w-full h-32 px-3 py-2 text-sm font-mono border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
+          />
+          <div className="mt-3 flex items-center justify-between">
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={useRankingData}
+                onChange={(e) => setUseRankingData(e.target.checked)}
+                className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+              />
+              Use ranking and rating from CSV
+            </label>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setCsvText('');
+                  setShowImportCSV(false);
+                }}
+                className="px-4 py-2 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleImportCSV}
+                className="px-4 py-2 text-sm bg-purple-600 text-white rounded hover:bg-purple-700"
+              >
+                Parse and Import
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="overflow-x-auto max-h-96 overflow-y-auto">
         <table className="min-w-full divide-y divide-gray-200">
