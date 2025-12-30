@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { configureOPPR, resetConfig, getDefaultConfig } from 'oppr';
-import type { OPPRConfig } from 'oppr';
+import { configureOPPR, resetConfig, getDefaultConfig } from '@oppr/core';
+import type { OPPRConfig } from '@oppr/core';
 
 const STORAGE_KEY = 'oppr-demo-config';
 
@@ -21,6 +21,33 @@ type DeepPartial<T> = {
 };
 
 export type PartialOPPRConfig = DeepPartial<OPPRConfig>;
+
+/**
+ * Deep merge utility function
+ */
+function deepMerge<T>(target: T, source: DeepPartial<T>): T {
+  const result = { ...target };
+
+  for (const key in source) {
+    const sourceValue = source[key];
+    const targetValue = result[key];
+
+    if (
+      sourceValue !== undefined &&
+      targetValue !== null &&
+      typeof targetValue === 'object' &&
+      !Array.isArray(targetValue) &&
+      typeof sourceValue === 'object' &&
+      !Array.isArray(sourceValue)
+    ) {
+      result[key] = deepMerge(targetValue, sourceValue as DeepPartial<typeof targetValue>);
+    } else if (sourceValue !== undefined) {
+      result[key] = sourceValue as T[Extract<keyof T, string>];
+    }
+  }
+
+  return result;
+}
 
 /**
  * Auto-calculate derived configuration values from core parameters
@@ -106,31 +133,6 @@ export function useConfiguration() {
   const [config, setConfig] = useState<OPPRConfig>(getDefaultConfig());
   const [userOverrides, setUserOverrides] = useState<PartialOPPRConfig>({});
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
-
-  // Deep merge utility
-  const deepMerge = useCallback(<T,>(target: T, source: DeepPartial<T>): T => {
-    const result = { ...target };
-
-    for (const key in source) {
-      const sourceValue = source[key];
-      const targetValue = result[key];
-
-      if (
-        sourceValue !== undefined &&
-        targetValue !== null &&
-        typeof targetValue === 'object' &&
-        !Array.isArray(targetValue) &&
-        typeof sourceValue === 'object' &&
-        !Array.isArray(sourceValue)
-      ) {
-        result[key] = deepMerge(targetValue, sourceValue as DeepPartial<typeof targetValue>);
-      } else if (sourceValue !== undefined) {
-        result[key] = sourceValue as T[Extract<keyof T, string>];
-      }
-    }
-
-    return result;
-  }, []);
 
   // Validate configuration
   const validateConfig = useCallback((cfg: OPPRConfig): ValidationError[] => {
@@ -322,7 +324,7 @@ export function useConfiguration() {
 
       return newOverrides;
     });
-  }, [deepMerge, validateConfig]);
+  }, [validateConfig]);
 
   // Reset to defaults
   const reset = useCallback(() => {
@@ -390,11 +392,11 @@ export function useConfiguration() {
   // Check if value is modified from default
   const isModified = useCallback((path: string): boolean => {
     const parts = path.split('.');
-    let current: any = userOverrides;
+    let current: unknown = userOverrides;
 
     for (const part of parts) {
       if (current && typeof current === 'object' && part in current) {
-        current = current[part];
+        current = (current as Record<string, unknown>)[part];
       } else {
         return false;
       }
@@ -404,13 +406,13 @@ export function useConfiguration() {
   }, [userOverrides]);
 
   // Get value at path
-  const getValue = useCallback((path: string): any => {
+  const getValue = useCallback((path: string): unknown => {
     const parts = path.split('.');
-    let current: any = config;
+    let current: unknown = config;
 
     for (const part of parts) {
       if (current && typeof current === 'object' && part in current) {
-        current = current[part];
+        current = (current as Record<string, unknown>)[part];
       } else {
         return undefined;
       }
@@ -445,7 +447,9 @@ export function useConfiguration() {
     } catch (error) {
       console.error('Failed to load config from localStorage:', error);
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    // This effect intentionally runs only once on mount to load initial config from URL params or localStorage
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return {
     config,

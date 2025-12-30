@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { TGPConfig } from 'oppr';
+import type { TGPConfig } from '@oppr/core';
 import type { PlayerWithName, PlayerResultWithName } from '../utils/calculations';
 import { calculateTournamentResults, formatNumber } from '../utils/calculations';
 

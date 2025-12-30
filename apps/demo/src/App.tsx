@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import type { TGPConfig } from 'oppr';
+import type { TGPConfig } from '@oppr/core';
 import { PlayerInput } from './components/PlayerInput';
 import { TournamentConfig } from './components/TournamentConfig';
 import { ResultsInput } from './components/ResultsInput';

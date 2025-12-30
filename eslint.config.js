@@ -5,13 +5,12 @@ import parser from '@typescript-eslint/parser';
 export default [
   js.configs.recommended,
   {
-    files: ['src/**/*.ts', 'tests/**/*.ts'],
+    files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
       parser: parser,
       parserOptions: {
         ecmaVersion: 'latest',
-        sourceType: 'module',
-        project: './tsconfig.eslint.json'
+        sourceType: 'module'
       }
     },
     plugins: {
@@ -24,5 +23,8 @@ export default [
       '@typescript-eslint/strict-boolean-expressions': 'off',
       'no-console': 'warn'
     }
+  },
+  {
+    ignores: ['**/node_modules/**', '**/dist/**', '**/.turbo/**', '**/coverage/**']
   }
 ];

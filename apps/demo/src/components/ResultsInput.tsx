@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import type { PlayerWithName, PlayerResultWithName } from '../utils/calculations';
 
 interface ResultsInputProps {
@@ -8,6 +8,13 @@ interface ResultsInputProps {
 }
 
 export function ResultsInput({ players, results, onResultsChange }: ResultsInputProps) {
+  const onResultsChangeRef = useRef(onResultsChange);
+
+  // Keep ref updated
+  useEffect(() => {
+    onResultsChangeRef.current = onResultsChange;
+  }, [onResultsChange]);
+
   // Initialize results when players change
   useEffect(() => {
     if (players.length > 0 && (results.length === 0 || results.length !== players.length)) {
@@ -15,9 +22,9 @@ export function ResultsInput({ players, results, onResultsChange }: ResultsInput
         player,
         position: index + 1,
       }));
-      onResultsChange(initialResults);
+      onResultsChangeRef.current(initialResults);
     }
-  }, [players.length]);
+  }, [players, results.length]);
 
   // Sync player data in results when player properties change
   useEffect(() => {
@@ -34,9 +41,9 @@ export function ResultsInput({ players, results, onResultsChange }: ResultsInput
     );
 
     if (hasChanges) {
-      onResultsChange(updatedResults);
+      onResultsChangeRef.current(updatedResults);
     }
-  }, [players, results, onResultsChange]);
+  }, [players, results]);
 
   const handlePositionChange = (playerId: string, newPosition: number) => {
     // Find the player with this position

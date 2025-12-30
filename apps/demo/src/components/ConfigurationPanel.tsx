@@ -130,15 +130,15 @@ export function ConfigurationPanel() {
 
   const handleNumberChange = (path: string, value: number) => {
     const keys = path.split('.');
-    const update: any = {};
-    let current = update;
+    const update: Record<string, unknown> = {};
+    let current: Record<string, unknown> = update;
 
     keys.forEach((key, index) => {
       if (index === keys.length - 1) {
         current[key] = value;
       } else {
         current[key] = {};
-        current = current[key];
+        current = current[key] as Record<string, unknown>;
       }
     });
 

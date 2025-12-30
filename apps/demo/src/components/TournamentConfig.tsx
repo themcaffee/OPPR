@@ -1,4 +1,4 @@
-import type { TGPConfig } from 'oppr';
+import type { TGPConfig } from '@oppr/core';
 
 interface TournamentConfigProps {
   tgpConfig: TGPConfig;
@@ -29,7 +29,7 @@ export function TournamentConfig({
   onTGPConfigChange,
   onEventBoosterChange,
 }: TournamentConfigProps) {
-  const updateQualifying = (field: string, value: any) => {
+  const updateQualifying = (field: string, value: string | number | boolean | undefined) => {
     onTGPConfigChange({
       ...tgpConfig,
       qualifying: {
@@ -39,7 +39,7 @@ export function TournamentConfig({
     });
   };
 
-  const updateFinals = (field: string, value: any) => {
+  const updateFinals = (field: string, value: string | number | boolean | undefined) => {
     onTGPConfigChange({
       ...tgpConfig,
       finals: {
