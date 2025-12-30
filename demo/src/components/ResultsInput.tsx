@@ -19,6 +19,25 @@ export function ResultsInput({ players, results, onResultsChange }: ResultsInput
     }
   }, [players.length]);
 
+  // Sync player data in results when player properties change
+  useEffect(() => {
+    if (results.length === 0) return;
+
+    const updatedResults = results.map((result) => {
+      const currentPlayer = players.find((p) => p.id === result.player.id);
+      return currentPlayer ? { ...result, player: currentPlayer } : result;
+    });
+
+    // Only update if there are actual changes to avoid infinite loops
+    const hasChanges = updatedResults.some(
+      (result, idx) => result.player !== results[idx]?.player
+    );
+
+    if (hasChanges) {
+      onResultsChange(updatedResults);
+    }
+  }, [players, results, onResultsChange]);
+
   const handlePositionChange = (playerId: string, newPosition: number) => {
     // Find the player with this position
     const updatedResults = results.map((result) => {
