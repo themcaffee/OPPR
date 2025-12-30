@@ -15,7 +15,6 @@ coverage/
 
 # pnpm
 .pnpm-store/
-pnpm-lock.yaml
 
 # IDEs and editors
 .vscode/
