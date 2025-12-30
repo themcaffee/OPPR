@@ -1,11 +1,17 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   calculatePlayerRankingContribution,
   calculateRankingTVA,
   getTopRankedPlayers,
 } from '../src/tva-ranking.js';
+import { resetConfig } from '../src/config.js';
 import type { Player } from '../src/types.js';
-import { TVA } from '../src/constants.js';
+import { DEFAULT_CONSTANTS } from '../src/constants.js';
+const TVA = DEFAULT_CONSTANTS.TVA;
+
+beforeEach(() => {
+  resetConfig();
+});
 
 describe('calculatePlayerRankingContribution', () => {
   it('should calculate contribution for rank 1 player', () => {

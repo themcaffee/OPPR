@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   calculateLinearPoints,
   calculateDynamicPoints,
@@ -7,7 +7,12 @@ import {
   getPointsForPosition,
   calculatePositionPercentage,
 } from '../src/point-distribution.js';
+import { resetConfig, configureOPPR } from '../src/config.js';
 import type { PlayerResult } from '../src/types.js';
+
+beforeEach(() => {
+  resetConfig();
+});
 
 describe('calculateLinearPoints', () => {
   it('should calculate linear distribution for first place', () => {
@@ -220,5 +225,114 @@ describe('calculatePositionPercentage', () => {
     const percentage = calculatePositionPercentage(1, 10, 0);
     // Should still award linear points
     expect(percentage).toBeGreaterThan(0);
+  });
+});
+
+describe('Configuration Tests', () => {
+  describe('calculateLinearPoints with custom config', () => {
+    it('should use custom LINEAR_PERCENTAGE', () => {
+      // Default: LINEAR_PERCENTAGE = 0.1 (10%)
+      const defaultPoints = calculateLinearPoints(1, 10, 100);
+      expect(defaultPoints).toBeCloseTo((10 + 1 - 1) * 0.1 * (100 / 10), 2); // 11
+
+      // Custom: LINEAR_PERCENTAGE = 0.2 (20%)
+      configureOPPR({ POINT_DISTRIBUTION: { LINEAR_PERCENTAGE: 0.2 } });
+      const customPoints = calculateLinearPoints(1, 10, 100);
+      expect(customPoints).toBeCloseTo((10 + 1 - 1) * 0.2 * (100 / 10), 2); // 22
+    });
+  });
+
+  describe('calculateDynamicPoints with custom config', () => {
+    it('should use custom DYNAMIC_PERCENTAGE', () => {
+      // Default: DYNAMIC_PERCENTAGE = 0.9 (90%)
+      const defaultPoints = calculateDynamicPoints(1, 10, 100);
+
+      // Custom: DYNAMIC_PERCENTAGE = 0.8 (80%)
+      configureOPPR({ POINT_DISTRIBUTION: { DYNAMIC_PERCENTAGE: 0.8 } });
+      const customPoints = calculateDynamicPoints(1, 10, 100);
+
+      // First place should get close to the full percentage
+      expect(defaultPoints).toBeCloseTo(90, 0);
+      expect(customPoints).toBeCloseTo(80, 0);
+    });
+
+    it('should use custom POSITION_EXPONENT', () => {
+      // Default: POSITION_EXPONENT = 0.7
+      const defaultPoints2nd = calculateDynamicPoints(2, 20, 100);
+
+      // Custom: POSITION_EXPONENT = 0.5 (less steep curve)
+      configureOPPR({ POINT_DISTRIBUTION: { POSITION_EXPONENT: 0.5 } });
+      const customPoints2nd = calculateDynamicPoints(2, 20, 100);
+
+      // Different exponents should produce different distributions
+      expect(defaultPoints2nd).not.toBeCloseTo(customPoints2nd, 1);
+    });
+
+    it('should use custom VALUE_EXPONENT', () => {
+      // Default: VALUE_EXPONENT = 3
+      const defaultPoints3rd = calculateDynamicPoints(3, 20, 100);
+
+      // Custom: VALUE_EXPONENT = 2
+      configureOPPR({ POINT_DISTRIBUTION: { VALUE_EXPONENT: 2 } });
+      const customPoints3rd = calculateDynamicPoints(3, 20, 100);
+
+      // Different value exponents should produce different results
+      expect(defaultPoints3rd).not.toBeCloseTo(customPoints3rd, 1);
+    });
+
+    it('should use custom MAX_DYNAMIC_PLAYERS', () => {
+      // Default: MAX_DYNAMIC_PLAYERS = 64
+      // With 200 players, dynamic cap = min(200/2, 64) = 64
+
+      // Position 65 should get 0 points with default
+      const defaultPoints65 = calculateDynamicPoints(65, 200, 100);
+      expect(defaultPoints65).toBe(0);
+
+      // Custom: MAX_DYNAMIC_PLAYERS = 100
+      // Now position 65 should get points
+      configureOPPR({ POINT_DISTRIBUTION: { MAX_DYNAMIC_PLAYERS: 100 } });
+      const customPoints65 = calculateDynamicPoints(65, 200, 100);
+      expect(customPoints65).toBeGreaterThan(0);
+    });
+
+    it('should combine multiple custom values', () => {
+      configureOPPR({
+        POINT_DISTRIBUTION: {
+          DYNAMIC_PERCENTAGE: 0.8,
+          POSITION_EXPONENT: 0.5,
+          VALUE_EXPONENT: 2,
+        },
+      });
+
+      const points = calculateDynamicPoints(1, 10, 100);
+      // First place should get close to 80% with custom settings
+      expect(points).toBeGreaterThan(75);
+      expect(points).toBeLessThanOrEqual(80);
+    });
+  });
+
+  describe('calculatePlayerPoints with custom config', () => {
+    it('should use custom percentages for total points', () => {
+      // Default: 10% linear + 90% dynamic = 100%
+      const defaultTotal = calculatePlayerPoints(1, 10, 10, 100);
+      const defaultPos5 = calculatePlayerPoints(5, 10, 10, 100);
+
+      // Custom: 20% linear + 80% dynamic = 100%
+      configureOPPR({
+        POINT_DISTRIBUTION: {
+          LINEAR_PERCENTAGE: 0.2,
+          DYNAMIC_PERCENTAGE: 0.8,
+        },
+      });
+      const customTotal = calculatePlayerPoints(1, 10, 10, 100);
+      const customPos5 = calculatePlayerPoints(5, 10, 10, 100);
+
+      // Both should still sum to approximately 100 for first place
+      expect(defaultTotal).toBeCloseTo(100, 0);
+      expect(customTotal).toBeCloseTo(100, 0);
+
+      // But distribution should be different for lower positions
+      expect(defaultPos5).not.toBeCloseTo(customPos5, 1);
+    });
   });
 });

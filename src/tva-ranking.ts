@@ -1,4 +1,4 @@
-import { TVA } from './constants.js';
+import { getConfig } from './config.js';
 import type { Player } from './types.js';
 import { calculateRatingTVA } from './tva-rating.js';
 
@@ -14,10 +14,12 @@ import { calculateRatingTVA } from './tva-rating.js';
  * @returns TVA contribution from this player
  */
 export function calculatePlayerRankingContribution(ranking: number): number {
+  const config = getConfig();
   // Ensure ranking is at least 1 to avoid invalid ln() calculations
   const validRanking = Math.max(1, ranking);
 
-  const contribution = Math.log(validRanking) * TVA.RANKING.COEFFICIENT + TVA.RANKING.OFFSET;
+  const contribution =
+    Math.log(validRanking) * config.TVA.RANKING.COEFFICIENT + config.TVA.RANKING.OFFSET;
 
   // Only count positive contributions
   return Math.max(0, contribution);
@@ -43,13 +45,14 @@ export function calculatePlayerRankingContribution(ranking: number): number {
  * ```
  */
 export function calculateRankingTVA(players: Player[]): number {
+  const config = getConfig();
   // Filter players with valid rankings (ranking > 0)
   const rankedPlayers = players.filter((player) => player.ranking > 0);
 
   // Sort by ranking (lowest/best first) and take top 64
   const topRankedPlayers = [...rankedPlayers]
     .sort((a, b) => a.ranking - b.ranking)
-    .slice(0, TVA.MAX_PLAYERS_CONSIDERED);
+    .slice(0, config.TVA.MAX_PLAYERS_CONSIDERED);
 
   // Sum contributions from all top-ranked players
   const totalTVA = topRankedPlayers.reduce((sum, player) => {
@@ -57,7 +60,7 @@ export function calculateRankingTVA(players: Player[]): number {
   }, 0);
 
   // Cap at maximum ranking TVA value
-  return Math.min(totalTVA, TVA.RANKING.MAX_VALUE);
+  return Math.min(totalTVA, config.TVA.RANKING.MAX_VALUE);
 }
 
 /**

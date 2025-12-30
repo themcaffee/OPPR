@@ -1,6 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { calculateBaseValue, countRatedPlayers, isPlayerRated } from '../src/base-value.js';
+import { resetConfig, configureOPPR } from '../src/config.js';
 import type { Player } from '../src/types.js';
+
+beforeEach(() => {
+  resetConfig();
+});
 
 describe('calculateBaseValue', () => {
   it('should calculate base value for rated players', () => {
@@ -93,5 +98,80 @@ describe('isPlayerRated', () => {
     expect(isPlayerRated(0)).toBe(false);
     expect(isPlayerRated(1)).toBe(false);
     expect(isPlayerRated(4)).toBe(false);
+  });
+});
+
+describe('Configuration Tests', () => {
+  describe('calculateBaseValue with custom config', () => {
+    it('should use custom POINTS_PER_PLAYER', () => {
+      const players: Player[] = Array.from({ length: 10 }, (_, i) => ({
+        id: `${i}`,
+        rating: 1500,
+        ranking: i + 1,
+        isRated: true,
+      }));
+
+      // Default behavior: 10 * 0.5 = 5
+      expect(calculateBaseValue(players)).toBe(5);
+
+      // Custom config: 10 * 1.0 = 10
+      configureOPPR({ BASE_VALUE: { POINTS_PER_PLAYER: 1.0 } });
+      expect(calculateBaseValue(players)).toBe(10);
+    });
+
+    it('should use custom MAX_BASE_VALUE', () => {
+      const players: Player[] = Array.from({ length: 100 }, (_, i) => ({
+        id: `${i}`,
+        rating: 1500,
+        ranking: i + 1,
+        isRated: true,
+      }));
+
+      // Default: capped at 32
+      expect(calculateBaseValue(players)).toBe(32);
+
+      // Custom cap at 64
+      configureOPPR({ BASE_VALUE: { MAX_BASE_VALUE: 64 } });
+      expect(calculateBaseValue(players)).toBe(50); // 100 * 0.5 = 50, capped at 64
+    });
+
+    it('should combine custom POINTS_PER_PLAYER and MAX_BASE_VALUE', () => {
+      const players: Player[] = Array.from({ length: 100 }, (_, i) => ({
+        id: `${i}`,
+        rating: 1500,
+        ranking: i + 1,
+        isRated: true,
+      }));
+
+      configureOPPR({
+        BASE_VALUE: {
+          POINTS_PER_PLAYER: 1.0,
+          MAX_BASE_VALUE: 80,
+        },
+      });
+
+      // 100 * 1.0 = 100, capped at 80
+      expect(calculateBaseValue(players)).toBe(80);
+    });
+  });
+
+  describe('isPlayerRated with custom config', () => {
+    it('should use custom RATED_PLAYER_THRESHOLD', () => {
+      // Default threshold is 5
+      expect(isPlayerRated(4)).toBe(false);
+      expect(isPlayerRated(5)).toBe(true);
+
+      // Custom threshold of 3
+      configureOPPR({ BASE_VALUE: { RATED_PLAYER_THRESHOLD: 3 } });
+      expect(isPlayerRated(2)).toBe(false);
+      expect(isPlayerRated(3)).toBe(true);
+      expect(isPlayerRated(4)).toBe(true);
+    });
+
+    it('should use custom threshold of 10', () => {
+      configureOPPR({ BASE_VALUE: { RATED_PLAYER_THRESHOLD: 10 } });
+      expect(isPlayerRated(9)).toBe(false);
+      expect(isPlayerRated(10)).toBe(true);
+    });
   });
 });

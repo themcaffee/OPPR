@@ -1,4 +1,4 @@
-import { TIME_DECAY } from './constants.js';
+import { getConfig } from './config.js';
 import type { DecayConfig } from './types.js';
 
 /**
@@ -22,8 +22,9 @@ export function calculateDaysBetween(eventDate: Date, referenceDate: Date = new 
  * @returns Age of event in years (decimal)
  */
 export function calculateEventAge(eventDate: Date, referenceDate: Date = new Date()): number {
+  const config = getConfig();
   const days = calculateDaysBetween(eventDate, referenceDate);
-  return days / TIME_DECAY.DAYS_PER_YEAR;
+  return days / config.TIME_DECAY.DAYS_PER_YEAR;
 }
 
 /**
@@ -39,14 +40,15 @@ export function calculateEventAge(eventDate: Date, referenceDate: Date = new Dat
  * @returns Decay multiplier (0.0 to 1.0)
  */
 export function getDecayMultiplier(ageInYears: number): number {
+  const config = getConfig();
   if (ageInYears < 1) {
-    return TIME_DECAY.YEAR_0_TO_1;
+    return config.TIME_DECAY.YEAR_0_TO_1;
   } else if (ageInYears < 2) {
-    return TIME_DECAY.YEAR_1_TO_2;
+    return config.TIME_DECAY.YEAR_1_TO_2;
   } else if (ageInYears < 3) {
-    return TIME_DECAY.YEAR_2_TO_3;
+    return config.TIME_DECAY.YEAR_2_TO_3;
   } else {
-    return TIME_DECAY.YEAR_3_PLUS;
+    return config.TIME_DECAY.YEAR_3_PLUS;
   }
 }
 
@@ -135,9 +137,10 @@ export function getEventDecayInfo(
   decayMultiplier: number;
   isActive: boolean;
 } {
+  const constants = getConfig();
   const referenceDate = config?.referenceDate ?? new Date();
   const ageInDays = calculateDaysBetween(eventDate, referenceDate);
-  const ageInYears = ageInDays / TIME_DECAY.DAYS_PER_YEAR;
+  const ageInYears = ageInDays / constants.TIME_DECAY.DAYS_PER_YEAR;
   const decayMultiplier = getDecayMultiplier(ageInYears);
   const isActive = ageInYears < 3;
 

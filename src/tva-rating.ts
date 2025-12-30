@@ -1,4 +1,4 @@
-import { TVA } from './constants.js';
+import { getConfig } from './config.js';
 import type { Player } from './types.js';
 
 /**
@@ -13,7 +13,8 @@ import type { Player } from './types.js';
  * @returns TVA contribution from this player (0 or positive)
  */
 export function calculatePlayerRatingContribution(rating: number): number {
-  const contribution = rating * TVA.RATING.COEFFICIENT - TVA.RATING.OFFSET;
+  const config = getConfig();
+  const contribution = rating * config.TVA.RATING.COEFFICIENT - config.TVA.RATING.OFFSET;
 
   // Only count positive contributions
   return Math.max(0, contribution);
@@ -39,10 +40,11 @@ export function calculatePlayerRatingContribution(rating: number): number {
  * ```
  */
 export function calculateRatingTVA(players: Player[]): number {
+  const config = getConfig();
   // Sort players by rating (highest first) and take top 64
   const topRatedPlayers = [...players]
     .sort((a, b) => b.rating - a.rating)
-    .slice(0, TVA.MAX_PLAYERS_CONSIDERED);
+    .slice(0, config.TVA.MAX_PLAYERS_CONSIDERED);
 
   // Sum contributions from all top-rated players
   const totalTVA = topRatedPlayers.reduce((sum, player) => {
@@ -50,7 +52,7 @@ export function calculateRatingTVA(players: Player[]): number {
   }, 0);
 
   // Cap at maximum rating TVA value
-  return Math.min(totalTVA, TVA.RATING.MAX_VALUE);
+  return Math.min(totalTVA, config.TVA.RATING.MAX_VALUE);
 }
 
 /**
@@ -60,7 +62,8 @@ export function calculateRatingTVA(players: Player[]): number {
  * @returns True if rating is above the minimum effective threshold (1285.71)
  */
 export function ratingContributesToTVA(rating: number): boolean {
-  return rating > TVA.RATING.MIN_EFFECTIVE_RATING;
+  const config = getConfig();
+  return rating > config.TVA.RATING.MIN_EFFECTIVE_RATING;
 }
 
 /**

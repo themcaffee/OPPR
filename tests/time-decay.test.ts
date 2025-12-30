@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   calculateDaysBetween,
   calculateEventAge,
@@ -9,6 +9,11 @@ import {
   filterActiveEvents,
   getEventDecayInfo,
 } from '../src/time-decay.js';
+import { resetConfig, configureOPPR } from '../src/config.js';
+
+beforeEach(() => {
+  resetConfig();
+});
 
 describe('calculateDaysBetween', () => {
   it('should calculate days between two dates', () => {
@@ -364,5 +369,123 @@ describe('getEventDecayInfo', () => {
     expect(info.ageInYears).toBe(0);
     expect(info.decayMultiplier).toBe(1.0);
     expect(info.isActive).toBe(true);
+  });
+});
+
+describe('Configuration Tests', () => {
+  describe('getDecayMultiplier with custom config', () => {
+    it('should use custom YEAR_0_TO_1', () => {
+      // Default: YEAR_0_TO_1 = 1.0
+      expect(getDecayMultiplier(0.5)).toBe(1.0);
+
+      // Custom: YEAR_0_TO_1 = 0.95
+      configureOPPR({ TIME_DECAY: { YEAR_0_TO_1: 0.95 } });
+      expect(getDecayMultiplier(0.5)).toBe(0.95);
+    });
+
+    it('should use custom YEAR_1_TO_2', () => {
+      // Default: YEAR_1_TO_2 = 0.75
+      expect(getDecayMultiplier(1.5)).toBe(0.75);
+
+      // Custom: YEAR_1_TO_2 = 0.85
+      configureOPPR({ TIME_DECAY: { YEAR_1_TO_2: 0.85 } });
+      expect(getDecayMultiplier(1.5)).toBe(0.85);
+    });
+
+    it('should use custom YEAR_2_TO_3', () => {
+      // Default: YEAR_2_TO_3 = 0.5
+      expect(getDecayMultiplier(2.5)).toBe(0.5);
+
+      // Custom: YEAR_2_TO_3 = 0.6
+      configureOPPR({ TIME_DECAY: { YEAR_2_TO_3: 0.6 } });
+      expect(getDecayMultiplier(2.5)).toBe(0.6);
+    });
+
+    it('should use custom YEAR_3_PLUS', () => {
+      // Default: YEAR_3_PLUS = 0.0
+      expect(getDecayMultiplier(4)).toBe(0.0);
+
+      // Custom: YEAR_3_PLUS = 0.25 (keep some value for old events)
+      configureOPPR({ TIME_DECAY: { YEAR_3_PLUS: 0.25 } });
+      expect(getDecayMultiplier(4)).toBe(0.25);
+    });
+
+    it('should use all custom decay values', () => {
+      configureOPPR({
+        TIME_DECAY: {
+          YEAR_0_TO_1: 1.0,
+          YEAR_1_TO_2: 0.9,
+          YEAR_2_TO_3: 0.7,
+          YEAR_3_PLUS: 0.5,
+        },
+      });
+
+      expect(getDecayMultiplier(0.5)).toBe(1.0);
+      expect(getDecayMultiplier(1.5)).toBe(0.9);
+      expect(getDecayMultiplier(2.5)).toBe(0.7);
+      expect(getDecayMultiplier(3.5)).toBe(0.5);
+    });
+  });
+
+  describe('calculateEventAge with custom config', () => {
+    it('should use custom DAYS_PER_YEAR', () => {
+      const eventDate = new Date('2023-01-01');
+      const referenceDate = new Date('2023-12-31'); // 364 days later
+
+      // Default: DAYS_PER_YEAR = 365
+      const defaultAge = calculateEventAge(eventDate, referenceDate);
+      expect(defaultAge).toBeCloseTo(364 / 365, 3);
+
+      // Custom: DAYS_PER_YEAR = 360 (simplified year)
+      configureOPPR({ TIME_DECAY: { DAYS_PER_YEAR: 360 } });
+      const customAge = calculateEventAge(eventDate, referenceDate);
+      expect(customAge).toBeCloseTo(364 / 360, 3);
+    });
+
+    it('should affect decay calculation with custom DAYS_PER_YEAR', () => {
+      const eventDate = new Date('2023-01-01');
+      const referenceDate = new Date('2024-07-01'); // 547 days later
+
+      // Default: 547 / 365 = 1.5 years → decay = 0.75
+      const defaultDecay = calculateDecayMultiplier(eventDate, { referenceDate });
+      expect(defaultDecay).toBe(0.75);
+
+      // Custom: 547 / 360 = 1.52 years → still 0.75
+      configureOPPR({ TIME_DECAY: { DAYS_PER_YEAR: 360 } });
+      const customDecay = calculateDecayMultiplier(eventDate, { referenceDate });
+      expect(customDecay).toBe(0.75);
+    });
+  });
+
+  describe('applyTimeDecay with custom config', () => {
+    it('should apply custom decay values to points', () => {
+      const points = 100;
+      const eventDate = new Date('2022-01-01');
+      const referenceDate = new Date('2023-07-01'); // 1.5 years
+
+      // Default: 100 * 0.75 = 75
+      const defaultDecayed = applyTimeDecay(points, eventDate, { referenceDate });
+      expect(defaultDecayed).toBe(75);
+
+      // Custom: 100 * 0.9 = 90
+      configureOPPR({ TIME_DECAY: { YEAR_1_TO_2: 0.9 } });
+      const customDecayed = applyTimeDecay(points, eventDate, { referenceDate });
+      expect(customDecayed).toBe(90);
+    });
+
+    it('should apply custom decay for older events', () => {
+      const points = 100;
+      const eventDate = new Date('2020-01-01');
+      const referenceDate = new Date('2024-01-01'); // 4 years
+
+      // Default: 100 * 0.0 = 0
+      const defaultDecayed = applyTimeDecay(points, eventDate, { referenceDate });
+      expect(defaultDecayed).toBe(0);
+
+      // Custom: 100 * 0.5 = 50 (keep some value for old events)
+      configureOPPR({ TIME_DECAY: { YEAR_3_PLUS: 0.5 } });
+      const customDecayed = applyTimeDecay(points, eventDate, { referenceDate });
+      expect(customDecayed).toBe(50);
+    });
   });
 });

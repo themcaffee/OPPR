@@ -247,3 +247,191 @@ export interface DecayConfig {
   /** Reference date for calculating age (defaults to current date) */
   referenceDate?: Date;
 }
+
+/**
+ * Base Value Constants Type
+ */
+export interface BaseValueConstants {
+  /** Points per rated player */
+  POINTS_PER_PLAYER: number;
+  /** Maximum base value (achieved at 64+ rated players) */
+  MAX_BASE_VALUE: number;
+  /** Player count that achieves maximum base value */
+  MAX_PLAYER_COUNT: number;
+  /** Minimum events to become a rated player */
+  RATED_PLAYER_THRESHOLD: number;
+}
+
+/**
+ * Tournament Value Adjustment (TVA) Constants Type
+ */
+export interface TVAConstants {
+  /** Rating-based TVA formula constants */
+  RATING: {
+    /** Maximum TVA points from ratings */
+    MAX_VALUE: number;
+    /** Rating multiplier coefficient */
+    COEFFICIENT: number;
+    /** Rating offset constant */
+    OFFSET: number;
+    /** Perfect player rating */
+    PERFECT_RATING: number;
+    /** Minimum rating that contributes to TVA */
+    MIN_EFFECTIVE_RATING: number;
+  };
+  /** Ranking-based TVA formula constants */
+  RANKING: {
+    /** Maximum TVA points from rankings */
+    MAX_VALUE: number;
+    /** Natural log coefficient */
+    COEFFICIENT: number;
+    /** Constant offset */
+    OFFSET: number;
+  };
+  /** Maximum players considered for TVA calculation */
+  MAX_PLAYERS_CONSIDERED: number;
+}
+
+/**
+ * Tournament Grading Percentage (TGP) Constants Type
+ */
+export interface TGPConstants {
+  /** Base TGP percentage per meaningful game (4% = 0.04) */
+  BASE_GAME_VALUE: number;
+  /** Maximum TGP for events without separate qualifying and finals */
+  MAX_WITHOUT_FINALS: number;
+  /** Maximum TGP for events with qualifying and finals */
+  MAX_WITH_FINALS: number;
+  /** Maximum meaningful games to reach 200% TGP */
+  MAX_GAMES_FOR_200_PERCENT: number;
+  /** Multipliers for group play formats */
+  MULTIPLIERS: {
+    /** 4-player PAPA-style groups */
+    FOUR_PLAYER_GROUPS: number;
+    /** 3-player groups */
+    THREE_PLAYER_GROUPS: number;
+    /** Unlimited best game qualifying (min 20 hours) */
+    UNLIMITED_BEST_GAME: number;
+    /** Hybrid best game qualifying */
+    HYBRID_BEST_GAME: number;
+    /** Unlimited card qualifying (min 20 hours) */
+    UNLIMITED_CARD: number;
+  };
+  /** Ball count adjustments */
+  BALL_ADJUSTMENTS: {
+    /** 1-ball formats */
+    ONE_BALL: number;
+    /** 2-ball formats */
+    TWO_BALL: number;
+    /** 3+ ball formats */
+    THREE_PLUS_BALL: number;
+  };
+  /** Qualifying time component (1% per hour, max 20%) */
+  UNLIMITED_QUALIFYING: {
+    PERCENT_PER_HOUR: number;
+    MAX_BONUS: number;
+    MIN_HOURS_FOR_MULTIPLIER: number;
+  };
+  /** Flip Frenzy grading divisors */
+  FLIP_FRENZY: {
+    THREE_BALL_DIVISOR: number;
+    ONE_BALL_DIVISOR: number;
+  };
+  /** Finals eligibility requirements */
+  FINALS_REQUIREMENTS: {
+    /** Minimum % of participants that must advance to finals */
+    MIN_FINALISTS_PERCENT: number;
+    /** Maximum % of participants that can advance to finals */
+    MAX_FINALISTS_PERCENT: number;
+  };
+}
+
+/**
+ * Event Booster Multipliers Type
+ */
+export interface EventBoosterConstants {
+  /** No booster */
+  NONE: number;
+  /** Certified events (125% = 1.25) */
+  CERTIFIED: number;
+  /** Certified+ events (150% = 1.5) */
+  CERTIFIED_PLUS: number;
+  /** Championship Series events (150% = 1.5) */
+  CHAMPIONSHIP_SERIES: number;
+  /** Major Championships (200% = 2.0) */
+  MAJOR: number;
+}
+
+/**
+ * Point Distribution Constants Type
+ */
+export interface PointDistributionConstants {
+  /** Linear distribution percentage (10%) */
+  LINEAR_PERCENTAGE: number;
+  /** Dynamic distribution percentage (90%) */
+  DYNAMIC_PERCENTAGE: number;
+  /** Dynamic formula exponent for position calculation */
+  POSITION_EXPONENT: number;
+  /** Dynamic formula exponent for final value */
+  VALUE_EXPONENT: number;
+  /** Maximum players for dynamic calculation cap */
+  MAX_DYNAMIC_PLAYERS: number;
+}
+
+/**
+ * Time Decay Constants Type
+ */
+export interface TimeDecayConstants {
+  /** Points worth 100% of value (0-1 years) */
+  YEAR_0_TO_1: number;
+  /** Points worth 75% of value (1-2 years) */
+  YEAR_1_TO_2: number;
+  /** Points worth 50% of value (2-3 years) */
+  YEAR_2_TO_3: number;
+  /** Points worth 0% of value (3+ years) */
+  YEAR_3_PLUS: number;
+  /** Days in a year for calculations */
+  DAYS_PER_YEAR: number;
+}
+
+/**
+ * Player Ranking Constants Type
+ */
+export interface RankingConstants {
+  /** Number of events that count toward player ranking */
+  TOP_EVENTS_COUNT: number;
+  /** Percentile for entry ranking of first-time players */
+  ENTRY_RANKING_PERCENTILE: number;
+}
+
+/**
+ * Rating System Constants (Glicko) Type
+ */
+export interface RatingConstants {
+  /** Default/provisional rating for new players */
+  DEFAULT_RATING: number;
+  /** Minimum rating deviation */
+  MIN_RD: number;
+  /** Maximum rating deviation */
+  MAX_RD: number;
+  /** RD decay rate per day */
+  RD_DECAY_PER_DAY: number;
+  /** Number of players above/below used for rating calculation */
+  OPPONENTS_RANGE: number;
+  /** Glicko system constant (q value) */
+  Q: number;
+}
+
+/**
+ * Tournament Validation Constants Type
+ */
+export interface ValidationConstants {
+  /** Minimum players for a sanctioned event */
+  MIN_PLAYERS: number;
+  /** Minimum private tournament players */
+  MIN_PRIVATE_PLAYERS: number;
+  /** Maximum games per machine per state/round */
+  MAX_GAMES_PER_MACHINE: number;
+  /** Minimum participation percentage for inclusion */
+  MIN_PARTICIPATION_PERCENT: number;
+}

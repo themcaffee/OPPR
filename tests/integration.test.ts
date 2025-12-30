@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   calculateBaseValue,
   calculateRatingTVA,
@@ -10,6 +10,11 @@ import {
   type TGPConfig,
   type PlayerResult,
 } from '../src/index.js';
+import { resetConfig, configureOPPR } from '../src/config.js';
+
+beforeEach(() => {
+  resetConfig();
+});
 
 describe('Full Tournament Calculation Integration', () => {
   it('should calculate complete tournament value and distribute points', () => {
@@ -175,5 +180,66 @@ describe('Full Tournament Calculation Integration', () => {
     const firstPlaceValue = (baseValue + ratingTVA + rankingTVA) * tgp * 1.0;
     expect(firstPlaceValue).toBeGreaterThan(0);
     expect(firstPlaceValue).toBeLessThan(10); // Small local tournament
+  });
+
+  it('should calculate tournament with custom configuration', () => {
+    // 20 player tournament
+    const players: Player[] = Array.from({ length: 20 }, (_, i) => ({
+      id: `${i}`,
+      rating: 1800 - i * 20,
+      ranking: i + 1,
+      isRated: true,
+    }));
+
+    // Configure higher tournament values
+    configureOPPR({
+      BASE_VALUE: {
+        POINTS_PER_PLAYER: 1.0, // Double the base value
+        MAX_BASE_VALUE: 64,
+      },
+      TVA: {
+        RATING: { MAX_VALUE: 50 }, // Double rating TVA
+        RANKING: { MAX_VALUE: 100 }, // Double ranking TVA
+      },
+      TIME_DECAY: {
+        YEAR_1_TO_2: 0.9, // Slower decay
+      },
+    });
+
+    // Calculate with custom config
+    const baseValue = calculateBaseValue(players);
+    expect(baseValue).toBe(20); // 20 players * 1.0 = 20
+
+    const ratingTVA = calculateRatingTVA(players);
+    const rankingTVA = calculateRankingTVA(players);
+
+    const tgpConfig: TGPConfig = {
+      qualifying: {
+        type: 'limited',
+        meaningfulGames: 10,
+      },
+      finals: {
+        formatType: 'match-play',
+        meaningfulGames: 12,
+      },
+    };
+
+    const tgp = calculateTGP(tgpConfig);
+    const firstPlaceValue = (baseValue + ratingTVA + rankingTVA) * tgp;
+
+    // With custom config, should get higher values
+    expect(firstPlaceValue).toBeGreaterThan(20);
+
+    // Distribute points
+    const playerResults: PlayerResult[] = players.map((player, i) => ({
+      player,
+      position: i + 1,
+    }));
+
+    const distribution = distributePoints(playerResults, firstPlaceValue);
+
+    // Verify distribution uses custom config
+    expect(distribution[0].totalPoints).toBeCloseTo(firstPlaceValue, 0); // First place gets ~100%
+    expect(distribution[0].totalPoints).toBeGreaterThan(20);
   });
 });

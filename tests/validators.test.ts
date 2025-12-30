@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   ValidationError,
   validateMinimumPlayers,
@@ -12,7 +12,12 @@ import {
   validateDateNotFuture,
   validatePercentage,
 } from '../src/validators.js';
+import { resetConfig, configureOPPR } from '../src/config.js';
 import type { Player, Tournament, TGPConfig, PlayerResult } from '../src/types.js';
+
+beforeEach(() => {
+  resetConfig();
+});
 
 describe('ValidationError', () => {
   it('should create a ValidationError with correct name and message', () => {
@@ -631,5 +636,148 @@ describe('validatePercentage', () => {
 
   it('should use default field name when not provided', () => {
     expect(() => validatePercentage(101)).toThrow('Percentage must be between 0 and 100 (got 101)');
+  });
+});
+
+describe('Configuration Tests', () => {
+  describe('validateMinimumPlayers with custom config', () => {
+    it('should use custom MIN_PLAYERS', () => {
+      // Default: MIN_PLAYERS = 3
+      expect(() => validateMinimumPlayers(2)).toThrow();
+      expect(() => validateMinimumPlayers(3)).not.toThrow();
+
+      // Custom: MIN_PLAYERS = 5
+      configureOPPR({ VALIDATION: { MIN_PLAYERS: 5 } });
+      expect(() => validateMinimumPlayers(4)).toThrow();
+      expect(() => validateMinimumPlayers(5)).not.toThrow();
+    });
+
+    it('should include custom MIN_PLAYERS in error message', () => {
+      configureOPPR({ VALIDATION: { MIN_PLAYERS: 10 } });
+
+      expect(() => validateMinimumPlayers(9)).toThrow(
+        'Tournament must have at least 10 players (got 9)'
+      );
+    });
+  });
+
+  describe('validatePrivateTournament with custom config', () => {
+    it('should use custom MIN_PRIVATE_PLAYERS', () => {
+      // Default: MIN_PRIVATE_PLAYERS = 16
+      expect(() => validatePrivateTournament(15, true)).toThrow();
+      expect(() => validatePrivateTournament(16, true)).not.toThrow();
+
+      // Custom: MIN_PRIVATE_PLAYERS = 20
+      configureOPPR({ VALIDATION: { MIN_PRIVATE_PLAYERS: 20 } });
+      expect(() => validatePrivateTournament(19, true)).toThrow();
+      expect(() => validatePrivateTournament(20, true)).not.toThrow();
+    });
+
+    it('should not validate public tournaments', () => {
+      configureOPPR({ VALIDATION: { MIN_PRIVATE_PLAYERS: 100 } });
+
+      // Public tournaments should pass even with very few players
+      expect(() => validatePrivateTournament(5, false)).not.toThrow();
+    });
+  });
+
+  describe('validateTGPConfig with custom config', () => {
+    it('should use custom MAX_GAMES_PER_MACHINE', () => {
+      // Default: MAX_GAMES_PER_MACHINE = 3
+      const invalidConfig: TGPConfig = {
+        qualifying: {
+          type: 'limited',
+          meaningfulGames: 40,
+          machineCount: 10, // 40/10 = 4 games per machine (exceeds default 3)
+        },
+        finals: {
+          formatType: 'match-play',
+          meaningfulGames: 10,
+        },
+      };
+
+      expect(() => validateTGPConfig(invalidConfig)).toThrow();
+
+      // Custom: MAX_GAMES_PER_MACHINE = 5
+      configureOPPR({ VALIDATION: { MAX_GAMES_PER_MACHINE: 5 } });
+      expect(() => validateTGPConfig(invalidConfig)).not.toThrow();
+    });
+  });
+
+  describe('validateFinalsRequirements with custom config', () => {
+    it('should use custom MIN_PARTICIPATION_PERCENT for minimum', () => {
+      // Default: MIN_PARTICIPATION_PERCENT = 0.5
+      // Minimum is 10% (0.5 * 0.2 = 0.1)
+      expect(() => validateFinalsRequirements(100, 9)).toThrow();
+      expect(() => validateFinalsRequirements(100, 10)).not.toThrow();
+
+      // Custom: MIN_PARTICIPATION_PERCENT = 1.0
+      // Minimum becomes 20% (1.0 * 0.2 = 0.2)
+      configureOPPR({ VALIDATION: { MIN_PARTICIPATION_PERCENT: 1.0 } });
+      expect(() => validateFinalsRequirements(100, 19)).toThrow();
+      expect(() => validateFinalsRequirements(100, 20)).not.toThrow();
+    });
+
+    it('should use custom MIN_PARTICIPATION_PERCENT for maximum', () => {
+      // Default: MIN_PARTICIPATION_PERCENT = 0.5 (50% maximum)
+      expect(() => validateFinalsRequirements(100, 50)).not.toThrow();
+      expect(() => validateFinalsRequirements(100, 51)).toThrow();
+
+      // Custom: MIN_PARTICIPATION_PERCENT = 0.6 (60% maximum)
+      configureOPPR({ VALIDATION: { MIN_PARTICIPATION_PERCENT: 0.6 } });
+      expect(() => validateFinalsRequirements(100, 60)).not.toThrow();
+      expect(() => validateFinalsRequirements(100, 61)).toThrow();
+    });
+  });
+
+  describe('validateTournament with custom config', () => {
+    it('should use custom MIN_PLAYERS validation', () => {
+      const tgpConfig: TGPConfig = {
+        qualifying: {
+          type: 'none',
+          meaningfulGames: 0,
+        },
+        finals: {
+          formatType: 'match-play',
+          meaningfulGames: 10,
+        },
+      };
+
+      const tournament1: Tournament = {
+        id: 'test',
+        name: 'Test Tournament',
+        date: new Date('2024-01-01'),
+        isPrivate: false,
+        players: Array.from({ length: 4 }, (_, i) => ({
+          id: `${i}`,
+          rating: 1500,
+          ranking: i + 1,
+          isRated: true,
+        })),
+        tgpConfig,
+      };
+
+      // Default: MIN_PLAYERS = 3 (4 players should pass)
+      expect(() => validateTournament(tournament1)).not.toThrow();
+
+      // Custom: MIN_PLAYERS = 5 (4 players should fail)
+      configureOPPR({ VALIDATION: { MIN_PLAYERS: 5 } });
+
+      const tournament2: Tournament = {
+        id: 'test',
+        name: 'Test Tournament',
+        date: new Date('2024-01-01'),
+        isPrivate: false,
+        players: Array.from({ length: 4 }, (_, i) => ({
+          id: `${i}`,
+          rating: 1500,
+          ranking: i + 1,
+          isRated: true,
+        })),
+        tgpConfig,
+      };
+
+      expect(() => validateTournament(tournament2)).toThrow();
+    });
   });
 });

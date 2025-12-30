@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   calculateEventEfficiency,
   calculateOverallEfficiency,
@@ -7,7 +7,12 @@ import {
   analyzeEfficiencyTrend,
   getEfficiencyStats,
 } from '../src/efficiency.js';
+import { resetConfig } from '../src/config.js';
 import type { PlayerEvent, Tournament } from '../src/types.js';
+
+beforeEach(() => {
+  resetConfig();
+});
 
 describe('calculateEventEfficiency', () => {
   it('should calculate efficiency correctly', () => {

@@ -29,18 +29,17 @@ export type {
 // Export CSV parser types
 export type { ParsePlayerCSVOptions, ParsedPlayer } from './csv-parser.js';
 
-// Export all constants
+// Export default constants for reference
+export { DEFAULT_CONSTANTS } from './constants.js';
+
+// Export configuration functions and types
 export {
-  BASE_VALUE,
-  TVA,
-  TGP,
-  EVENT_BOOSTERS,
-  POINT_DISTRIBUTION,
-  TIME_DECAY,
-  RANKING,
-  RATING,
-  VALIDATION,
-} from './constants.js';
+  configureOPPR,
+  resetConfig,
+  getDefaultConfig,
+  type OPPRConfig,
+  type PartialOPPRConfig,
+} from './config.js';
 
 // Export base value functions
 export { calculateBaseValue, countRatedPlayers, isPlayerRated } from './base-value.js';

@@ -1,4 +1,4 @@
-import { VALIDATION } from './constants.js';
+import { getConfig } from './config.js';
 import type { Tournament, Player, TGPConfig, PlayerResult } from './types.js';
 
 /**
@@ -18,9 +18,10 @@ export class ValidationError extends Error {
  * @throws ValidationError if player count is below minimum
  */
 export function validateMinimumPlayers(playerCount: number): void {
-  if (playerCount < VALIDATION.MIN_PLAYERS) {
+  const config = getConfig();
+  if (playerCount < config.VALIDATION.MIN_PLAYERS) {
     throw new ValidationError(
-      `Tournament must have at least ${VALIDATION.MIN_PLAYERS} players (got ${playerCount})`
+      `Tournament must have at least ${config.VALIDATION.MIN_PLAYERS} players (got ${playerCount})`
     );
   }
 }
@@ -33,9 +34,10 @@ export function validateMinimumPlayers(playerCount: number): void {
  * @throws ValidationError if private tournament doesn't meet minimum
  */
 export function validatePrivateTournament(playerCount: number, isPrivate: boolean): void {
-  if (isPrivate && playerCount < VALIDATION.MIN_PRIVATE_PLAYERS) {
+  const config = getConfig();
+  if (isPrivate && playerCount < config.VALIDATION.MIN_PRIVATE_PLAYERS) {
     throw new ValidationError(
-      `Private tournament must have at least ${VALIDATION.MIN_PRIVATE_PLAYERS} players (got ${playerCount})`
+      `Private tournament must have at least ${config.VALIDATION.MIN_PRIVATE_PLAYERS} players (got ${playerCount})`
     );
   }
 }
@@ -121,10 +123,11 @@ export function validateTGPConfig(config: TGPConfig): void {
 
   // Validate that games per machine doesn't exceed max
   if (config.qualifying.machineCount && config.qualifying.machineCount > 0) {
+    const opprConfig = getConfig();
     const gamesPerMachine = config.qualifying.meaningfulGames / config.qualifying.machineCount;
-    if (gamesPerMachine > VALIDATION.MAX_GAMES_PER_MACHINE) {
+    if (gamesPerMachine > opprConfig.VALIDATION.MAX_GAMES_PER_MACHINE) {
       throw new ValidationError(
-        `Cannot exceed ${VALIDATION.MAX_GAMES_PER_MACHINE} games per machine (got ${gamesPerMachine})`
+        `Cannot exceed ${opprConfig.VALIDATION.MAX_GAMES_PER_MACHINE} games per machine (got ${gamesPerMachine})`
       );
     }
   }
@@ -201,16 +204,17 @@ export function validatePlayerResults(results: PlayerResult[]): void {
  * @throws ValidationError if requirements not met
  */
 export function validateFinalsRequirements(totalParticipants: number, finalistCount: number): void {
+  const config = getConfig();
   const percentage = finalistCount / totalParticipants;
 
-  if (percentage < VALIDATION.MIN_PARTICIPATION_PERCENT * 0.2) {
+  if (percentage < config.VALIDATION.MIN_PARTICIPATION_PERCENT * 0.2) {
     // 10% minimum
     throw new ValidationError(
       `Finals must include at least 10% of participants (got ${(percentage * 100).toFixed(1)}%)`
     );
   }
 
-  if (percentage > VALIDATION.MIN_PARTICIPATION_PERCENT) {
+  if (percentage > config.VALIDATION.MIN_PARTICIPATION_PERCENT) {
     // 50% maximum
     throw new ValidationError(
       `Finals cannot include more than 50% of participants (got ${(percentage * 100).toFixed(1)}%)`
