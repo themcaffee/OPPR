@@ -1,4 +1,4 @@
-import { POINT_DISTRIBUTION } from './constants.js';
+import { getConfig } from './config.js';
 import type { PointDistribution, PlayerResult } from './types.js';
 
 /**
@@ -16,9 +16,10 @@ export function calculateLinearPoints(
   playerCount: number,
   firstPlaceValue: number
 ): number {
+  const config = getConfig();
   return (
     (playerCount + 1 - position) *
-    POINT_DISTRIBUTION.LINEAR_PERCENTAGE *
+    config.POINT_DISTRIBUTION.LINEAR_PERCENTAGE *
     (firstPlaceValue / playerCount)
   );
 }
@@ -40,8 +41,9 @@ export function calculateDynamicPoints(
   ratedPlayerCount: number,
   firstPlaceValue: number
 ): number {
+  const config = getConfig();
   // Dynamic distribution only applies to top half of rated players, capped at 64
-  const dynamicCap = Math.min(ratedPlayerCount / 2, POINT_DISTRIBUTION.MAX_DYNAMIC_PLAYERS);
+  const dynamicCap = Math.min(ratedPlayerCount / 2, config.POINT_DISTRIBUTION.MAX_DYNAMIC_PLAYERS);
 
   // Players finishing outside the dynamic range get 0 dynamic points
   if (position - 1 >= dynamicCap) {
@@ -53,11 +55,11 @@ export function calculateDynamicPoints(
 
   // Apply exponential decay formula
   const decayFactor = Math.pow(
-    1 - Math.pow(positionRatio, POINT_DISTRIBUTION.POSITION_EXPONENT),
-    POINT_DISTRIBUTION.VALUE_EXPONENT
+    1 - Math.pow(positionRatio, config.POINT_DISTRIBUTION.POSITION_EXPONENT),
+    config.POINT_DISTRIBUTION.VALUE_EXPONENT
   );
 
-  return decayFactor * POINT_DISTRIBUTION.DYNAMIC_PERCENTAGE * firstPlaceValue;
+  return decayFactor * config.POINT_DISTRIBUTION.DYNAMIC_PERCENTAGE * firstPlaceValue;
 }
 
 /**

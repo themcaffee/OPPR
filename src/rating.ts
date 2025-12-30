@@ -1,4 +1,4 @@
-import { RATING } from './constants.js';
+import { getConfig } from './config.js';
 import type { RatingUpdate, RatingResult, PlayerResult } from './types.js';
 
 /**
@@ -10,7 +10,8 @@ import type { RatingUpdate, RatingResult, PlayerResult } from './types.js';
  * @returns g(RD) value
  */
 function calculateG(rd: number): number {
-  const qSquared = RATING.Q * RATING.Q;
+  const config = getConfig();
+  const qSquared = config.RATING.Q * config.RATING.Q;
   const rdSquared = rd * rd;
   return 1 / Math.sqrt(1 + (3 * qSquared * rdSquared) / (Math.PI * Math.PI));
 }
@@ -48,7 +49,8 @@ function calculateDSquared(
   results: Array<{ opponentRating: number; opponentRD: number }>,
   rating: number
 ): number {
-  const qSquared = RATING.Q * RATING.Q;
+  const config = getConfig();
+  const qSquared = config.RATING.Q * config.RATING.Q;
 
   const sum = results.reduce((total, result) => {
     const g = calculateG(result.opponentRD);
@@ -85,6 +87,7 @@ function calculateDSquared(
  * ```
  */
 export function updateRating(update: RatingUpdate): RatingResult {
+  const config = getConfig();
   const { currentRating, currentRD, results } = update;
 
   // If no results, return current values (no change)
@@ -106,7 +109,7 @@ export function updateRating(update: RatingUpdate): RatingResult {
   }, 0);
 
   // Calculate new rating
-  const qSquared = RATING.Q * RATING.Q;
+  const qSquared = config.RATING.Q * config.RATING.Q;
   const newRating = currentRating + (qSquared / (1 / (currentRD * currentRD) + 1 / dSquared)) * sum;
 
   // Calculate new RD
@@ -114,7 +117,7 @@ export function updateRating(update: RatingUpdate): RatingResult {
 
   return {
     newRating: Math.round(newRating * 100) / 100, // Round to 2 decimal places
-    newRD: Math.max(RATING.MIN_RD, Math.min(newRD, RATING.MAX_RD)),
+    newRD: Math.max(config.RATING.MIN_RD, Math.min(newRD, config.RATING.MAX_RD)),
   };
 }
 
@@ -128,8 +131,9 @@ export function updateRating(update: RatingUpdate): RatingResult {
  * @returns New RD value after decay
  */
 export function applyRDDecay(currentRD: number, daysSinceLastEvent: number): number {
-  const newRD = currentRD + daysSinceLastEvent * RATING.RD_DECAY_PER_DAY;
-  return Math.min(newRD, RATING.MAX_RD);
+  const config = getConfig();
+  const newRD = currentRD + daysSinceLastEvent * config.RATING.RD_DECAY_PER_DAY;
+  return Math.min(newRD, config.RATING.MAX_RD);
 }
 
 /**
@@ -161,6 +165,7 @@ export function simulateTournamentMatches(
   playerPosition: number,
   allResults: PlayerResult[]
 ): Array<{ opponentRating: number; opponentRD: number; score: number }> {
+  const config = getConfig();
   const matches: Array<{ opponentRating: number; opponentRD: number; score: number }> = [];
 
   // Sort results by position
@@ -172,8 +177,8 @@ export function simulateTournamentMatches(
   if (playerIndex === -1) return matches;
 
   // Get opponents within range (32 above and 32 below)
-  const startIndex = Math.max(0, playerIndex - RATING.OPPONENTS_RANGE);
-  const endIndex = Math.min(sortedResults.length, playerIndex + RATING.OPPONENTS_RANGE + 1);
+  const startIndex = Math.max(0, playerIndex - config.RATING.OPPONENTS_RANGE);
+  const endIndex = Math.min(sortedResults.length, playerIndex + config.RATING.OPPONENTS_RANGE + 1);
 
   for (let i = startIndex; i < endIndex; i++) {
     if (i === playerIndex) continue; // Skip self
@@ -193,7 +198,7 @@ export function simulateTournamentMatches(
 
     matches.push({
       opponentRating: opponent.rating,
-      opponentRD: opponent.ratingDeviation ?? RATING.DEFAULT_RATING,
+      opponentRD: opponent.ratingDeviation ?? config.RATING.DEFAULT_RATING,
       score,
     });
   }
@@ -207,9 +212,10 @@ export function simulateTournamentMatches(
  * @returns Player rating object with default values
  */
 export function createNewPlayerRating(): { rating: number; rd: number } {
+  const config = getConfig();
   return {
-    rating: RATING.DEFAULT_RATING,
-    rd: RATING.MAX_RD,
+    rating: config.RATING.DEFAULT_RATING,
+    rd: config.RATING.MAX_RD,
   };
 }
 

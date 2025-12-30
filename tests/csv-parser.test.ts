@@ -1,6 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { parsePlayerCSV, ValidationError } from '../src/index.js';
+import { resetConfig } from '../src/config.js';
 import type { ParsePlayerCSVOptions } from '../src/index.js';
+
+beforeEach(() => {
+  resetConfig();
+});
 
 describe('parsePlayerCSV', () => {
   const validCSV = `"Name","ID","Rank","Rating","Base points","Rating points","Rank points","Points"

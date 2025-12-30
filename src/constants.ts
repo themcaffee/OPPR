@@ -2,10 +2,12 @@
  * Constants for OPPR calculations based on the ranking system rules
  */
 
+import type { OPPRConfig } from './config.js';
+
 /**
  * Base Value Constants
  */
-export const BASE_VALUE = {
+const BASE_VALUE = {
   /** Points per rated player */
   POINTS_PER_PLAYER: 0.5,
   /** Maximum base value (achieved at 64+ rated players) */
@@ -14,12 +16,12 @@ export const BASE_VALUE = {
   MAX_PLAYER_COUNT: 64,
   /** Minimum events to become a rated player */
   RATED_PLAYER_THRESHOLD: 5,
-} as const;
+};
 
 /**
  * Tournament Value Adjustment (TVA) Constants
  */
-export const TVA = {
+const TVA = {
   /** Rating-based TVA formula constants */
   RATING: {
     /** Maximum TVA points from ratings */
@@ -44,12 +46,12 @@ export const TVA = {
   },
   /** Maximum players considered for TVA calculation */
   MAX_PLAYERS_CONSIDERED: 64,
-} as const;
+};
 
 /**
  * Tournament Grading Percentage (TGP) Constants
  */
-export const TGP = {
+const TGP = {
   /** Base TGP percentage per meaningful game (4% = 0.04) */
   BASE_GAME_VALUE: 0.04,
   /** Maximum TGP for events without separate qualifying and finals */
@@ -98,12 +100,12 @@ export const TGP = {
     /** Maximum % of participants that can advance to finals */
     MAX_FINALISTS_PERCENT: 0.5,
   },
-} as const;
+};
 
 /**
  * Event Booster Multipliers
  */
-export const EVENT_BOOSTERS = {
+const EVENT_BOOSTERS = {
   /** No booster */
   NONE: 1.0,
   /** Certified events (125% = 1.25) */
@@ -114,12 +116,12 @@ export const EVENT_BOOSTERS = {
   CHAMPIONSHIP_SERIES: 1.5,
   /** Major Championships (200% = 2.0) */
   MAJOR: 2.0,
-} as const;
+};
 
 /**
  * Point Distribution Constants
  */
-export const POINT_DISTRIBUTION = {
+const POINT_DISTRIBUTION = {
   /** Linear distribution percentage (10%) */
   LINEAR_PERCENTAGE: 0.1,
   /** Dynamic distribution percentage (90%) */
@@ -130,12 +132,12 @@ export const POINT_DISTRIBUTION = {
   VALUE_EXPONENT: 3,
   /** Maximum players for dynamic calculation cap */
   MAX_DYNAMIC_PLAYERS: 64,
-} as const;
+};
 
 /**
  * Time Decay Constants
  */
-export const TIME_DECAY = {
+const TIME_DECAY = {
   /** Points worth 100% of value (0-1 years) */
   YEAR_0_TO_1: 1.0,
   /** Points worth 75% of value (1-2 years) */
@@ -146,22 +148,22 @@ export const TIME_DECAY = {
   YEAR_3_PLUS: 0.0,
   /** Days in a year for calculations */
   DAYS_PER_YEAR: 365,
-} as const;
+};
 
 /**
  * Player Ranking Constants
  */
-export const RANKING = {
+const RANKING = {
   /** Number of events that count toward player ranking */
   TOP_EVENTS_COUNT: 15,
   /** Percentile for entry ranking of first-time players */
   ENTRY_RANKING_PERCENTILE: 0.1,
-} as const;
+};
 
 /**
  * Rating System Constants (Glicko)
  */
-export const RATING = {
+const RATING = {
   /** Default/provisional rating for new players */
   DEFAULT_RATING: 1300,
   /** Minimum rating deviation */
@@ -174,12 +176,12 @@ export const RATING = {
   OPPONENTS_RANGE: 32,
   /** Glicko system constant (q value) */
   Q: Math.LN10 / 400,
-} as const;
+};
 
 /**
  * Tournament Validation Constants
  */
-export const VALIDATION = {
+const VALIDATION = {
   /** Minimum players for a sanctioned event */
   MIN_PLAYERS: 3,
   /** Minimum private tournament players */
@@ -188,4 +190,20 @@ export const VALIDATION = {
   MAX_GAMES_PER_MACHINE: 3,
   /** Minimum participation percentage for inclusion */
   MIN_PARTICIPATION_PERCENT: 0.5,
-} as const;
+};
+
+/**
+ * Default OPPR configuration with all constant groups
+ * These are the original OPPR calculation constants
+ */
+export const DEFAULT_CONSTANTS: OPPRConfig = {
+  BASE_VALUE,
+  TVA,
+  TGP,
+  EVENT_BOOSTERS,
+  POINT_DISTRIBUTION,
+  TIME_DECAY,
+  RANKING,
+  RATING,
+  VALIDATION,
+};

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   updateRating,
   applyRDDecay,
@@ -6,8 +6,14 @@ import {
   createNewPlayerRating,
   isProvisionalRating,
 } from '../src/rating.js';
+import { resetConfig } from '../src/config.js';
 import type { RatingUpdate, PlayerResult, Player } from '../src/types.js';
-import { RATING } from '../src/constants.js';
+import { DEFAULT_CONSTANTS } from '../src/constants.js';
+const RATING = DEFAULT_CONSTANTS.RATING;
+
+beforeEach(() => {
+  resetConfig();
+});
 
 describe('updateRating', () => {
   it('should return unchanged rating when no results', () => {

@@ -1,4 +1,4 @@
-import { EVENT_BOOSTERS } from './constants.js';
+import { getConfig } from './config.js';
 import type { EventBoosterType } from './types.js';
 
 /**
@@ -23,18 +23,19 @@ import type { EventBoosterType } from './types.js';
  * ```
  */
 export function getEventBoosterMultiplier(boosterType: EventBoosterType): number {
+  const config = getConfig();
   switch (boosterType) {
     case 'major':
-      return EVENT_BOOSTERS.MAJOR;
+      return config.EVENT_BOOSTERS.MAJOR;
     case 'championship-series':
-      return EVENT_BOOSTERS.CHAMPIONSHIP_SERIES;
+      return config.EVENT_BOOSTERS.CHAMPIONSHIP_SERIES;
     case 'certified-plus':
-      return EVENT_BOOSTERS.CERTIFIED_PLUS;
+      return config.EVENT_BOOSTERS.CERTIFIED_PLUS;
     case 'certified':
-      return EVENT_BOOSTERS.CERTIFIED;
+      return config.EVENT_BOOSTERS.CERTIFIED;
     case 'none':
     default:
-      return EVENT_BOOSTERS.NONE;
+      return config.EVENT_BOOSTERS.NONE;
   }
 }
 

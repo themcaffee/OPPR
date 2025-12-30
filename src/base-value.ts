@@ -1,4 +1,4 @@
-import { BASE_VALUE } from './constants.js';
+import { getConfig } from './config.js';
 import type { Player } from './types.js';
 
 /**
@@ -21,14 +21,15 @@ import type { Player } from './types.js';
  * ```
  */
 export function calculateBaseValue(players: Player[]): number {
+  const config = getConfig();
   // Count only rated players
   const ratedPlayerCount = players.filter((player) => player.isRated).length;
 
   // Calculate base value: 0.5 per rated player
-  const baseValue = ratedPlayerCount * BASE_VALUE.POINTS_PER_PLAYER;
+  const baseValue = ratedPlayerCount * config.BASE_VALUE.POINTS_PER_PLAYER;
 
   // Cap at maximum base value (32 points for 64+ players)
-  return Math.min(baseValue, BASE_VALUE.MAX_BASE_VALUE);
+  return Math.min(baseValue, config.BASE_VALUE.MAX_BASE_VALUE);
 }
 
 /**
@@ -48,5 +49,6 @@ export function countRatedPlayers(players: Player[]): number {
  * @returns True if player has participated in 5 or more events
  */
 export function isPlayerRated(eventCount: number): boolean {
-  return eventCount >= BASE_VALUE.RATED_PLAYER_THRESHOLD;
+  const config = getConfig();
+  return eventCount >= config.BASE_VALUE.RATED_PLAYER_THRESHOLD;
 }

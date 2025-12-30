@@ -1,4 +1,4 @@
-import { TGP } from './constants.js';
+import { getConfig } from './config.js';
 import type { TGPConfig } from './types.js';
 
 /**
@@ -8,6 +8,7 @@ import type { TGPConfig } from './types.js';
  * @returns TGP percentage contribution from qualifying (0.0 - 2.0)
  */
 export function calculateQualifyingTGP(config: TGPConfig): number {
+  const constants = getConfig();
   const { qualifying } = config;
   let tgp = 0;
 
@@ -17,28 +18,28 @@ export function calculateQualifyingTGP(config: TGPConfig): number {
   }
 
   // Base meaningful games value
-  let gameValue = TGP.BASE_GAME_VALUE;
+  let gameValue = constants.TGP.BASE_GAME_VALUE;
 
   // Apply multipliers based on format type
   if (
     qualifying.type === 'unlimited' &&
     qualifying.hours &&
-    qualifying.hours >= TGP.UNLIMITED_QUALIFYING.MIN_HOURS_FOR_MULTIPLIER
+    qualifying.hours >= constants.TGP.UNLIMITED_QUALIFYING.MIN_HOURS_FOR_MULTIPLIER
   ) {
     // Unlimited Best Game: 2X (8% per game)
     // Note: Card qualifying uses different multiplier
-    gameValue = TGP.BASE_GAME_VALUE * TGP.MULTIPLIERS.UNLIMITED_BEST_GAME;
+    gameValue = constants.TGP.BASE_GAME_VALUE * constants.TGP.MULTIPLIERS.UNLIMITED_BEST_GAME;
   } else if (qualifying.type === 'hybrid') {
     // Hybrid Best Game: 3X (12% per game)
-    gameValue = TGP.BASE_GAME_VALUE * TGP.MULTIPLIERS.HYBRID_BEST_GAME;
+    gameValue = constants.TGP.BASE_GAME_VALUE * constants.TGP.MULTIPLIERS.HYBRID_BEST_GAME;
   }
 
   // Apply group size multipliers (if applicable and not multi-matchplay)
   if (!qualifying.multiMatchplay) {
     if (qualifying.fourPlayerGroups) {
-      gameValue *= TGP.MULTIPLIERS.FOUR_PLAYER_GROUPS;
+      gameValue *= constants.TGP.MULTIPLIERS.FOUR_PLAYER_GROUPS;
     } else if (qualifying.threePlayerGroups) {
-      gameValue *= TGP.MULTIPLIERS.THREE_PLAYER_GROUPS;
+      gameValue *= constants.TGP.MULTIPLIERS.THREE_PLAYER_GROUPS;
     }
   }
 
@@ -51,8 +52,8 @@ export function calculateQualifyingTGP(config: TGPConfig): number {
   // Add time component for unlimited qualifying (1% per hour, max 20%)
   if (qualifying.type === 'unlimited' && qualifying.hours) {
     const timeBonus = Math.min(
-      qualifying.hours * TGP.UNLIMITED_QUALIFYING.PERCENT_PER_HOUR,
-      TGP.UNLIMITED_QUALIFYING.MAX_BONUS
+      qualifying.hours * constants.TGP.UNLIMITED_QUALIFYING.PERCENT_PER_HOUR,
+      constants.TGP.UNLIMITED_QUALIFYING.MAX_BONUS
     );
     tgp += timeBonus;
   }
@@ -67,6 +68,7 @@ export function calculateQualifyingTGP(config: TGPConfig): number {
  * @returns TGP percentage contribution from finals (0.0 - 2.0)
  */
 export function calculateFinalsTGP(config: TGPConfig): number {
+  const constants = getConfig();
   const { finals } = config;
 
   // No TGP from finals if format type is 'none'
@@ -74,14 +76,14 @@ export function calculateFinalsTGP(config: TGPConfig): number {
     return 0;
   }
 
-  let gameValue = TGP.BASE_GAME_VALUE;
+  let gameValue = constants.TGP.BASE_GAME_VALUE;
 
   // Apply group size multipliers for PAPA-style formats (not multi-matchplay)
   if (!finals.multiMatchplay) {
     if (finals.fourPlayerGroups) {
-      gameValue *= TGP.MULTIPLIERS.FOUR_PLAYER_GROUPS;
+      gameValue *= constants.TGP.MULTIPLIERS.FOUR_PLAYER_GROUPS;
     } else if (finals.threePlayerGroups) {
-      gameValue *= TGP.MULTIPLIERS.THREE_PLAYER_GROUPS;
+      gameValue *= constants.TGP.MULTIPLIERS.THREE_PLAYER_GROUPS;
     }
   }
 
@@ -122,6 +124,7 @@ export function calculateFinalsTGP(config: TGPConfig): number {
  * ```
  */
 export function calculateTGP(config: TGPConfig): number {
+  const constants = getConfig();
   const qualifyingTGP = calculateQualifyingTGP(config);
   const finalsTGP = calculateFinalsTGP(config);
 
@@ -133,7 +136,7 @@ export function calculateTGP(config: TGPConfig): number {
   const hasSeparateFinals =
     config.finals.formatType !== 'none' && config.finals.meaningfulGames > 0;
   const maxTGP =
-    hasSeparateQualifying && hasSeparateFinals ? TGP.MAX_WITH_FINALS : TGP.MAX_WITHOUT_FINALS;
+    hasSeparateQualifying && hasSeparateFinals ? constants.TGP.MAX_WITH_FINALS : constants.TGP.MAX_WITHOUT_FINALS;
 
   // Cap at maximum
   totalTGP = Math.min(totalTGP, maxTGP);
@@ -155,6 +158,7 @@ export function calculateUnlimitedCardTGP(
   hours: number,
   finalsGames: number
 ): number {
+  const constants = getConfig();
   const config: TGPConfig = {
     qualifying: {
       type: 'unlimited',
@@ -169,22 +173,23 @@ export function calculateUnlimitedCardTGP(
 
   // For card qualifying, override the game value calculation
   let qualifyingTGP = 0;
-  if (hours >= TGP.UNLIMITED_QUALIFYING.MIN_HOURS_FOR_MULTIPLIER) {
+  if (hours >= constants.TGP.UNLIMITED_QUALIFYING.MIN_HOURS_FOR_MULTIPLIER) {
     // 4X multiplier for card qualifying (16% per game)
-    qualifyingTGP = meaningfulGames * TGP.BASE_GAME_VALUE * TGP.MULTIPLIERS.UNLIMITED_CARD;
+    qualifyingTGP =
+      meaningfulGames * constants.TGP.BASE_GAME_VALUE * constants.TGP.MULTIPLIERS.UNLIMITED_CARD;
   } else {
-    qualifyingTGP = meaningfulGames * TGP.BASE_GAME_VALUE;
+    qualifyingTGP = meaningfulGames * constants.TGP.BASE_GAME_VALUE;
   }
 
   // Add time bonus
   const timeBonus = Math.min(
-    hours * TGP.UNLIMITED_QUALIFYING.PERCENT_PER_HOUR,
-    TGP.UNLIMITED_QUALIFYING.MAX_BONUS
+    hours * constants.TGP.UNLIMITED_QUALIFYING.PERCENT_PER_HOUR,
+    constants.TGP.UNLIMITED_QUALIFYING.MAX_BONUS
   );
   qualifyingTGP += timeBonus;
 
   const finalsTGP = calculateFinalsTGP(config);
-  const totalTGP = Math.min(qualifyingTGP + finalsTGP, TGP.MAX_WITH_FINALS);
+  const totalTGP = Math.min(qualifyingTGP + finalsTGP, constants.TGP.MAX_WITH_FINALS);
 
   return totalTGP;
 }
@@ -198,12 +203,15 @@ export function calculateUnlimitedCardTGP(
  * @returns TGP value
  */
 export function calculateFlipFrenzyTGP(averageMatches: number, isOneBall = false): number {
-  const divisor = isOneBall ? TGP.FLIP_FRENZY.ONE_BALL_DIVISOR : TGP.FLIP_FRENZY.THREE_BALL_DIVISOR;
+  const constants = getConfig();
+  const divisor = isOneBall
+    ? constants.TGP.FLIP_FRENZY.ONE_BALL_DIVISOR
+    : constants.TGP.FLIP_FRENZY.THREE_BALL_DIVISOR;
   const meaningfulGames = averageMatches / divisor;
 
-  const tgp = meaningfulGames * TGP.BASE_GAME_VALUE;
+  const tgp = meaningfulGames * constants.TGP.BASE_GAME_VALUE;
 
-  return Math.min(tgp, TGP.MAX_WITHOUT_FINALS);
+  return Math.min(tgp, constants.TGP.MAX_WITHOUT_FINALS);
 }
 
 /**
@@ -222,10 +230,11 @@ export function validateFinalsEligibility(
   totalParticipants: number,
   finalistCount: number
 ): boolean {
+  const constants = getConfig();
   const finalistPercentage = finalistCount / totalParticipants;
 
   return (
-    finalistPercentage >= TGP.FINALS_REQUIREMENTS.MIN_FINALISTS_PERCENT &&
-    finalistPercentage <= TGP.FINALS_REQUIREMENTS.MAX_FINALISTS_PERCENT
+    finalistPercentage >= constants.TGP.FINALS_REQUIREMENTS.MIN_FINALISTS_PERCENT &&
+    finalistPercentage <= constants.TGP.FINALS_REQUIREMENTS.MAX_FINALISTS_PERCENT
   );
 }

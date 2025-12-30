@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   calculateQualifyingTGP,
   calculateFinalsTGP,
@@ -7,8 +7,14 @@ import {
   calculateFlipFrenzyTGP,
   validateFinalsEligibility,
 } from '../src/tgp.js';
+import { resetConfig } from '../src/config.js';
 import type { TGPConfig } from '../src/types.js';
-import { TGP } from '../src/constants.js';
+import { DEFAULT_CONSTANTS } from '../src/constants.js';
+const TGP = DEFAULT_CONSTANTS.TGP;
+
+beforeEach(() => {
+  resetConfig();
+});
 
 describe('calculateQualifyingTGP', () => {
   it('should return 0 for no qualifying', () => {

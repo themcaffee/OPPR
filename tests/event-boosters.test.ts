@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   getEventBoosterMultiplier,
   qualifiesForCertified,
@@ -6,7 +6,13 @@ import {
   determineEventBooster,
   applyEventBooster,
 } from '../src/event-boosters.js';
-import { EVENT_BOOSTERS } from '../src/constants.js';
+import { resetConfig } from '../src/config.js';
+import { DEFAULT_CONSTANTS } from '../src/constants.js';
+const EVENT_BOOSTERS = DEFAULT_CONSTANTS.EVENT_BOOSTERS;
+
+beforeEach(() => {
+  resetConfig();
+});
 
 describe('getEventBoosterMultiplier', () => {
   it('should return correct multiplier for none', () => {
