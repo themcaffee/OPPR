@@ -91,6 +91,28 @@ function NumberInput({
   );
 }
 
+interface ReadOnlyValueProps {
+  label: string;
+  value: number | string;
+  description: string;
+}
+
+function ReadOnlyValue({ label, value, description }: ReadOnlyValueProps) {
+  const displayValue = typeof value === 'number' ? value.toFixed(6).replace(/\.?0+$/, '') : value;
+
+  return (
+    <div className="flex flex-col space-y-1">
+      <div className="flex items-center justify-between">
+        <label className="text-sm font-medium text-gray-700">{label}</label>
+        <div className="px-3 py-1.5 bg-gray-100 border border-gray-200 rounded text-gray-700 w-32 text-right font-mono text-sm">
+          {displayValue}
+        </div>
+      </div>
+      <p className="text-xs text-gray-600">{description}</p>
+    </div>
+  );
+}
+
 export function ConfigurationPanel() {
   const {
     config,
@@ -542,15 +564,118 @@ export function ConfigurationPanel() {
             Note: Only events within the active time window (0-3 years) are considered
           </div>
         </ConfigSection>
-      </div>
 
-      {/* Footer Info */}
-      <div className="px-6 py-3 border-t border-gray-200 bg-gray-50">
-        <p className="text-xs text-gray-600">
-          <strong>Auto-calculated values:</strong> Points per player (0.5), base game value (0.04),
-          perfect rating (2000), TVA coefficients, max player count, and max games for 200% TGP are
-          automatically calculated from the core parameters above.
-        </p>
+        {/* Computed Values */}
+        <ConfigSection
+          title="Computed Values"
+          description="Auto-calculated constants and derived values (read-only)"
+        >
+          <div className="mb-4 px-4 py-3 bg-blue-50 border border-blue-200 rounded">
+            <p className="text-xs text-gray-700">
+              <strong>Note:</strong> These values are automatically calculated from the editable parameters above.
+              Fixed constants define core system behavior, while derived values are computed based on your configuration.
+            </p>
+          </div>
+
+          {/* Fixed Constants */}
+          <div className="space-y-4">
+            <div className="text-sm font-semibold text-gray-900 border-b border-gray-300 pb-1">
+              Fixed Constants
+            </div>
+            <ReadOnlyValue
+              label="Points Per Player"
+              value={0.5}
+              description="Base points awarded per player in event (constant)"
+            />
+            <ReadOnlyValue
+              label="Base Game Value"
+              value={0.04}
+              description="TGP value per game played (constant)"
+            />
+            <ReadOnlyValue
+              label="Perfect Rating"
+              value={2000}
+              description="Maximum player rating value (constant)"
+            />
+            <ReadOnlyValue
+              label="Rated Player Threshold"
+              value={5}
+              description="Minimum players needed for rating-based TVA (constant)"
+            />
+            <ReadOnlyValue
+              label="Three+ Ball Multiplier"
+              value={1}
+              description="Ball count multiplier for 3+ balls (constant)"
+            />
+            <ReadOnlyValue
+              label="None Booster"
+              value={1}
+              description="Event booster for non-certified events (constant)"
+            />
+            <ReadOnlyValue
+              label="Year 0-1 Decay"
+              value={1}
+              description="Events 0-1 years old retain 100% value (constant)"
+            />
+            <ReadOnlyValue
+              label="Year 3+ Decay"
+              value={0}
+              description="Events 3+ years old have expired (constant)"
+            />
+            <ReadOnlyValue
+              label="Days Per Year"
+              value={365}
+              description="Days used for time decay calculations (constant)"
+            />
+            <ReadOnlyValue
+              label="Q Constant"
+              value={Math.LN10 / 400}
+              description="Elo-style rating calculation constant (ln(10)/400)"
+            />
+          </div>
+
+          {/* Derived Values */}
+          <div className="space-y-4 mt-6">
+            <div className="text-sm font-semibold text-gray-900 border-b border-gray-300 pb-1">
+              Derived Values
+            </div>
+            <ReadOnlyValue
+              label="Max Player Count"
+              value={config.BASE_VALUE.MAX_PLAYER_COUNT}
+              description="Maximum players for max base value (MAX_BASE_VALUE / 0.5)"
+            />
+            <ReadOnlyValue
+              label="Max Games for 200% TGP"
+              value={config.TGP.MAX_GAMES_FOR_200_PERCENT}
+              description="Games needed to reach max TGP with finals (MAX_WITH_FINALS / 0.04)"
+            />
+            <ReadOnlyValue
+              label="TVA Rating: Coefficient"
+              value={config.TVA.RATING.COEFFICIENT}
+              description="Coefficient for converting player ratings to TVA points"
+            />
+            <ReadOnlyValue
+              label="TVA Rating: Offset"
+              value={config.TVA.RATING.OFFSET}
+              description="Offset adjustment for rating-based TVA calculation"
+            />
+            <ReadOnlyValue
+              label="TVA Rating: Min Effective Rating"
+              value={config.TVA.RATING.MIN_EFFECTIVE_RATING}
+              description="Minimum rating that contributes to TVA (64.3% of perfect)"
+            />
+            <ReadOnlyValue
+              label="TVA Ranking: Coefficient"
+              value={config.TVA.RANKING.COEFFICIENT}
+              description="Coefficient for converting player rankings to TVA points"
+            />
+            <ReadOnlyValue
+              label="TVA Ranking: Offset"
+              value={config.TVA.RANKING.OFFSET}
+              description="Offset adjustment for ranking-based TVA calculation"
+            />
+          </div>
+        </ConfigSection>
       </div>
     </div>
   );
