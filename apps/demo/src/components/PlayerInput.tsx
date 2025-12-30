@@ -31,7 +31,7 @@ export function PlayerInput({ players, onPlayersChange }: PlayerInputProps) {
     onPlayersChange(players.filter((p) => p.id !== id));
   };
 
-  const handleUpdatePlayer = (id: string, field: keyof PlayerWithName, value: any) => {
+  const handleUpdatePlayer = (id: string, field: keyof PlayerWithName, value: string | number | boolean) => {
     onPlayersChange(
       players.map((p) =>
         p.id === id
@@ -39,7 +39,7 @@ export function PlayerInput({ players, onPlayersChange }: PlayerInputProps) {
               ...p,
               [field]: value,
               // Auto-update isRated based on eventCount
-              ...(field === 'eventCount' ? { isRated: value >= 5 } : {}),
+              ...(field === 'eventCount' ? { isRated: (value as number) >= 5 } : {}),
             }
           : p
       )
