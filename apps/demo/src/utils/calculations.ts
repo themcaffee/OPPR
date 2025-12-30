@@ -1,4 +1,4 @@
-import type { Player, TGPConfig, PointDistribution } from 'oppr';
+import type { Player, TGPConfig, PointDistribution } from '@oppr/core';
 import {
   calculateBaseValue,
   calculateRatingTVA,
@@ -9,7 +9,7 @@ import {
   updateRating,
   simulateTournamentMatches,
   type RatingUpdate,
-} from 'oppr';
+} from '@oppr/core';
 
 export interface TournamentCalculation {
   baseValue: number;

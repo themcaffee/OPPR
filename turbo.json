@@ -1,0 +1,53 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["**/.env"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "tsconfig.json", "package.json"],
+      "outputs": ["dist/**", ".next/**", ".vite/**"]
+    },
+    "test": {
+      "dependsOn": ["build"],
+      "inputs": ["src/**", "tests/**", "vitest.config.ts", "tsconfig.json"],
+      "outputs": ["coverage/**"]
+    },
+    "test:watch": {
+      "cache": false,
+      "persistent": true
+    },
+    "test:coverage": {
+      "dependsOn": ["build"],
+      "inputs": ["src/**", "tests/**", "vitest.config.ts", "tsconfig.json"],
+      "outputs": ["coverage/**"]
+    },
+    "lint": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "tests/**", "*.ts", "*.tsx", "eslint.config.js", ".eslintrc*"]
+    },
+    "lint:fix": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "tests/**", "*.ts", "*.tsx", "eslint.config.js", ".eslintrc*"],
+      "cache": false
+    },
+    "typecheck": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "tests/**", "*.ts", "*.tsx", "tsconfig.json"]
+    },
+    "format": {
+      "inputs": ["src/**", "tests/**", "*.ts", "*.tsx", ".prettierrc"],
+      "cache": false
+    },
+    "format:check": {
+      "inputs": ["src/**", "tests/**", "*.ts", "*.tsx", ".prettierrc"]
+    },
+    "dev": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
+    },
+    "clean": {
+      "cache": false
+    }
+  }
+}

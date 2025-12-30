@@ -18,15 +18,20 @@ jobs:
         with:
           fetch-depth: 0 # Full git history for provenance
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Extract version from tag
         id: extract_version
@@ -45,25 +50,29 @@ jobs:
           echo "Extracted version: $VERSION"
 
       - name: Update package.json version
+        working-directory: packages/core
         run: |
-          npm version ${{ steps.extract_version.outputs.version }} --no-git-tag-version
+          pnpm version ${{ steps.extract_version.outputs.version }} --no-git-tag-version
           echo "Updated package.json to version ${{ steps.extract_version.outputs.version }}"
 
       - name: Run quality checks and build
-        run: npm run prepublishOnly
+        working-directory: packages/core
+        run: pnpm run prepublishOnly
 
       - name: Dry-run publish
+        working-directory: packages/core
         run: |
-          echo "Running npm publish --dry-run to validate package..."
-          npm publish --dry-run
+          echo "Running pnpm publish --dry-run to validate package..."
+          pnpm publish --dry-run --no-git-checks
           echo "Dry-run completed successfully!"
 
       - name: Publish to npm with provenance
-        run: npm publish --provenance --access public
+        working-directory: packages/core
+        run: pnpm publish --provenance --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
       - name: Report success
         run: |
-          echo "✅ Successfully published oppr@${{ steps.extract_version.outputs.version }} to npm!"
-          echo "Package URL: https://www.npmjs.com/package/oppr/v/${{ steps.extract_version.outputs.version }}"
+          echo "✅ Successfully published @oppr/core@${{ steps.extract_version.outputs.version }} to npm!"
+          echo "Package URL: https://www.npmjs.com/package/@oppr/core/v/${{ steps.extract_version.outputs.version }}"

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { PlayerWithName } from '../utils/calculations';
 import { exampleTournaments, generatePlayerNames } from '../data/examples';
-import { parsePlayerCSV, ValidationError } from 'oppr';
+import { parsePlayerCSV, ValidationError } from '@oppr/core';
 
 interface PlayerInputProps {
   players: PlayerWithName[];

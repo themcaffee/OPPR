@@ -1,4 +1,4 @@
-import type { TGPConfig } from 'oppr';
+import type { TGPConfig } from '@oppr/core';
 
 interface TournamentConfigProps {
   tgpConfig: TGPConfig;

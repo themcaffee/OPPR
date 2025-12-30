@@ -10,8 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@oppr/core": "workspace:*",
     "@tanstack/react-table": "^8.21.3",
-    "oppr": "file:..",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "recharts": "^3.6.0"
