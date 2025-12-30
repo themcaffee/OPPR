@@ -26,6 +26,9 @@ export type {
   DecayConfig,
 } from './types.js';
 
+// Export CSV parser types
+export type { ParsePlayerCSVOptions, ParsedPlayer } from './csv-parser.js';
+
 // Export all constants
 export {
   BASE_VALUE,
@@ -132,3 +135,6 @@ export {
   validateDateNotFuture,
   validatePercentage,
 } from './validators.js';
+
+// Export CSV parser functions
+export { parsePlayerCSV } from './csv-parser.js';
