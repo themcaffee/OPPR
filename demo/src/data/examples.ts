@@ -122,11 +122,38 @@ export const majorTournament: ExampleTournament = {
   },
 };
 
+// Best Game Tournament (40 players, no finals)
+export const bestGameTournament: ExampleTournament = {
+  id: 'bestgame-1',
+  name: 'Best Game Tournament',
+  description: 'Best game format with no separate finals - qualifying only',
+  eventBooster: 'none',
+  players: Array.from({ length: 40 }, (_, i) => ({
+    id: `${i + 1}`,
+    rating: Math.max(1300, 1750 - i * 10),
+    ranking: i < 30 ? i * 4 + 1 : i * 15,
+    isRated: i < 32,
+    ratingDeviation: i < 32 ? 70 + i : 140 + (i - 32) * 8,
+    eventCount: i < 32 ? Math.max(5, 18 - i) : Math.max(0, 5 - (i - 32)),
+  })),
+  tgpConfig: {
+    qualifying: {
+      type: 'limited',
+      meaningfulGames: 12,
+    },
+    finals: {
+      formatType: 'none',
+      meaningfulGames: 0,
+    },
+  },
+};
+
 // Export all examples
 export const exampleTournaments = {
   local: localTournament,
   regional: regionalTournament,
   major: majorTournament,
+  bestGame: bestGameTournament,
 };
 
 // Helper to get player names (for display purposes)

@@ -68,6 +68,12 @@ export function calculateQualifyingTGP(config: TGPConfig): number {
  */
 export function calculateFinalsTGP(config: TGPConfig): number {
   const { finals } = config;
+
+  // No TGP from finals if format type is 'none'
+  if (finals.formatType === 'none') {
+    return 0;
+  }
+
   let gameValue = TGP.BASE_GAME_VALUE;
 
   // Apply group size multipliers for PAPA-style formats (not multi-matchplay)
@@ -121,10 +127,12 @@ export function calculateTGP(config: TGPConfig): number {
 
   let totalTGP = qualifyingTGP + finalsTGP;
 
-  // Determine maximum TGP based on whether there's a qualifying component
+  // Determine maximum TGP based on whether there are separate qualifying and finals components
   const hasSeparateQualifying =
     config.qualifying.type !== 'none' && config.qualifying.meaningfulGames > 0;
-  const maxTGP = hasSeparateQualifying ? TGP.MAX_WITH_FINALS : TGP.MAX_WITHOUT_FINALS;
+  const hasSeparateFinals =
+    config.finals.formatType !== 'none' && config.finals.meaningfulGames > 0;
+  const maxTGP = hasSeparateQualifying && hasSeparateFinals ? TGP.MAX_WITH_FINALS : TGP.MAX_WITHOUT_FINALS;
 
   // Cap at maximum
   totalTGP = Math.min(totalTGP, maxTGP);

@@ -29,7 +29,8 @@ export type TournamentFormatType =
   | 'flip-frenzy'
   | 'strike-format'
   | 'target-match-play'
-  | 'hybrid';
+  | 'hybrid'
+  | 'none';
 
 /**
  * Qualifying format configuration
