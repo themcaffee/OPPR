@@ -4,6 +4,7 @@
   "include-component-in-tag": false,
   "include-v-in-tag": true,
   "pull-request-title-pattern": "chore: release ${version}",
+  "group-pull-request-title-pattern": "chore: release ${version}",
   "packages": {
     "packages/core": {
       "component": "core"
