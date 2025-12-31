@@ -5,6 +5,8 @@ node_modules/
 # Build outputs (built in container)
 dist/
 **/dist/
+.next/
+**/.next/
 *.tsbuildinfo
 **/*.tsbuildinfo
 

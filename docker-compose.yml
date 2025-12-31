@@ -48,6 +48,24 @@ services:
       RUN_MIGRATIONS: ${RUN_MIGRATIONS:-true}
 
   # ==========================================================================
+  # Frontend (Next.js)
+  # ==========================================================================
+  frontend-next:
+    build:
+      context: .
+      dockerfile: apps/frontend-next/Dockerfile
+    container_name: oppr-frontend
+    restart: unless-stopped
+    depends_on:
+      rest-api:
+        condition: service_started
+    ports:
+      - "${FRONTEND_PORT:-3001}:3000"
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3000}
+
+  # ==========================================================================
   # Database Seeder (run with: docker compose --profile seed up seed)
   # ==========================================================================
   seed:
