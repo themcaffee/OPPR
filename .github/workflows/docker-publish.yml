@@ -1,0 +1,79 @@
+name: Publish Docker Image
+
+on:
+  push:
+    branches:
+      - main
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/oppr-rest-api
+
+jobs:
+  docker-publish:
+    runs-on: ubuntu-latest
+    # Skip release-please commits for canary builds
+    if: |
+      github.event_name == 'release' ||
+      (github.event_name == 'push' && !startsWith(github.event.head_commit.message, 'chore: release'))
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Calculate image tags
+        id: tags
+        run: |
+          BASE_VERSION=$(node -p "require('./packages/core/package.json').version")
+
+          if [ "${{ github.event_name }}" = "release" ]; then
+            # Stable release: version + latest
+            echo "tags=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${BASE_VERSION},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_OUTPUT
+            echo "version=${BASE_VERSION}" >> $GITHUB_OUTPUT
+          else
+            # Canary: version-canary.sha
+            SHORT_SHA=$(git rev-parse --short HEAD)
+            CANARY_VERSION="${BASE_VERSION}-canary.${SHORT_SHA}"
+            echo "tags=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${CANARY_VERSION}" >> $GITHUB_OUTPUT
+            echo "version=${CANARY_VERSION}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/rest-api/Dockerfile
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Report success
+        run: |
+          echo "Successfully published Docker image:"
+          echo "  Tags: ${{ steps.tags.outputs.tags }}"
+          echo ""
+          echo "Pull with: docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tags.outputs.version }}"
