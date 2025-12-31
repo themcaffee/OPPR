@@ -1,0 +1,46 @@
+# Source files (we publish dist/)
+src/
+tsconfig.json
+tsconfig.*.json
+
+# Tests
+tests/
+*.test.ts
+*.spec.ts
+coverage/
+
+# Development files
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+*.swp
+*.swo
+
+# Config files
+.prettierrc
+.prettierignore
+eslint.config.js
+vitest.config.ts
+
+# Git
+.git/
+.gitignore
+.github/
+
+# Misc
+node_modules/
+.cache/
