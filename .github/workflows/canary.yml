@@ -43,6 +43,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Generate Prisma client
+        run: pnpm --filter @opprs/db-prisma run db:generate
+
       - name: Calculate canary version
         run: |
           BASE_VERSION=$(node -p "require('./packages/core/package.json').version")
