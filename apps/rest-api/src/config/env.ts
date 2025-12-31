@@ -7,6 +7,7 @@ export interface EnvConfig {
   jwtAccessExpiresIn: string;
   jwtRefreshExpiresIn: string;
   nodeEnv: string;
+  matchplayApiToken?: string;
 }
 
 function getEnvVar(name: string, defaultValue?: string): string {
@@ -30,6 +31,7 @@ export function loadEnvConfig(): EnvConfig {
     jwtAccessExpiresIn: getEnvVar('JWT_ACCESS_EXPIRES_IN', '15m'),
     jwtRefreshExpiresIn: getEnvVar('JWT_REFRESH_EXPIRES_IN', '7d'),
     nodeEnv: getEnvVar('NODE_ENV', 'development'),
+    matchplayApiToken: process.env.MATCHPLAY_API_TOKEN,
   };
 }
 
