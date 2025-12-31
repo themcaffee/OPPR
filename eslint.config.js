@@ -48,6 +48,7 @@ export default [
       '@typescript-eslint': typescript
     },
     rules: {
+      'no-unused-vars': 'off', // Disable base rule in favor of TypeScript version
       '@typescript-eslint/explicit-function-return-type': 'warn',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'error',
