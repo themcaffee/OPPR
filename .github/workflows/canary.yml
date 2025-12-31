@@ -1,0 +1,90 @@
+name: Canary Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    # Skip if this is a release-please commit
+    if: ${{ !startsWith(github.event.head_commit.message, 'chore: release') }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install pnpm
+        run: npm install -g pnpm@9.15.0
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Calculate canary version
+        run: |
+          BASE_VERSION=$(node -p "require('./packages/core/package.json').version")
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          CANARY_VERSION="${BASE_VERSION}-canary.${SHORT_SHA}"
+          echo "CANARY_VERSION=$CANARY_VERSION" >> $GITHUB_ENV
+          echo "Canary version: $CANARY_VERSION"
+
+      - name: Update package versions
+        run: |
+          cd packages/core
+          npm version ${{ env.CANARY_VERSION }} --no-git-tag-version --allow-same-version
+          cd ../db-prisma
+          npm version ${{ env.CANARY_VERSION }} --no-git-tag-version --allow-same-version
+          # Update peer dependency to canary version
+          sed -i "s/\"@opprs\/core\": \"workspace:\^*\"/\"@opprs\/core\": \"^${{ env.CANARY_VERSION }}\"/" package.json
+
+      - name: Run quality checks and build
+        run: |
+          pnpm --filter @opprs/core run typecheck
+          pnpm --filter @opprs/core run lint
+          pnpm --filter @opprs/core run build
+          pnpm --filter @opprs/db-prisma run typecheck
+          pnpm --filter @opprs/db-prisma run lint
+          pnpm --filter @opprs/db-prisma run build
+
+      - name: Publish @opprs/core to npm (canary)
+        working-directory: packages/core
+        run: pnpm publish --tag canary --provenance --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+      - name: Publish @opprs/db-prisma to npm (canary)
+        working-directory: packages/db-prisma
+        run: pnpm publish --tag canary --provenance --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+      - name: Report success
+        run: |
+          echo "Successfully published canary releases:"
+          echo "  - @opprs/core@${{ env.CANARY_VERSION }}"
+          echo "  - @opprs/db-prisma@${{ env.CANARY_VERSION }}"
+          echo ""
+          echo "Install with: npm install @opprs/core@canary"
