@@ -83,5 +83,5 @@ jobs:
 
       - name: Report success
         run: |
-          echo "✅ Successfully published @oppr/core@${{ steps.extract_version.outputs.version }} to npm!"
-          echo "Package URL: https://www.npmjs.com/package/@oppr/core/v/${{ steps.extract_version.outputs.version }}"
+          echo "✅ Successfully published @opprs/core@${{ steps.extract_version.outputs.version }} to npm!"
+          echo "Package URL: https://www.npmjs.com/package/@opprs/core/v/${{ steps.extract_version.outputs.version }}"

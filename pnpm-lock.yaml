@@ -32,7 +32,7 @@ importers:
 
   apps/demo:
     dependencies:
-      '@oppr/core':
+      '@opprs/core':
         specifier: workspace:*
         version: link:../../packages/core
       '@tanstack/react-table':

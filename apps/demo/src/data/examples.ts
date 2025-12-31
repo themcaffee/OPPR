@@ -1,4 +1,4 @@
-import type { Player, TGPConfig } from '@oppr/core';
+import type { Player, TGPConfig } from '@opprs/core';
 
 export interface ExampleTournament {
   id: string;
