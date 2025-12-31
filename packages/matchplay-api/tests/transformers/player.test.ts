@@ -1,6 +1,16 @@
 import { describe, it, expect } from 'vitest';
-import { toOPPRPlayer, toOPPRPlayers, standingToPlayer, ratingToPlayer } from '../../src/transformers/player.js';
-import { sampleUserWithDetails, sampleUserWithoutRating, sampleStandings, sampleRating } from '../fixtures/index.js';
+import {
+  toOPPRPlayer,
+  toOPPRPlayers,
+  standingToPlayer,
+  ratingToPlayer,
+} from '../../src/transformers/player.js';
+import {
+  sampleUserWithDetails,
+  sampleUserWithoutRating,
+  sampleStandings,
+  sampleRating,
+} from '../fixtures/index.js';
 
 describe('toOPPRPlayer', () => {
   it('should transform user with rating and IFPA data', () => {

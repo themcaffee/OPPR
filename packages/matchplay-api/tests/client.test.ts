@@ -144,10 +144,7 @@ describe('MatchplayClient', () => {
         expect.stringContaining('status=completed'),
         expect.any(Object)
       );
-      expect(fetch).toHaveBeenCalledWith(
-        expect.stringContaining('limit=10'),
-        expect.any(Object)
-      );
+      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('limit=10'), expect.any(Object));
     });
   });
 

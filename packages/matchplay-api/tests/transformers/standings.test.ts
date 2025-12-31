@@ -56,7 +56,12 @@ describe('toOPPRResults', () => {
 
 describe('sortStandingsByPosition', () => {
   it('should sort standings by position', () => {
-    const unsortedStandings = [sampleStandings[2], sampleStandings[0], sampleStandings[3], sampleStandings[1]];
+    const unsortedStandings = [
+      sampleStandings[2],
+      sampleStandings[0],
+      sampleStandings[3],
+      sampleStandings[1],
+    ];
 
     const sorted = sortStandingsByPosition(unsortedStandings);
 

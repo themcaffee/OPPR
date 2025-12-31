@@ -30,7 +30,12 @@ import {
   MatchplayNetworkError,
   MatchplayTimeoutError,
 } from './errors.js';
-import { toOPPRTournament, toOPPRPlayer, toOPPRResults, ratingToPlayer } from './transformers/index.js';
+import {
+  toOPPRTournament,
+  toOPPRPlayer,
+  toOPPRResults,
+  ratingToPlayer,
+} from './transformers/index.js';
 
 const DEFAULT_BASE_URL = 'https://app.matchplay.events/api';
 const DEFAULT_TIMEOUT = 30000;
@@ -294,7 +299,10 @@ export class MatchplayClient {
   /**
    * Get ratings list (for leaderboard/ranking purposes)
    */
-  async getRatings(params: RatingParams = {}, options: PlayerTransformOptions = {}): Promise<Player[]> {
+  async getRatings(
+    params: RatingParams = {},
+    options: PlayerTransformOptions = {}
+  ): Promise<Player[]> {
     const queryString = this.buildQueryString(params as Record<string, unknown>);
     const response = await this.request<MatchplayListResponse<MatchplayRating>>(
       `/ratings${queryString}`
