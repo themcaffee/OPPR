@@ -1,0 +1,123 @@
+// Prisma schema for OPPR Database
+// Documentation: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Player model - represents a pinball player
+model Player {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Player identification
+  externalId       String?  @unique // External ID from OPPR or other systems
+  name             String?
+  email            String?  @unique
+
+  // OPPR Rating fields
+  rating           Float    @default(1500) // Glicko rating
+  ratingDeviation  Float    @default(200)  // Rating uncertainty (RD)
+  ranking          Int?                     // World ranking position
+  isRated          Boolean  @default(false) // Has 5+ events
+  eventCount       Int      @default(0)     // Number of events participated
+
+  // Timestamps for rating calculations
+  lastRatingUpdate DateTime @default(now())
+  lastEventDate    DateTime?
+
+  // Relations
+  tournamentResults TournamentResult[]
+
+  @@index([email])
+  @@index([externalId])
+  @@index([rating])
+  @@index([ranking])
+}
+
+// Tournament model - represents a pinball tournament event
+model Tournament {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Tournament identification
+  externalId       String?  @unique // External ID from OPPR or other systems
+  name             String
+  location         String?
+  date             DateTime
+
+  // Tournament configuration (stored as JSON)
+  // Contains TGPConfig structure from OPPR
+  tgpConfig        Json?
+
+  // Event classification
+  eventBooster     EventBoosterType @default(NONE)
+  allowsOptOut     Boolean          @default(false)
+
+  // Tournament value calculations (can be calculated or cached)
+  baseValue        Float?
+  tvaRating        Float?
+  tvaRanking       Float?
+  totalTVA         Float?
+  tgp              Float?
+  eventBoosterMultiplier Float?
+  firstPlaceValue  Float?
+
+  // Relations
+  results          TournamentResult[]
+
+  @@index([date])
+  @@index([eventBooster])
+  @@index([externalId])
+}
+
+// Tournament Result - junction table linking players to tournaments
+model TournamentResult {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  playerId         String
+  player           Player     @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  tournamentId     String
+  tournament       Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+
+  // Result data
+  position         Int      // Finishing position (1 = first place)
+  optedOut         Boolean  @default(false)
+
+  // Points awarded
+  linearPoints     Float?   @default(0) // Linear distribution points
+  dynamicPoints    Float?   @default(0) // Dynamic distribution points
+  totalPoints      Float?   // Total points (linear + dynamic)
+
+  // Time decay tracking
+  ageInDays        Int?     @default(0) // Age of event in days at calculation time
+  decayMultiplier  Float?   @default(1.0) // Time decay multiplier (1.0, 0.75, 0.5, or 0.0)
+  decayedPoints    Float?   // Points after applying decay (defaults to totalPoints via application logic)
+
+  // Efficiency tracking
+  efficiency       Float?   // Performance efficiency percentage
+
+  @@unique([playerId, tournamentId])
+  @@index([playerId])
+  @@index([tournamentId])
+  @@index([position])
+}
+
+// Enum for event booster types
+enum EventBoosterType {
+  NONE
+  CERTIFIED
+  CERTIFIED_PLUS
+  CHAMPIONSHIP_SERIES
+  MAJOR
+}
