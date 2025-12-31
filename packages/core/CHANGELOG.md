@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.3](https://github.com/themcaffee/OPPR/compare/v0.5.2...v0.5.3) (2025-12-31)
+
+
+### Bug Fixes
+
+* **ci:** sync manifest and package versions to 0.5.2 ([#30](https://github.com/themcaffee/OPPR/issues/30)) ([3ec9d29](https://github.com/themcaffee/OPPR/commit/3ec9d294be0794c8460a3bdb8cc271e08def82d9))
+
 ## [0.5.2](https://github.com/themcaffee/OPPR/compare/v0.5.1...v0.5.2) (2025-12-31)
 
 
