@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/themcaffee/OPPR/compare/v0.5.0...v0.5.1) (2025-12-31)
+
+
+### Documentation
+
+* **core:** simplify README and use OPPRS naming ([#23](https://github.com/themcaffee/OPPR/issues/23)) ([d9363f5](https://github.com/themcaffee/OPPR/commit/d9363f5315433e9e01c0d67b6e9506326a007aa8))
+
 ## [0.5.0](https://github.com/themcaffee/OPPR/compare/v0.4.1...v0.5.0) (2025-12-31)
 
 
