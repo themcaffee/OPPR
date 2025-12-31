@@ -4,13 +4,13 @@ import { buildApp } from '../src/app.js';
 
 describe('buildApp', () => {
   it('should create app with default logger enabled', async () => {
-    const app = await buildApp();
+    const app = await buildApp({ skipDatabase: true });
     expect(app).toBeDefined();
     await app.close();
   });
 
   it('should create app with custom logger option', async () => {
-    const app = await buildApp({ logger: false });
+    const app = await buildApp({ logger: false, skipDatabase: true });
     expect(app).toBeDefined();
     await app.close();
   });
@@ -20,7 +20,7 @@ describe('Health endpoint', () => {
   let app: FastifyInstance;
 
   beforeAll(async () => {
-    app = await buildApp({ logger: false });
+    app = await buildApp({ logger: false, skipDatabase: true });
   });
 
   afterAll(async () => {
