@@ -1,0 +1,58 @@
+# Dependencies (installed fresh in container)
+node_modules/
+**/node_modules/
+
+# Build outputs (built in container)
+dist/
+**/dist/
+*.tsbuildinfo
+**/*.tsbuildinfo
+
+# Turbo cache
+.turbo/
+**/.turbo/
+
+# Test and coverage
+coverage/
+**/coverage/
+.nyc_output/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment files (use runtime env vars)
+.env
+.env.*
+!.env.example
+
+# Documentation (not needed for API)
+docs/
+
+# Demo app (not needed for API)
+apps/demo/
+
+# Test files (not needed in production)
+**/tests/
+**/*.test.ts
+**/*.spec.ts
+**/vitest.config.ts
+
+# Git
+.git/
+.gitignore
+
+# GitHub
+.github/
+
+# Logs
+*.log
+logs/
+
+# Claude configuration
+CLAUDE.md
+.claude/
