@@ -1,4 +1,4 @@
-name: Deploy Demo to GitHub Pages
+name: Deploy to GitHub Pages
 
 on:
   push:
@@ -49,10 +49,22 @@ jobs:
       - name: Build all packages
         run: pnpm run build
 
+      - name: Build docs
+        run: pnpm run docs:build
+
+      - name: Prepare combined deployment directory
+        run: |
+          mkdir -p ./dist
+          # Copy VitePress docs to root of dist
+          cp -r ./docs/.vitepress/dist/* ./dist/
+          # Copy demo app to demo/ subdirectory
+          mkdir -p ./dist/demo
+          cp -r ./apps/demo/dist/* ./dist/demo/
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./apps/demo/dist
+          path: ./dist
 
   deploy:
     needs: build
