@@ -19,6 +19,7 @@ pnpm docs:dev
 - **[Constants & Calibration](./docs/constants.md)** - Detailed rationale for all system constants
 - **[API Reference](./docs/api-reference.md)** - Complete types and function reference
 - **[Database (Prisma)](./docs/db-prisma.md)** - PostgreSQL persistence with Prisma ORM
+- **[REST API](./docs/rest-api.md)** - Fastify REST API with JWT authentication
 
 ## Monorepo Structure
 
@@ -30,7 +31,8 @@ This project is organized as a monorepo using [Turborepo](https://turbo.build/) 
 │   ├── core/              # @opprs/core - Main TypeScript library
 │   └── db-prisma/         # @opprs/db-prisma - PostgreSQL persistence layer
 ├── apps/
-│   └── demo/              # Interactive demo application
+│   ├── demo/              # Interactive demo application
+│   └── rest-api/          # REST API server
 ├── docs/                  # VitePress documentation
 ├── turbo.json             # Turborepo pipeline configuration
 ├── pnpm-workspace.yaml    # pnpm workspace configuration
@@ -42,6 +44,7 @@ This project is organized as a monorepo using [Turborepo](https://turbo.build/) 
 - **@opprs/core** (`packages/core/`) - The core OPPRS library, published to npm
 - **@opprs/db-prisma** (`packages/db-prisma/`) - PostgreSQL persistence layer using Prisma ORM
 - **demo** (`apps/demo/`) - Interactive React demo application for testing and visualization
+- **rest-api** (`apps/rest-api/`) - Fastify REST API with JWT auth, CRUD endpoints, and OpenAPI docs
 - **docs** (`docs/`) - VitePress documentation site
 
 ## Features
