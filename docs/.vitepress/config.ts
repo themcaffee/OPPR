@@ -9,7 +9,7 @@ export default defineConfig({
       { text: 'Home', link: '/' },
       { text: 'Getting Started', link: '/getting-started' },
       { text: 'API Reference', link: '/api-reference' },
-      { text: 'Demo', link: '/demo/' },
+      { text: 'Demo', link: 'https://themcaffee.github.io/OPPR/demo/' },
     ],
     sidebar: [
       {
