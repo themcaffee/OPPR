@@ -226,3 +226,114 @@ cat backup.sql | docker compose exec -T postgres psql -U oppr oppr_db
 ```bash
 docker run --rm -v oppr_postgres_data:/data -v $(pwd):/backup alpine tar czf /backup/postgres_backup.tar.gz /data
 ```
+
+---
+
+## Terraform Deployment (Digital Ocean)
+
+For automated infrastructure provisioning on Digital Ocean, use the Terraform configuration in `terraform/`.
+
+### Prerequisites
+
+- [Terraform](https://www.terraform.io/downloads) >= 1.0.0
+- Digital Ocean account with API token
+- SSH key pair
+
+### Quick Start
+
+```bash
+cd deploy/terraform
+
+# Initialize Terraform
+terraform init
+
+# Create terraform.tfvars with your configuration
+cat > terraform.tfvars <<EOF
+do_token       = "dop_v1_your_token_here"
+ssh_public_key = "ssh-rsa AAAA... your-key"
+github_owner   = "your-github-username"
+
+# Optional configurations
+droplet_size   = "s-1vcpu-2gb"    # or s-2vcpu-2gb, s-2vcpu-4gb
+droplet_region = "nyc1"           # or sfo3, lon1, ams3
+domain         = "oppr.example.com"  # leave empty for IP-only access
+EOF
+
+# Preview changes
+terraform plan
+
+# Deploy
+terraform apply
+```
+
+### Configuration Variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `do_token` | Yes | - | Digital Ocean API token |
+| `ssh_public_key` | Yes | - | SSH public key for access |
+| `github_owner` | Yes | - | GitHub username/org for GHCR images |
+| `droplet_size` | No | `s-1vcpu-2gb` | Droplet size slug |
+| `droplet_region` | No | `nyc1` | DO region |
+| `domain` | No | `""` | Domain for HTTPS (empty = IP access) |
+| `enable_reserved_ip` | No | `false` | Use static IP |
+| `image_tag` | No | `latest` | Docker image tag |
+
+### Droplet Size Reference
+
+| Size Slug | vCPUs | RAM | Monthly Cost |
+|-----------|-------|-----|--------------|
+| `s-1vcpu-1gb` | 1 | 1GB | ~$6/mo |
+| `s-1vcpu-2gb` | 1 | 2GB | ~$12/mo |
+| `s-2vcpu-2gb` | 2 | 2GB | ~$18/mo |
+| `s-2vcpu-4gb` | 2 | 4GB | ~$24/mo |
+
+### Outputs
+
+After deployment, Terraform outputs useful information:
+
+```bash
+# View all outputs
+terraform output
+
+# Get SSH command
+terraform output ssh_command
+
+# Get sensitive secrets (for backup)
+terraform output -json postgres_password
+```
+
+### Updating Deployed Application
+
+```bash
+# SSH into server and update
+ssh root@$(terraform output -raw effective_ip)
+cd /opt/oppr
+docker compose pull
+docker compose up -d
+
+# Or deploy a specific version via Terraform
+terraform apply -var="image_tag=1.2.0"
+```
+
+### Destroy Infrastructure
+
+```bash
+terraform destroy
+```
+
+### State Management
+
+The Terraform state file (`terraform.tfstate`) contains sensitive information. For team environments, consider using remote state:
+
+```hcl
+# Add to versions.tf for Terraform Cloud
+terraform {
+  cloud {
+    organization = "your-org"
+    workspaces {
+      name = "oppr-production"
+    }
+  }
+}
+```
