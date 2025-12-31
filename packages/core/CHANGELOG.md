@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.2](https://github.com/themcaffee/OPPR/compare/v0.5.1...v0.5.2) (2025-12-31)
+
+
+### Bug Fixes
+
+* **ci:** release-please publish workflow and docs cleanup ([#27](https://github.com/themcaffee/OPPR/issues/27)) ([ab2c746](https://github.com/themcaffee/OPPR/commit/ab2c74606067d51d1b64c7422d5cf61acde6013c))
+
 ## [0.5.1](https://github.com/themcaffee/OPPR/compare/v0.5.0...v0.5.1) (2025-12-31)
 
 
