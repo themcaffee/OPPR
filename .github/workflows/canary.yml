@@ -13,7 +13,7 @@ jobs:
   canary:
     runs-on: ubuntu-latest
     # Skip if this is a release-please commit
-    if: ${{ !startsWith(github.event.head_commit.message, 'chore: release') }}
+    if: "${{ !startsWith(github.event.head_commit.message, 'chore: release') }}"
 
     steps:
       - name: Checkout code
