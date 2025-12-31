@@ -18,6 +18,7 @@ pnpm docs:dev
 - **[Core Concepts](./docs/core-concepts.md)** - Base Value, TVA, TGP, Event Boosters, Point Distribution, Time Decay, and Glicko Rating
 - **[Constants & Calibration](./docs/constants.md)** - Detailed rationale for all system constants
 - **[API Reference](./docs/api-reference.md)** - Complete types and function reference
+- **[Database (Prisma)](./docs/db-prisma.md)** - PostgreSQL persistence with Prisma ORM
 
 ## Monorepo Structure
 
@@ -26,7 +27,8 @@ This project is organized as a monorepo using [Turborepo](https://turbo.build/) 
 ```
 .
 ├── packages/
-│   └── core/              # @opprs/core - Main TypeScript library
+│   ├── core/              # @opprs/core - Main TypeScript library
+│   └── db-prisma/         # @opprs/db-prisma - PostgreSQL persistence layer
 ├── apps/
 │   └── demo/              # Interactive demo application
 ├── docs/                  # VitePress documentation
@@ -38,6 +40,7 @@ This project is organized as a monorepo using [Turborepo](https://turbo.build/) 
 ### Packages
 
 - **@opprs/core** (`packages/core/`) - The core OPPRS library, published to npm
+- **@opprs/db-prisma** (`packages/db-prisma/`) - PostgreSQL persistence layer using Prisma ORM
 - **demo** (`apps/demo/`) - Interactive React demo application for testing and visualization
 - **docs** (`docs/`) - VitePress documentation site
 
