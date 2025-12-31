@@ -29,11 +29,14 @@ This project is organized as a monorepo using [Turborepo](https://turbo.build/) 
 .
 ├── packages/
 │   ├── core/              # @opprs/core - Main TypeScript library
-│   └── db-prisma/         # @opprs/db-prisma - PostgreSQL persistence layer
+│   ├── db-prisma/         # @opprs/db-prisma - PostgreSQL persistence layer
+│   └── matchplay-api/     # @opprs/matchplay-api - Matchplay Events API client
 ├── apps/
-│   ├── demo/              # Interactive demo application
-│   └── rest-api/          # REST API server
+│   ├── demo/              # Interactive React demo application
+│   ├── rest-api/          # Fastify REST API server
+│   └── frontend-next/     # Next.js web frontend
 ├── docs/                  # VitePress documentation
+├── deploy/                # Deployment configuration (Terraform + Caddy)
 ├── turbo.json             # Turborepo pipeline configuration
 ├── pnpm-workspace.yaml    # pnpm workspace configuration
 └── package.json           # Root package.json with shared scripts
@@ -43,9 +46,12 @@ This project is organized as a monorepo using [Turborepo](https://turbo.build/) 
 
 - **@opprs/core** (`packages/core/`) - The core OPPRS library, published to npm
 - **@opprs/db-prisma** (`packages/db-prisma/`) - PostgreSQL persistence layer using Prisma ORM
-- **demo** (`apps/demo/`) - Interactive React demo application for testing and visualization
+- **@opprs/matchplay-api** (`packages/matchplay-api/`) - Matchplay Events API client with transformers for OPPR types
+- **demo** (`apps/demo/`) - Interactive React + Vite demo application for testing and visualization
 - **rest-api** (`apps/rest-api/`) - Fastify REST API with JWT auth, CRUD endpoints, and OpenAPI docs
+- **frontend-next** (`apps/frontend-next/`) - Next.js 15 web frontend with React 19, Tailwind CSS 4, and Docker support
 - **docs** (`docs/`) - VitePress documentation site
+- **deploy** (`deploy/`) - Deployment infrastructure with Terraform (Digital Ocean) and Caddy reverse proxy
 
 ## Features
 
