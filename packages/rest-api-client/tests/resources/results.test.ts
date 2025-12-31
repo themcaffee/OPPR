@@ -33,7 +33,7 @@ describe('ResultsResource', () => {
       await resource.list({ playerId: 'player-1', tournamentId: 'tournament-1' });
 
       expect(mockRequest).toHaveBeenCalledWith(
-        '/results?playerId=player-1&tournamentId=tournament-1',
+        '/results?playerId=player-1&tournamentId=tournament-1'
       );
     });
   });

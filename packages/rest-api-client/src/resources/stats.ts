@@ -1,20 +1,16 @@
 import type { OverviewStats, LeaderboardParams, Player } from '../types/index.js';
 
- 
 type RequestFn = <T>(p: string, o?: RequestInit, r?: boolean) => Promise<T>;
 type BuildQueryFn = (p: Record<string, unknown>) => string;
- 
 
 /**
  * Stats resource methods
  */
 export class StatsResource {
   constructor(
-     
     private readonly _request: RequestFn,
-    private readonly _buildQueryString: BuildQueryFn,
-    ) {
-     }
+    private readonly _buildQueryString: BuildQueryFn
+  ) {}
 
   /**
    * Get system-wide statistics

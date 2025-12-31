@@ -80,7 +80,7 @@ describe('TournamentsResource', () => {
       await resource.list({ startDate: '2025-01-01', endDate: '2025-12-31' });
 
       expect(mockRequest).toHaveBeenCalledWith(
-        '/tournaments?startDate=2025-01-01&endDate=2025-12-31',
+        '/tournaments?startDate=2025-01-01&endDate=2025-12-31'
       );
     });
   });

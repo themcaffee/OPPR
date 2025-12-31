@@ -70,7 +70,7 @@ export class OpprsClient {
         method: 'POST',
         body: JSON.stringify(credentials),
       },
-      false,
+      false
     ); // Don't require auth for login
 
     this.setTokens(response);
@@ -119,9 +119,7 @@ export class OpprsClient {
     this.tokenExpiresAt = Date.now() + tokens.expiresIn * 1000;
   }
 
-  private setTokens(
-    response: LoginResponse | (RefreshResponse & { refreshToken?: string }),
-  ): void {
+  private setTokens(response: LoginResponse | (RefreshResponse & { refreshToken?: string })): void {
     this.accessToken = response.accessToken;
     if ('refreshToken' in response && response.refreshToken) {
       this.refreshToken = response.refreshToken;
@@ -189,7 +187,7 @@ export class OpprsClient {
           method: 'POST',
           body: JSON.stringify({ refreshToken: this.refreshToken } satisfies RefreshRequest),
         },
-        false,
+        false
       );
 
       this.setTokens(response);
@@ -205,11 +203,7 @@ export class OpprsClient {
 
   // ==================== HTTP Request Infrastructure ====================
 
-  private async request<T>(
-    path: string,
-    options?: RequestInit,
-    requireAuth = true,
-  ): Promise<T> {
+  private async request<T>(path: string, options?: RequestInit, requireAuth = true): Promise<T> {
     if (requireAuth) {
       await this.ensureValidToken();
     }
@@ -262,7 +256,7 @@ export class OpprsClient {
 
       throw new OpprsNetworkError(
         'Network request failed',
-        error instanceof Error ? error : undefined,
+        error instanceof Error ? error : undefined
       );
     }
   }

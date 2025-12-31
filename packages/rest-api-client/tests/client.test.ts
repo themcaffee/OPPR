@@ -63,7 +63,7 @@ describe('OpprsClient', () => {
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify({ email: 'test@example.com', password: 'password' }),
-        }),
+        })
       );
     });
 
@@ -112,7 +112,7 @@ describe('OpprsClient', () => {
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify({ refreshToken: 'refresh-token' }),
-        }),
+        })
       );
     });
 
@@ -126,9 +126,7 @@ describe('OpprsClient', () => {
 
       mockFetch
         .mockResolvedValueOnce(createMockResponse(loginResponse))
-        .mockResolvedValueOnce(
-          createMockResponse({ message: 'Invalid token' }, 401),
-        );
+        .mockResolvedValueOnce(createMockResponse({ message: 'Invalid token' }, 401));
 
       const client = new OpprsClient({ fetch: mockFetch });
       await client.login({ email: 'test@example.com', password: 'password' });
@@ -140,15 +138,13 @@ describe('OpprsClient', () => {
 
   describe('error handling', () => {
     it('should throw OpprsAuthError for 401 responses', async () => {
-      mockFetch.mockResolvedValueOnce(
-        createMockResponse({ message: 'Unauthorized' }, 401),
-      );
+      mockFetch.mockResolvedValueOnce(createMockResponse({ message: 'Unauthorized' }, 401));
 
       const client = new OpprsClient({ fetch: mockFetch });
 
-      await expect(
-        client.login({ email: 'test@example.com', password: 'wrong' }),
-      ).rejects.toThrow(OpprsAuthError);
+      await expect(client.login({ email: 'test@example.com', password: 'wrong' })).rejects.toThrow(
+        OpprsAuthError
+      );
     });
 
     it('should throw OpprsNotFoundError for 404 responses', async () => {
@@ -159,11 +155,9 @@ describe('OpprsClient', () => {
             refreshToken: 'refresh',
             expiresIn: 900,
             tokenType: 'Bearer',
-          }),
+          })
         )
-        .mockResolvedValueOnce(
-          createMockResponse({ message: 'Player not found' }, 404),
-        );
+        .mockResolvedValueOnce(createMockResponse({ message: 'Player not found' }, 404));
 
       const client = new OpprsClient({ fetch: mockFetch });
       await client.login({ email: 'test@example.com', password: 'password' });
@@ -175,15 +169,15 @@ describe('OpprsClient', () => {
       mockFetch.mockResolvedValueOnce(
         createMockResponse(
           { message: 'Validation failed', details: { email: 'Invalid format' } },
-          400,
-        ),
+          400
+        )
       );
 
       const client = new OpprsClient({ fetch: mockFetch });
 
-      await expect(
-        client.login({ email: 'invalid', password: 'password' }),
-      ).rejects.toThrow(OpprsValidationError);
+      await expect(client.login({ email: 'invalid', password: 'password' })).rejects.toThrow(
+        OpprsValidationError
+      );
     });
 
     it('should throw OpprsTimeoutError when request times out', async () => {
@@ -193,13 +187,13 @@ describe('OpprsClient', () => {
             const error = new Error('Aborted');
             error.name = 'AbortError';
             setTimeout(() => reject(error), 100);
-          }),
+          })
       );
 
       const client = new OpprsClient({ fetch: mockFetch, timeout: 50 });
 
       await expect(
-        client.login({ email: 'test@example.com', password: 'password' }),
+        client.login({ email: 'test@example.com', password: 'password' })
       ).rejects.toThrow(OpprsTimeoutError);
     });
   });
@@ -255,7 +249,7 @@ describe('OpprsClient', () => {
           headers: expect.objectContaining({
             Authorization: 'Bearer access-token',
           }),
-        }),
+        })
       );
     });
 
@@ -283,7 +277,7 @@ describe('OpprsClient', () => {
             refreshToken: 'refresh',
             expiresIn: 900,
             tokenType: 'Bearer',
-          }),
+          })
         )
         .mockResolvedValueOnce(createMockResponse(player));
 

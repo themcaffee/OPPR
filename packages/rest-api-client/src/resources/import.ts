@@ -1,11 +1,6 @@
-import type {
-  ImportMatchplayTournamentRequest,
-  ImportTournamentResponse,
-} from '../types/index.js';
+import type { ImportMatchplayTournamentRequest, ImportTournamentResponse } from '../types/index.js';
 
- 
 type RequestFn = <T>(p: string, o?: RequestInit, r?: boolean) => Promise<T>;
- 
 
 /**
  * Import resource methods
@@ -18,7 +13,7 @@ export class ImportResource {
    */
   async matchplayTournament(
     matchplayId: number,
-    options: ImportMatchplayTournamentRequest = {},
+    options: ImportMatchplayTournamentRequest = {}
   ): Promise<ImportTournamentResponse> {
     return this._request<ImportTournamentResponse>(`/import/matchplay/tournament/${matchplayId}`, {
       method: 'POST',

@@ -9,10 +9,8 @@ import type {
   PaginatedResponse,
 } from '../types/index.js';
 
- 
 type RequestFn = <T>(p: string, o?: RequestInit, r?: boolean) => Promise<T>;
 type BuildQueryFn = (p: Record<string, unknown>) => string;
- 
 
 interface LimitParams {
   limit?: number;
@@ -23,11 +21,9 @@ interface LimitParams {
  */
 export class TournamentsResource {
   constructor(
-     
     private readonly _request: RequestFn,
-    private readonly _buildQueryString: BuildQueryFn,
-    ) {
-     }
+    private readonly _buildQueryString: BuildQueryFn
+  ) {}
 
   /**
    * List tournaments with pagination

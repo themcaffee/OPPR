@@ -9,21 +9,17 @@ import type {
   PaginatedResponse,
 } from '../types/index.js';
 
- 
 type RequestFn = <T>(p: string, o?: RequestInit, r?: boolean) => Promise<T>;
 type BuildQueryFn = (p: Record<string, unknown>) => string;
- 
 
 /**
  * Results resource methods
  */
 export class ResultsResource {
   constructor(
-     
     private readonly _request: RequestFn,
-    private readonly _buildQueryString: BuildQueryFn,
-    ) {
-     }
+    private readonly _buildQueryString: BuildQueryFn
+  ) {}
 
   /**
    * List results with pagination

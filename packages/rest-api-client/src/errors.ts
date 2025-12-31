@@ -10,7 +10,7 @@ export class OpprsApiError extends Error {
     message: string,
     statusCode: number,
     errorType: string,
-    details?: Record<string, unknown>,
+    details?: Record<string, unknown>
   ) {
     super(message);
     this.name = 'OpprsApiError';
