@@ -61,8 +61,8 @@ jobs:
       - name: Update package versions
         run: |
           VERSION="${{ steps.extract_version.outputs.version }}"
-          cd packages/core && pnpm version $VERSION --no-git-tag-version
-          cd ../db-prisma && pnpm version $VERSION --no-git-tag-version
+          cd packages/core && pnpm version $VERSION --no-git-tag-version --allow-same-version
+          cd ../db-prisma && pnpm version $VERSION --no-git-tag-version --allow-same-version
           echo "Updated both packages to version $VERSION"
 
       - name: Update db-prisma peerDependency
