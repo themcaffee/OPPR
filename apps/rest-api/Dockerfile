@@ -17,6 +17,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 # Copy package.json files for all workspace packages (preserve structure)
 COPY packages/core/package.json ./packages/core/
 COPY packages/db-prisma/package.json ./packages/db-prisma/
+COPY packages/matchplay-api/package.json ./packages/matchplay-api/
 COPY apps/rest-api/package.json ./apps/rest-api/
 
 # Copy Prisma schema (needed for prisma generate during install)
@@ -33,11 +34,16 @@ RUN pnpm --filter @opprs/db-prisma run db:generate
 # =============================================================================
 FROM deps AS builder
 
+# Copy root tsconfig (needed for packages that extend it)
+COPY tsconfig.json ./
+
 # Copy source files for all packages
 COPY packages/core/src ./packages/core/src/
 COPY packages/core/tsconfig.json ./packages/core/
 COPY packages/db-prisma/src ./packages/db-prisma/src/
 COPY packages/db-prisma/tsconfig.json ./packages/db-prisma/
+COPY packages/matchplay-api/src ./packages/matchplay-api/src/
+COPY packages/matchplay-api/tsconfig.json ./packages/matchplay-api/
 COPY apps/rest-api/src ./apps/rest-api/src/
 COPY apps/rest-api/tsconfig.json ./apps/rest-api/
 
@@ -57,6 +63,7 @@ COPY --from=builder /app/pnpm-workspace.yaml ./
 # Copy package manifests
 COPY --from=builder /app/packages/core/package.json ./packages/core/
 COPY --from=builder /app/packages/db-prisma/package.json ./packages/db-prisma/
+COPY --from=builder /app/packages/matchplay-api/package.json ./packages/matchplay-api/
 COPY --from=builder /app/apps/rest-api/package.json ./apps/rest-api/
 
 # Copy Prisma schema and seed (needed for migrations and seeding at runtime)
@@ -78,6 +85,7 @@ ENV NODE_ENV=production
 # Copy built packages
 COPY --from=builder /app/packages/core/dist ./packages/core/dist/
 COPY --from=builder /app/packages/db-prisma/dist ./packages/db-prisma/dist/
+COPY --from=builder /app/packages/matchplay-api/dist ./packages/matchplay-api/dist/
 COPY --from=builder /app/apps/rest-api/dist ./apps/rest-api/dist/
 
 # Create non-root user for security
