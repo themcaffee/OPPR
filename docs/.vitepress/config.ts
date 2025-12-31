@@ -28,8 +28,11 @@ export default defineConfig({
         ],
       },
       {
-        text: 'Database',
-        items: [{ text: 'Database (Prisma)', link: '/db-prisma' }],
+        text: 'Backend',
+        items: [
+          { text: 'Database (Prisma)', link: '/db-prisma' },
+          { text: 'REST API', link: '/rest-api' },
+        ],
       },
       {
         text: 'Reference',
