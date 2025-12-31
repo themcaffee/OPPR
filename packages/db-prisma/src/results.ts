@@ -69,11 +69,9 @@ export async function createResult(data: CreateResultInput): Promise<TournamentR
 /**
  * Creates multiple tournament results at once
  */
-export async function createManyResults(
-  data: CreateResultInput[],
-): Promise<Prisma.BatchPayload> {
+export async function createManyResults(data: CreateResultInput[]): Promise<Prisma.BatchPayload> {
   // Apply same defaults as createResult
-  const resultsData = data.map(item => ({
+  const resultsData = data.map((item) => ({
     ...item,
     decayedPoints: item.decayedPoints ?? item.totalPoints ?? 0,
   }));
@@ -176,10 +174,7 @@ export async function getPlayerTopFinishes(
 /**
  * Updates a tournament result
  */
-export async function updateResult(
-  id: string,
-  data: UpdateResultInput,
-): Promise<TournamentResult> {
+export async function updateResult(id: string, data: UpdateResultInput): Promise<TournamentResult> {
   return prisma.tournamentResult.update({
     where: { id },
     data,
@@ -196,7 +191,9 @@ export async function updateResultPoints(
   totalPoints: number,
 ): Promise<TournamentResult> {
   // Get the result to access tournament date for decay calculation
-  const result = (await findResultById(id, { tournament: true })) as TournamentResultWithTournament | null;
+  const result = (await findResultById(id, {
+    tournament: true,
+  })) as TournamentResultWithTournament | null;
   if (!result) {
     throw new Error(`Result with id ${id} not found`);
   }
@@ -204,9 +201,7 @@ export async function updateResultPoints(
   // Calculate age and decay multiplier
   const now = new Date();
   const tournamentDate = result.tournament.date;
-  const ageInDays = Math.floor(
-    (now.getTime() - tournamentDate.getTime()) / (1000 * 60 * 60 * 24),
-  );
+  const ageInDays = Math.floor((now.getTime() - tournamentDate.getTime()) / (1000 * 60 * 60 * 24));
   const ageInYears = ageInDays / 365;
 
   let decayMultiplier = 0;

@@ -12,11 +12,7 @@ export type {
 /**
  * Re-export custom input types
  */
-export type {
-  CreatePlayerInput,
-  UpdatePlayerInput,
-  FindPlayersOptions,
-} from './players.js';
+export type { CreatePlayerInput, UpdatePlayerInput, FindPlayersOptions } from './players.js';
 
 export type {
   CreateTournamentInput,
@@ -24,11 +20,7 @@ export type {
   FindTournamentsOptions,
 } from './tournaments.js';
 
-export type {
-  CreateResultInput,
-  UpdateResultInput,
-  FindResultsOptions,
-} from './results.js';
+export type { CreateResultInput, UpdateResultInput, FindResultsOptions } from './results.js';
 
 /**
  * Player with full tournament results

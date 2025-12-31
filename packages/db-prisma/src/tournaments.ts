@@ -92,9 +92,7 @@ export async function findTournamentByExternalId(
 /**
  * Finds multiple tournaments with optional filters
  */
-export async function findTournaments(
-  options: FindTournamentsOptions = {},
-): Promise<Tournament[]> {
+export async function findTournaments(options: FindTournamentsOptions = {}): Promise<Tournament[]> {
   return prisma.tournament.findMany({
     take: options.take,
     skip: options.skip,
@@ -212,10 +210,7 @@ export async function getTournamentWithResults(id: string) {
 /**
  * Searches tournaments by name or location
  */
-export async function searchTournaments(
-  query: string,
-  limit: number = 20,
-): Promise<Tournament[]> {
+export async function searchTournaments(query: string, limit: number = 20): Promise<Tournament[]> {
   return findTournaments({
     take: limit,
     where: {
