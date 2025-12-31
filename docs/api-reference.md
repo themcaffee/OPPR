@@ -1,5 +1,9 @@
 # API Reference
 
+::: info Core Library Reference
+This is the TypeScript API reference for the `@opprs/core` calculation library. For REST API documentation, see the [REST API](/rest-api) page. This reference is for developers directly using the npm package.
+:::
+
 Complete reference for all types and functions exported by `@opprs/core`.
 
 ## Types

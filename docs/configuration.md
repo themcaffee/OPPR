@@ -1,5 +1,9 @@
 # Configuration
 
+::: info Core Library Reference
+This page documents configuration options for the `@opprs/core` calculation library. If you're using the REST API, configuration is typically managed server-side. This reference is for developers directly integrating the library.
+:::
+
 The OPPRS library allows you to configure all calculation constants to customize the ranking system for your specific needs. By default, the library uses the standard OPPRS constants, but you can override any value globally.
 
 ## Basic Configuration

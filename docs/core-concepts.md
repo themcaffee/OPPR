@@ -1,5 +1,9 @@
 # Core Concepts
 
+::: info Core Library Reference
+This page documents the `@opprs/core` calculation library. If you're running the full OPPRS stack (REST API + Frontend), these calculations are handled automatically. This reference is for developers who want to understand the algorithms or integrate the library into custom applications.
+:::
+
 This page explains the fundamental concepts and calculations used in the OPPRS ranking system.
 
 ## Base Value

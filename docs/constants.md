@@ -1,5 +1,9 @@
 # Constants and Calibration Rationale
 
+::: info Core Library Reference
+This page documents the calculation constants in the `@opprs/core` library. If you're using the REST API, these constants are applied automatically. This reference is for developers who want to understand the mathematical foundation or customize the calculations.
+:::
+
 This section explains why each constant in the system has its current value. The constants are carefully calibrated to create a balanced, mathematically sound ranking system.
 
 ## Design Philosophy
