@@ -58,30 +58,53 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Extracted version: $VERSION"
 
-      - name: Update package.json version
-        working-directory: packages/core
+      - name: Update package versions
         run: |
-          pnpm version ${{ steps.extract_version.outputs.version }} --no-git-tag-version
-          echo "Updated package.json to version ${{ steps.extract_version.outputs.version }}"
+          VERSION="${{ steps.extract_version.outputs.version }}"
+          cd packages/core && pnpm version $VERSION --no-git-tag-version
+          cd ../db-prisma && pnpm version $VERSION --no-git-tag-version
+          echo "Updated both packages to version $VERSION"
+
+      - name: Update db-prisma peerDependency
+        run: |
+          VERSION="${{ steps.extract_version.outputs.version }}"
+          cd packages/db-prisma
+          sed -i "s/\"@opprs\/core\": \"workspace:\^*\"/\"@opprs\/core\": \"^$VERSION\"/" package.json
 
       - name: Run quality checks and build
-        working-directory: packages/core
-        run: pnpm run prepublishOnly
+        run: |
+          pnpm --filter @opprs/core run prepublishOnly
+          pnpm --filter @opprs/db-prisma run prepublishOnly
 
-      - name: Dry-run publish
+      - name: Dry-run publish @opprs/core
         working-directory: packages/core
         run: |
-          echo "Running pnpm publish --dry-run to validate package..."
+          echo "Running pnpm publish --dry-run to validate @opprs/core..."
           pnpm publish --dry-run --no-git-checks
           echo "Dry-run completed successfully!"
 
-      - name: Publish to npm with provenance
+      - name: Dry-run publish @opprs/db-prisma
+        working-directory: packages/db-prisma
+        run: |
+          echo "Running pnpm publish --dry-run to validate @opprs/db-prisma..."
+          pnpm publish --dry-run --no-git-checks
+          echo "Dry-run completed successfully!"
+
+      - name: Publish @opprs/core to npm
         working-directory: packages/core
+        run: pnpm publish --provenance --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+      - name: Publish @opprs/db-prisma to npm
+        working-directory: packages/db-prisma
         run: pnpm publish --provenance --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
       - name: Report success
         run: |
-          echo "✅ Successfully published @opprs/core@${{ steps.extract_version.outputs.version }} to npm!"
-          echo "Package URL: https://www.npmjs.com/package/@opprs/core/v/${{ steps.extract_version.outputs.version }}"
+          VERSION="${{ steps.extract_version.outputs.version }}"
+          echo "Successfully published:"
+          echo "  - @opprs/core@$VERSION: https://www.npmjs.com/package/@opprs/core/v/$VERSION"
+          echo "  - @opprs/db-prisma@$VERSION: https://www.npmjs.com/package/@opprs/db-prisma/v/$VERSION"
