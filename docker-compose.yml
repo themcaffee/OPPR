@@ -10,8 +10,6 @@ services:
       POSTGRES_USER: oppr
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-oppr_dev_password}
       POSTGRES_DB: oppr_db
-    ports:
-      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -20,6 +18,8 @@ services:
       timeout: 5s
       retries: 10
       start_period: 10s
+    networks:
+      - oppr-network
 
   # ==========================================================================
   # REST API
@@ -33,8 +33,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    ports:
-      - "${API_PORT:-3000}:3000"
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       HOST: 0.0.0.0
@@ -46,6 +44,8 @@ services:
       JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-7d}
       LOG_LEVEL: ${LOG_LEVEL:-info}
       RUN_MIGRATIONS: ${RUN_MIGRATIONS:-true}
+    networks:
+      - oppr-network
 
   # ==========================================================================
   # Frontend (Next.js)
@@ -59,11 +59,34 @@ services:
     depends_on:
       rest-api:
         condition: service_started
-    ports:
-      - "${FRONTEND_PORT:-3001}:3000"
     environment:
       NODE_ENV: ${NODE_ENV:-production}
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3000}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-}
+    networks:
+      - oppr-network
+
+  # ==========================================================================
+  # Caddy Reverse Proxy
+  # ==========================================================================
+  caddy:
+    image: caddy:2-alpine
+    container_name: oppr-caddy
+    restart: unless-stopped
+    depends_on:
+      - frontend-next
+      - rest-api
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - oppr-network
 
   # ==========================================================================
   # Database Seeder (run with: docker compose --profile seed up seed)
@@ -83,6 +106,14 @@ services:
       SEED_DATABASE: "true"
     command: echo "Seeding complete"
     restart: "no"
+    networks:
+      - oppr-network
+
+networks:
+  oppr-network:
+    driver: bridge
 
 volumes:
   postgres_data:
+  caddy_data:
+  caddy_config:
