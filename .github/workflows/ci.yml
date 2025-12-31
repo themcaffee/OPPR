@@ -56,3 +56,11 @@ jobs:
 
       - name: Build
         run: pnpm run build
+
+      - name: Dry-run publish @opprs/core
+        working-directory: packages/core
+        run: pnpm publish --dry-run --no-git-checks
+
+      - name: Dry-run publish @opprs/db-prisma
+        working-directory: packages/db-prisma
+        run: pnpm publish --dry-run --no-git-checks
