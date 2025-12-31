@@ -4,6 +4,9 @@ export default defineConfig({
   title: 'OPPRS',
   description: 'Open Pinball Player Ranking System - Documentation',
   base: '/OPPR/',
+  ignoreDeadLinks: [
+    /^http:\/\/localhost/,
+  ],
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },
