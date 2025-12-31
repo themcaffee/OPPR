@@ -1,6 +1,6 @@
 import fp from 'fastify-plugin';
 import type { FastifyInstance, FastifyError } from 'fastify';
-import { ApiError } from '../utils/errors.js';
+import { ApiError, ExternalServiceError } from '../utils/errors.js';
 
 interface PrismaError extends Error {
   code?: string;
@@ -22,6 +22,15 @@ export default fp(
           error: 'Bad Request',
           message: 'Validation failed',
           details: error.validation,
+        });
+      }
+
+      if (error instanceof ExternalServiceError) {
+        return reply.status(error.statusCode).send({
+          statusCode: error.statusCode,
+          error: 'Bad Gateway',
+          message: error.message,
+          service: error.service,
         });
       }
 

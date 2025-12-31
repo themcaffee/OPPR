@@ -42,3 +42,13 @@ export class ConflictError extends ApiError {
     this.name = 'ConflictError';
   }
 }
+
+export class ExternalServiceError extends ApiError {
+  public readonly service: string;
+
+  constructor(service: string, message: string) {
+    super(`${service} error: ${message}`, 502);
+    this.name = 'ExternalServiceError';
+    this.service = service;
+  }
+}

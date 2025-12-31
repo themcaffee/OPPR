@@ -19,6 +19,7 @@
   "dependencies": {
     "@opprs/core": "workspace:*",
     "@opprs/db-prisma": "workspace:*",
+    "@opprs/matchplay-api": "workspace:*",
     "@fastify/cors": "^10.0.0",
     "@fastify/jwt": "^9.0.0",
     "@fastify/swagger": "^9.0.0",
