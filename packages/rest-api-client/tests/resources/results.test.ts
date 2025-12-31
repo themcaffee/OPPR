@@ -38,6 +38,72 @@ describe('ResultsResource', () => {
     });
   });
 
+  describe('get', () => {
+    it('should get result by id', async () => {
+      const result = {
+        id: 'result-1',
+        playerId: 'player-1',
+        tournamentId: 'tournament-1',
+        position: 1,
+        optedOut: false,
+        linearPoints: 10,
+        dynamicPoints: 20,
+        totalPoints: 30,
+        ageInDays: 5,
+        decayMultiplier: 1,
+        decayedPoints: 30,
+        efficiency: 1.5,
+        createdAt: '2025-01-01T00:00:00Z',
+        updatedAt: '2025-01-01T00:00:00Z',
+        player: {
+          id: 'player-1',
+          name: 'Test Player',
+        },
+        tournament: {
+          id: 'tournament-1',
+          name: 'Test Tournament',
+        },
+      };
+
+      mockRequest.mockResolvedValue(result);
+
+      const res = await resource.get('result-1');
+
+      expect(res).toEqual(result);
+      expect(mockRequest).toHaveBeenCalledWith('/results/result-1');
+    });
+  });
+
+  describe('create', () => {
+    it('should create a result', async () => {
+      const createData = { playerId: 'player-1', tournamentId: 'tournament-1', position: 1 };
+      const createdResult = {
+        id: 'result-1',
+        ...createData,
+        optedOut: false,
+        linearPoints: 10,
+        dynamicPoints: 20,
+        totalPoints: 30,
+        ageInDays: 0,
+        decayMultiplier: 1,
+        decayedPoints: 30,
+        efficiency: 1.5,
+        createdAt: '2025-01-01T00:00:00Z',
+        updatedAt: '2025-01-01T00:00:00Z',
+      };
+
+      mockRequest.mockResolvedValue(createdResult);
+
+      const result = await resource.create(createData);
+
+      expect(result).toEqual(createdResult);
+      expect(mockRequest).toHaveBeenCalledWith('/results', {
+        method: 'POST',
+        body: JSON.stringify(createData),
+      });
+    });
+  });
+
   describe('createBatch', () => {
     it('should create multiple results', async () => {
       const results = [
@@ -53,6 +119,50 @@ describe('ResultsResource', () => {
       expect(mockRequest).toHaveBeenCalledWith('/results/batch', {
         method: 'POST',
         body: JSON.stringify(results),
+      });
+    });
+  });
+
+  describe('update', () => {
+    it('should update a result', async () => {
+      const updateData = { position: 2 };
+      const updatedResult = {
+        id: 'result-1',
+        playerId: 'player-1',
+        tournamentId: 'tournament-1',
+        position: 2,
+        optedOut: false,
+        linearPoints: 8,
+        dynamicPoints: 15,
+        totalPoints: 23,
+        ageInDays: 0,
+        decayMultiplier: 1,
+        decayedPoints: 23,
+        efficiency: 1.2,
+        createdAt: '2025-01-01T00:00:00Z',
+        updatedAt: '2025-01-01T00:00:00Z',
+      };
+
+      mockRequest.mockResolvedValue(updatedResult);
+
+      const result = await resource.update('result-1', updateData);
+
+      expect(result).toEqual(updatedResult);
+      expect(mockRequest).toHaveBeenCalledWith('/results/result-1', {
+        method: 'PATCH',
+        body: JSON.stringify(updateData),
+      });
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete a result', async () => {
+      mockRequest.mockResolvedValue(undefined);
+
+      await resource.delete('result-1');
+
+      expect(mockRequest).toHaveBeenCalledWith('/results/result-1', {
+        method: 'DELETE',
       });
     });
   });
