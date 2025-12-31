@@ -35,6 +35,10 @@ export default defineConfig({
         ],
       },
       {
+        text: 'Apps',
+        items: [{ text: 'Frontend (Next.js)', link: '/frontend-next' }],
+      },
+      {
         text: 'Reference',
         items: [{ text: 'API Reference', link: '/api-reference' }],
       },
