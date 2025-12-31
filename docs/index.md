@@ -3,43 +3,51 @@ layout: home
 hero:
   name: OPPRS
   text: Open Pinball Player Ranking System
-  tagline: A comprehensive TypeScript library for calculating pinball tournament rankings and player ratings
+  tagline: A complete ranking system with REST API, web interface, and calculation engine for competitive pinball
   actions:
     - theme: brand
       text: Get Started
       link: /getting-started
     - theme: alt
       text: View on GitHub
-      link: https://github.com/your-org/opprs
+      link: https://github.com/themcaffee/OPPR
 features:
-  - title: Configurable Constants
-    details: Override any calculation constant to customize the ranking system for your specific needs.
-  - title: Complete Tournament Scoring
-    details: Base Value, TVA, TGP, Event Boosters, and Point Distribution calculations built-in.
-  - title: Glicko Rating System
-    details: Player skill rating with uncertainty tracking using the proven Glicko algorithm.
-  - title: TypeScript First
-    details: Full type safety and IntelliSense support with comprehensive type definitions.
+  - title: REST API
+    details: Full-featured Fastify API with JWT authentication, player/tournament management, and OpenAPI documentation.
+  - title: Web Interface
+    details: Modern Next.js 15 application with React 19, Tailwind CSS, and responsive design.
+  - title: Database Layer
+    details: PostgreSQL persistence with Prisma ORM for players, tournaments, results, and ratings.
+  - title: Calculation Engine
+    details: TypeScript library implementing tournament scoring, TGP, TVA, Glicko ratings, and time decay.
 ---
 
 ## Quick Overview
 
-OPPRS provides everything you need to implement a competitive pinball ranking system:
+OPPRS is a complete ranking system for competitive pinball tournaments:
 
-- **Base Value Calculation** - Tournament value based on number of rated players
-- **Tournament Value Adjustment (TVA)** - Strength indicators from player ratings and rankings
-- **Tournament Grading Percentage (TGP)** - Format quality assessment
-- **Event Boosters** - Multipliers for major championships and certified events
-- **Point Distribution** - Linear and dynamic point allocation
-- **Time Decay** - Automatic point depreciation over time
-- **Glicko Rating System** - Player skill rating with uncertainty
-- **Efficiency Tracking** - Performance metrics
-- **Input Validation** - Comprehensive data validation
+- **REST API** - Fastify-based HTTP API with JWT auth, CRUD operations, leaderboards, and batch processing
+- **Web Application** - Next.js frontend for player registration, tournament management, and rankings display
+- **Database** - PostgreSQL with Prisma for persistent storage of players, tournaments, and results
+- **Calculation Engine** - Core TypeScript library for tournament scoring, player ratings, and point distribution
+- **OpenAPI Docs** - Interactive Swagger UI for API exploration and testing
+- **Docker Ready** - Multi-stage Dockerfiles and docker-compose for easy deployment
 
-## Installation
+## Getting Started
+
+Run the full stack locally with Docker Compose:
 
 ```bash
-npm install @opprs/core
+docker compose up
 ```
 
-See the [Getting Started](/getting-started) guide for more details.
+Or install and run services individually:
+
+```bash
+pnpm install
+pnpm --filter @opprs/db-prisma run db:generate
+pnpm --filter rest-api dev    # API at http://localhost:3000
+pnpm --filter frontend-next dev  # Frontend at http://localhost:3001
+```
+
+See the [Getting Started](/getting-started) guide for detailed setup instructions.

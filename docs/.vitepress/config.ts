@@ -8,7 +8,8 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Getting Started', link: '/getting-started' },
-      { text: 'API Reference', link: '/api-reference' },
+      { text: 'REST API', link: '/rest-api' },
+      { text: 'Frontend', link: '/frontend-next' },
       { text: 'Demo', link: 'https://themcaffee.github.io/OPPR/demo/' },
     ],
     sidebar: [
@@ -20,27 +21,26 @@ export default defineConfig({
         ],
       },
       {
-        text: 'Guide',
+        text: 'Applications',
         items: [
-          { text: 'Configuration', link: '/configuration' },
-          { text: 'Core Concepts', link: '/core-concepts' },
-          { text: 'Constants & Calibration', link: '/constants' },
+          { text: 'REST API', link: '/rest-api' },
+          { text: 'Frontend (Next.js)', link: '/frontend-next' },
         ],
       },
       {
-        text: 'Backend',
+        text: 'Backend Services',
         items: [
           { text: 'Database (Prisma)', link: '/db-prisma' },
-          { text: 'REST API', link: '/rest-api' },
         ],
       },
       {
-        text: 'Apps',
-        items: [{ text: 'Frontend (Next.js)', link: '/frontend-next' }],
-      },
-      {
-        text: 'Reference',
-        items: [{ text: 'API Reference', link: '/api-reference' }],
+        text: 'Core Library',
+        items: [
+          { text: 'Core Concepts', link: '/core-concepts' },
+          { text: 'Configuration', link: '/configuration' },
+          { text: 'Constants & Calibration', link: '/constants' },
+          { text: 'API Reference', link: '/api-reference' },
+        ],
       },
     ],
     socialLinks: [{ icon: 'github', link: 'https://github.com/themcaffee/OPPR' }],
