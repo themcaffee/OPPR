@@ -2,6 +2,20 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { FastifyInstance } from 'fastify';
 import { buildApp } from '../src/app.js';
 
+describe('buildApp', () => {
+  it('should create app with default logger enabled', async () => {
+    const app = await buildApp();
+    expect(app).toBeDefined();
+    await app.close();
+  });
+
+  it('should create app with custom logger option', async () => {
+    const app = await buildApp({ logger: false });
+    expect(app).toBeDefined();
+    await app.close();
+  });
+});
+
 describe('Health endpoint', () => {
   let app: FastifyInstance;
 
