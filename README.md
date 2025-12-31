@@ -9,7 +9,7 @@ This project is organized as a monorepo using [Turborepo](https://turbo.build/) 
 ```
 .
 ├── packages/
-│   └── core/              # @oppr/core - Main TypeScript library
+│   └── core/              # @opprs/core - Main TypeScript library
 ├── apps/
 │   └── demo/              # Interactive demo application
 ├── turbo.json             # Turborepo pipeline configuration
@@ -19,7 +19,7 @@ This project is organized as a monorepo using [Turborepo](https://turbo.build/) 
 
 ### Packages
 
-- **@oppr/core** (`packages/core/`) - The core OPPR library, published to npm
+- **@opprs/core** (`packages/core/`) - The core OPPR library, published to npm
 - **demo** (`apps/demo/`) - Interactive React demo application for testing and visualization
 
 ## Features
@@ -39,17 +39,17 @@ This project is organized as a monorepo using [Turborepo](https://turbo.build/) 
 ## Installation
 
 ```bash
-npm install @oppr/core
+npm install @opprs/core
 ```
 
 Or with other package managers:
 
 ```bash
 # pnpm
-pnpm add @oppr/core
+pnpm add @opprs/core
 
 # yarn
-yarn add @oppr/core
+yarn add @opprs/core
 ```
 
 ## Quick Start
@@ -65,7 +65,7 @@ import {
   type Player,
   type TGPConfig,
   type PlayerResult,
-} from '@oppr/core';
+} from '@opprs/core';
 
 // Define your players
 const players: Player[] = [
@@ -117,7 +117,7 @@ The OPPR library allows you to configure all calculation constants to customize 
 ### Basic Configuration
 
 ```typescript
-import { configureOPPR, calculateBaseValue } from '@oppr/core';
+import { configureOPPR, calculateBaseValue } from '@opprs/core';
 
 // Configure specific constants
 configureOPPR({
@@ -153,7 +153,7 @@ You can configure any of the following constant groups:
 You only need to specify the values you want to override. All other values will use the defaults:
 
 ```typescript
-import { configureOPPR } from '@oppr/core';
+import { configureOPPR } from '@opprs/core';
 
 // Only override specific nested values
 configureOPPR({
@@ -170,7 +170,7 @@ configureOPPR({
 ### Resetting Configuration
 
 ```typescript
-import { resetConfig } from '@oppr/core';
+import { resetConfig } from '@opprs/core';
 
 // Reset all constants back to defaults
 resetConfig();
@@ -179,7 +179,7 @@ resetConfig();
 ### Accessing Default Constants
 
 ```typescript
-import { getDefaultConfig, DEFAULT_CONSTANTS } from '@oppr/core';
+import { getDefaultConfig, DEFAULT_CONSTANTS } from '@opprs/core';
 
 // Get the current defaults programmatically
 const defaults = getDefaultConfig();
@@ -194,7 +194,7 @@ console.log(DEFAULT_CONSTANTS.BASE_VALUE.MAX_BASE_VALUE); // 32
 #### Example 1: Higher Tournament Values
 
 ```typescript
-import { configureOPPR } from '@oppr/core';
+import { configureOPPR } from '@opprs/core';
 
 // Make tournaments worth more points
 configureOPPR({
@@ -216,7 +216,7 @@ configureOPPR({
 #### Example 2: Slower Time Decay
 
 ```typescript
-import { configureOPPR } from '@oppr/core';
+import { configureOPPR } from '@opprs/core';
 
 // Keep points valuable longer
 configureOPPR({
@@ -232,7 +232,7 @@ configureOPPR({
 #### Example 3: Different TGP Scaling
 
 ```typescript
-import { configureOPPR } from '@oppr/core';
+import { configureOPPR } from '@opprs/core';
 
 // Adjust TGP values
 configureOPPR({
@@ -252,7 +252,7 @@ configureOPPR({
 The configuration system is fully typed. Your IDE will provide autocomplete and type checking:
 
 ```typescript
-import { configureOPPR, type PartialOPPRConfig } from '@oppr/core';
+import { configureOPPR, type PartialOPPRConfig } from '@opprs/core';
 
 const myConfig: PartialOPPRConfig = {
   BASE_VALUE: {
@@ -275,7 +275,7 @@ The base value of a tournament is calculated based on the number of rated player
 - **Maximum of 32 points** (achieved at 64+ rated players)
 
 ```typescript
-import { calculateBaseValue } from '@oppr/core';
+import { calculateBaseValue } from '@opprs/core';
 
 const baseValue = calculateBaseValue(players);
 ```
@@ -295,7 +295,7 @@ TVA increases tournament value based on the strength of the field:
 - Formula: `ln(ranking) * -0.211675054 + 1.459827968`
 
 ```typescript
-import { calculateRatingTVA, calculateRankingTVA } from '@oppr/core';
+import { calculateRatingTVA, calculateRankingTVA } from '@opprs/core';
 
 const ratingTVA = calculateRatingTVA(players);
 const rankingTVA = calculateRankingTVA(players);
@@ -316,7 +316,7 @@ TGP measures the quality and completeness of a tournament format:
   - Unlimited card qualifying: 4X
 
 ```typescript
-import { calculateTGP, type TGPConfig } from '@oppr/core';
+import { calculateTGP, type TGPConfig } from '@opprs/core';
 
 const tgpConfig: TGPConfig = {
   qualifying: {
@@ -344,7 +344,7 @@ Event boosters multiply the final tournament value:
 - **Major:** 2.0X (200%)
 
 ```typescript
-import { getEventBoosterMultiplier } from '@oppr/core';
+import { getEventBoosterMultiplier } from '@opprs/core';
 
 const booster = getEventBoosterMultiplier('major'); // Returns 2.0
 ```
@@ -357,7 +357,7 @@ Points are distributed using two components:
 2. **Dynamic Distribution (90%):** Heavily weighted toward top finishers
 
 ```typescript
-import { distributePoints } from '@oppr/core';
+import { distributePoints } from '@opprs/core';
 
 const distributions = distributePoints(results, firstPlaceValue);
 ```
@@ -372,7 +372,7 @@ Points decay over time to emphasize recent performance:
 - **3+ years:** 0% value (inactive)
 
 ```typescript
-import { applyTimeDecay, isEventActive } from '@oppr/core';
+import { applyTimeDecay, isEventActive } from '@opprs/core';
 
 const eventDate = new Date('2023-01-01');
 const decayedPoints = applyTimeDecay(100, eventDate);
@@ -388,7 +388,7 @@ Player ratings use the Glicko system with rating deviation (uncertainty):
 - **RD decay:** ~0.3 per day of inactivity
 
 ```typescript
-import { updateRating, type RatingUpdate } from '@oppr/core';
+import { updateRating, type RatingUpdate } from '@opprs/core';
 
 const update: RatingUpdate = {
   currentRating: 1500,
@@ -746,10 +746,10 @@ pnpm run dev
 
 ```bash
 # Build only the core package
-pnpm --filter @oppr/core build
+pnpm --filter @opprs/core build
 
 # Run tests only for core package
-pnpm --filter @oppr/core test
+pnpm --filter @opprs/core test
 
 # Run the demo app
 pnpm --filter demo dev

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { configureOPPR, resetConfig, getDefaultConfig } from '@oppr/core';
-import type { OPPRConfig } from '@oppr/core';
+import { configureOPPR, resetConfig, getDefaultConfig } from '@opprs/core';
+import type { OPPRConfig } from '@opprs/core';
 
 const STORAGE_KEY = 'oppr-demo-config';
 
