@@ -172,7 +172,7 @@ MIT License - see LICENSE file for details
 
 ## Contributing
 
-Contributions are welcome! Please ensure all tests pass and maintain the existing code style.
+Contributions are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
 ## Acknowledgments
 
