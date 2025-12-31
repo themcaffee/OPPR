@@ -124,8 +124,8 @@ importers:
   packages/db-prisma:
     dependencies:
       '@opprs/core':
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: workspace:^
+        version: link:../core
       '@prisma/client':
         specifier: ^6.2.0
         version: 6.19.1(prisma@6.19.1(typescript@5.9.3))(typescript@5.9.3)
@@ -755,10 +755,6 @@ packages:
 
   '@js-sdsl/ordered-map@4.4.2':
     resolution: {integrity: sha512-iUKgm52T8HOE/makSxjqoWhe95ZJA1/G1sYsGev2JDKUSS14KAgg1LHb+Ba+IPow0xflbnSkOsZcO08C7w1gYw==}
-
-  '@opprs/core@0.3.0':
-    resolution: {integrity: sha512-rzfcdiBpDYJ6V6aL1GcRGPCzL/TnuCeVaSSv66NucUMYToUYOkLyguH5+Gftqm7hxneab6Nba6Rd+tPXDct5yA==}
-    engines: {node: '>=18.0.0'}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -3672,8 +3668,6 @@ snapshots:
       '@jridgewell/sourcemap-codec': 1.5.5
 
   '@js-sdsl/ordered-map@4.4.2': {}
-
-  '@opprs/core@0.3.0': {}
 
   '@pkgjs/parseargs@0.11.0':
     optional: true

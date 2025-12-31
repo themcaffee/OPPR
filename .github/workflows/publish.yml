@@ -69,7 +69,7 @@ jobs:
         run: |
           VERSION="${{ steps.extract_version.outputs.version }}"
           cd packages/db-prisma
-          sed -i "s/\"@opprs\/core\": \"^[^\"]*\"/\"@opprs\/core\": \"^$VERSION\"/" package.json
+          sed -i "s/\"@opprs\/core\": \"workspace:\^*\"/\"@opprs\/core\": \"^$VERSION\"/" package.json
 
       - name: Run quality checks and build
         run: |

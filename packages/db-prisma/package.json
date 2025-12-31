@@ -75,7 +75,7 @@
     "vitest": "^4.0.16"
   },
   "peerDependencies": {
-    "@opprs/core": "^0.4.1"
+    "@opprs/core": "workspace:^"
   },
   "engines": {
     "node": ">=18.0.0"
