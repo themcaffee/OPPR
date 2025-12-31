@@ -24,6 +24,9 @@ coverage/
 *~
 .DS_Store
 
+CLAUDE.md
+.claude/
+
 # Logs
 logs/
 *.log
