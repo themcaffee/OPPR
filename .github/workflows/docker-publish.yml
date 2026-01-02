@@ -27,10 +27,13 @@ env:
 jobs:
   docker-publish:
     runs-on: ubuntu-latest
-    # Skip release commits for canary builds (push events only)
+    # Run for:
+    # - GitHub release events
+    # - workflow_call (detected by inputs.is_stable_release being set)
+    # - Push events that are NOT release commits (canary builds)
     if: |
       github.event_name == 'release' ||
-      github.event_name == 'workflow_call' ||
+      inputs.is_stable_release != '' ||
       (github.event_name == 'push' && !startsWith(github.event.head_commit.message, 'chore: release'))
 
     strategy:
