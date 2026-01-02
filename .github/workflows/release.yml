@@ -147,3 +147,63 @@ jobs:
           echo "  Tags: ${{ steps.tags.outputs.tags }}"
           echo ""
           echo "Pull with: docker pull ${{ env.REGISTRY }}/${{ steps.tags.outputs.image_name }}:${{ steps.tags.outputs.version }}"
+
+  deploy:
+    needs: [release, docker-publish]
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ vars.APP_URL }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Setup SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+
+      - name: Test SSH connection
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${SSH_USER:-root}@${{ secrets.DEPLOY_HOST }} "echo 'SSH connection successful'"
+
+      - name: Deploy to production
+        env:
+          REMOTE_HOST: ${{ secrets.DEPLOY_HOST }}
+          IMAGE_TAG: ${{ needs.release.outputs.version }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+        run: |
+          export SSH_KEY="$HOME/.ssh/deploy_key"
+          chmod +x ./deploy/scripts/deploy.sh
+          ./deploy/scripts/deploy.sh
+
+      - name: Verify deployment
+        run: |
+          sleep 5
+          if [ -n "${{ vars.APP_URL }}" ]; then
+            echo "Checking application health at ${{ vars.APP_URL }}/health"
+            curl -f ${{ vars.APP_URL }}/health || echo "Warning: Health check failed, but deployment completed"
+          fi
+
+      - name: Notify deployment success
+        if: success()
+        run: |
+          echo "Deployment successful!"
+          echo "Tag: ${{ needs.release.outputs.version }}"
+          echo "Environment: production"
+          if [ -n "${{ vars.APP_URL }}" ]; then
+            echo "URL: ${{ vars.APP_URL }}"
+          fi
+
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -f ~/.ssh/deploy_key
