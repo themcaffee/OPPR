@@ -1,5 +1,13 @@
 # rest-api
 
+## 1.1.4
+
+### Patch Changes
+
+- Updated dependencies [b75d627]
+  - @opprs/core@1.1.4
+  - @opprs/matchplay-api@1.0.0
+
 ## 1.1.3
 
 ### Patch Changes

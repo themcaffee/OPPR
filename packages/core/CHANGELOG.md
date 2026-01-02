@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.4
+
+### Patch Changes
+
+- b75d627: chore: final test of Docker publish on release
+
 ## 1.1.3
 
 ### Patch Changes
