@@ -205,8 +205,11 @@ log_info "Using network: $NETWORK_NAME"
 log_info "Running database migrations..."
 MIGRATION_START=$(date +%s)
 
+# Construct DATABASE_URL from POSTGRES_PASSWORD (matches docker-compose.yml format)
+# The .env file has POSTGRES_PASSWORD but not DATABASE_URL, so we construct it here
 if remote_exec "docker run --rm \
     --env-file $DEPLOY_DIR/.env \
+    -e DATABASE_URL=\"postgresql://oppr:\$(grep POSTGRES_PASSWORD $DEPLOY_DIR/.env | cut -d= -f2)@postgres:5432/oppr_db?schema=public\" \
     --network $NETWORK_NAME \
     $IMAGE_NAME \
     sh -c 'cd /app/packages/db-prisma && npx prisma migrate deploy'"; then
@@ -228,6 +231,6 @@ else
     log_error ""
     log_error "To check migration status manually:"
     log_error "  ssh $SSH_USER@$REMOTE_HOST"
-    log_error "  docker run --rm --env-file $DEPLOY_DIR/.env --network $NETWORK_NAME $IMAGE_NAME sh -c 'cd /app/packages/db-prisma && npx prisma migrate status'"
+    log_error "  docker run --rm --env-file $DEPLOY_DIR/.env -e DATABASE_URL=\"postgresql://oppr:\$(grep POSTGRES_PASSWORD $DEPLOY_DIR/.env | cut -d= -f2)@postgres:5432/oppr_db?schema=public\" --network $NETWORK_NAME $IMAGE_NAME sh -c 'cd /app/packages/db-prisma && npx prisma migrate status'"
     exit 1
 fi
