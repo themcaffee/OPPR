@@ -1,0 +1,26 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.1.2/schema.json",
+  "changelog": "@changesets/cli/changelog",
+  "commit": false,
+  "fixed": [],
+  "linked": [
+    [
+      "@opprs/core",
+      "@opprs/db-prisma",
+      "@opprs/matchplay-api",
+      "@opprs/rest-api-client",
+      "demo",
+      "frontend-next",
+      "rest-api",
+      "docs"
+    ]
+  ],
+  "access": "public",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": [],
+  "privatePackages": {
+    "version": true,
+    "tag": true
+  }
+}
