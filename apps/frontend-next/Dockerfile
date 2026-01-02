@@ -51,6 +51,10 @@ ARG TURBO_TOKEN
 ENV TURBO_TEAM=${TURBO_TEAM}
 ENV TURBO_TOKEN=${TURBO_TOKEN}
 
+# Next.js public env vars (must be set at build time)
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
 # Build packages in dependency order
 RUN pnpm turbo run build --filter=frontend-next...
 
