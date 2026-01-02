@@ -16,6 +16,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json tsconfig.json ./
 
 # Copy package.json files for required workspace packages (preserve structure)
 COPY packages/core/package.json ./packages/core/
+COPY packages/rest-api-client/package.json ./packages/rest-api-client/
 COPY apps/frontend-next/package.json ./apps/frontend-next/
 
 # Install all dependencies (frozen lockfile for reproducibility)
@@ -29,6 +30,10 @@ FROM deps AS builder
 # Copy source files for core package
 COPY packages/core/src ./packages/core/src/
 COPY packages/core/tsconfig.json ./packages/core/
+
+# Copy source files for rest-api-client package
+COPY packages/rest-api-client/src ./packages/rest-api-client/src/
+COPY packages/rest-api-client/tsconfig.json ./packages/rest-api-client/
 
 # Copy source files for frontend-next
 COPY apps/frontend-next/app ./apps/frontend-next/app/
