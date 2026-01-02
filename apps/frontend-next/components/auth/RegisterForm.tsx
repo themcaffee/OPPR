@@ -1,12 +1,23 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  OpprsConflictError,
+  OpprsValidationError,
+  OpprsNetworkError,
+} from '@opprs/rest-api-client';
 import { registerSchema, type RegisterFormData } from '@/lib/validations/auth';
+import { apiClient } from '@/lib/api-client';
 import { FormField } from '@/components/ui/FormField';
 import { Button } from '@/components/ui/Button';
 
 export function RegisterForm() {
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
@@ -16,17 +27,46 @@ export function RegisterForm() {
   });
 
   const onSubmit = async (data: RegisterFormData) => {
-    // TODO: Implement actual registration when backend is ready
-    console.log('Registration submitted:', data);
+    setError(null);
 
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    alert('Registration successful! (Backend not yet implemented)');
+    try {
+      await apiClient.register({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      });
+      router.push('/profile');
+    } catch (err) {
+      if (err instanceof OpprsConflictError) {
+        setError('An account with this email already exists.');
+      } else if (err instanceof OpprsValidationError) {
+        setError(err.message || 'Please check your information and try again.');
+      } else if (err instanceof OpprsNetworkError) {
+        setError('Unable to connect. Please check your connection and try again.');
+      } else {
+        setError('Registration failed. Please try again.');
+      }
+    }
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {error && (
+        <div className="rounded-md bg-red-50 p-3 text-sm text-red-700" role="alert">
+          {error}
+        </div>
+      )}
+
+      <FormField
+        label="Name"
+        id="name"
+        type="text"
+        placeholder="Your name"
+        autoComplete="name"
+        error={errors.name?.message}
+        {...register('name')}
+      />
+
       <FormField
         label="Email"
         id="email"
