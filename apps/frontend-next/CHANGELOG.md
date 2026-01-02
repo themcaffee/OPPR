@@ -1,5 +1,12 @@
 # frontend-next
 
+## 1.1.2
+
+### Patch Changes
+
+- Updated dependencies [35a4242]
+  - @opprs/core@1.1.2
+
 ## 1.1.1
 
 ### Patch Changes
