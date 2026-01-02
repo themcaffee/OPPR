@@ -24,5 +24,6 @@ JWT_ACCESS_EXPIRES_IN=15m
 JWT_REFRESH_EXPIRES_IN=7d
 
 # Database Migration
-RUN_MIGRATIONS=true
+# Migrations are run explicitly in CI/CD before deployment
+RUN_MIGRATIONS=false
 SEED_DATABASE=false
