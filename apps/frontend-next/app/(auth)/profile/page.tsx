@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
+import { LogoutButton } from '@/components/auth/LogoutButton';
 
 export const metadata: Metadata = {
   title: 'Welcome - OPPRS',
@@ -15,13 +16,14 @@ export default function ProfilePage() {
         Your account has been created successfully. You can now start tracking your pinball
         tournament results.
       </p>
-      <div className="text-center">
+      <div className="flex justify-center gap-3">
         <Link
           href="/"
           className="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
         >
           Go to Dashboard
         </Link>
+        <LogoutButton />
       </div>
     </Card>
   );
