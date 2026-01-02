@@ -70,6 +70,7 @@ export {
   createUserWithPlayer,
   findUserById,
   findUserByEmail,
+  findUsers,
   getUserWithPlayer,
   getUserByEmailWithPlayer,
   updateUser,

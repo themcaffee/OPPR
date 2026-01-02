@@ -143,15 +143,16 @@ export const resultRoutes: FastifyPluginAsync = async (app) => {
     {
       schema: {
         tags: ['Results'],
-        summary: 'Create a new result',
+        summary: 'Create a new result (admin only)',
         security: [{ bearerAuth: [] }],
         body: createResultSchema,
         response: {
           201: resultSchema,
           401: errorResponseSchema,
+          403: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
+      preHandler: [app.requireAdmin],
     },
     async (request, reply) => {
       const result = await createResult(request.body);
@@ -165,15 +166,16 @@ export const resultRoutes: FastifyPluginAsync = async (app) => {
     {
       schema: {
         tags: ['Results'],
-        summary: 'Create multiple results at once',
+        summary: 'Create multiple results at once (admin only)',
         security: [{ bearerAuth: [] }],
         body: createManyResultsSchema,
         response: {
           201: batchResultResponseSchema,
           401: errorResponseSchema,
+          403: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
+      preHandler: [app.requireAdmin],
     },
     async (request, reply) => {
       const result = await createManyResults(request.body);
@@ -187,17 +189,18 @@ export const resultRoutes: FastifyPluginAsync = async (app) => {
     {
       schema: {
         tags: ['Results'],
-        summary: 'Update a result',
+        summary: 'Update a result (admin only)',
         security: [{ bearerAuth: [] }],
         params: idParamSchema,
         body: updateResultSchema,
         response: {
           200: resultSchema,
           401: errorResponseSchema,
+          403: errorResponseSchema,
           404: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
+      preHandler: [app.requireAdmin],
     },
     async (request, reply) => {
       const existing = await findResultById(request.params.id);
@@ -215,16 +218,17 @@ export const resultRoutes: FastifyPluginAsync = async (app) => {
     {
       schema: {
         tags: ['Results'],
-        summary: 'Delete a result',
+        summary: 'Delete a result (admin only)',
         security: [{ bearerAuth: [] }],
         params: idParamSchema,
         response: {
           204: { type: 'null' },
           401: errorResponseSchema,
+          403: errorResponseSchema,
           404: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
+      preHandler: [app.requireAdmin],
     },
     async (request, reply) => {
       const existing = await findResultById(request.params.id);
@@ -242,14 +246,15 @@ export const resultRoutes: FastifyPluginAsync = async (app) => {
     {
       schema: {
         tags: ['Results'],
-        summary: 'Recalculate time decay for all results',
+        summary: 'Recalculate time decay for all results (admin only)',
         security: [{ bearerAuth: [] }],
         response: {
           200: recalculateDecayResponseSchema,
           401: errorResponseSchema,
+          403: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
+      preHandler: [app.requireAdmin],
     },
     async (_request, reply) => {
       const updatedResults = await recalculateTimeDecay();
