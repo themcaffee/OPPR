@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0](https://github.com/themcaffee/OPPR/compare/v0.6.0...v0.7.0) (2026-01-02)
+
+
+### Features
+
+* **rest-api:** add Docker support with PostgreSQL and migrations ([#37](https://github.com/themcaffee/OPPR/issues/37)) ([6782466](https://github.com/themcaffee/OPPR/commit/6782466a6113ecfe43125befd210ba5effcc2343))
+
+
+### Bug Fixes
+
+* **ci:** release-please publish workflow and docs cleanup ([#27](https://github.com/themcaffee/OPPR/issues/27)) ([ab2c746](https://github.com/themcaffee/OPPR/commit/ab2c74606067d51d1b64c7422d5cf61acde6013c))
+* **ci:** sync package versions and fix release-please config ([#22](https://github.com/themcaffee/OPPR/issues/22)) ([36ddb60](https://github.com/themcaffee/OPPR/commit/36ddb60ef94e0e1d92675b09793f96cdfb31f480))
+
 ## [0.6.0](https://github.com/themcaffee/OPPR/compare/v0.5.2...v0.6.0) (2025-12-31)
 
 
