@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.0.0
+
+### Minor Changes
+
+- 3bf48f4: Add user registration API with cookie-based authentication
+  - Add User model with role-based access and Player linking
+  - Add registration endpoint that creates user with linked player profile
+  - Support HTTP-only cookie authentication alongside token-based auth
+  - Add cookie mode to REST API client with `useCookies` option
+  - Add `register()` method to REST API client
+
+### Patch Changes
+
+- Updated dependencies [05fc34c]
+  - @opprs/core@1.0.0
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
@@ -7,37 +23,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.7.0](https://github.com/themcaffee/OPPR/compare/v0.6.0...v0.7.0) (2026-01-02)
 
-
 ### Features
 
-* **rest-api:** add Docker support with PostgreSQL and migrations ([#37](https://github.com/themcaffee/OPPR/issues/37)) ([6782466](https://github.com/themcaffee/OPPR/commit/6782466a6113ecfe43125befd210ba5effcc2343))
-
+- **rest-api:** add Docker support with PostgreSQL and migrations ([#37](https://github.com/themcaffee/OPPR/issues/37)) ([6782466](https://github.com/themcaffee/OPPR/commit/6782466a6113ecfe43125befd210ba5effcc2343))
 
 ### Bug Fixes
 
-* **ci:** release-please publish workflow and docs cleanup ([#27](https://github.com/themcaffee/OPPR/issues/27)) ([ab2c746](https://github.com/themcaffee/OPPR/commit/ab2c74606067d51d1b64c7422d5cf61acde6013c))
-* **ci:** sync package versions and fix release-please config ([#22](https://github.com/themcaffee/OPPR/issues/22)) ([36ddb60](https://github.com/themcaffee/OPPR/commit/36ddb60ef94e0e1d92675b09793f96cdfb31f480))
+- **ci:** release-please publish workflow and docs cleanup ([#27](https://github.com/themcaffee/OPPR/issues/27)) ([ab2c746](https://github.com/themcaffee/OPPR/commit/ab2c74606067d51d1b64c7422d5cf61acde6013c))
+- **ci:** sync package versions and fix release-please config ([#22](https://github.com/themcaffee/OPPR/issues/22)) ([36ddb60](https://github.com/themcaffee/OPPR/commit/36ddb60ef94e0e1d92675b09793f96cdfb31f480))
 
 ## [0.6.0](https://github.com/themcaffee/OPPR/compare/v0.5.2...v0.6.0) (2025-12-31)
 
-
 ### Features
 
-* **rest-api:** add Docker support with PostgreSQL and migrations ([#37](https://github.com/themcaffee/OPPR/issues/37)) ([6782466](https://github.com/themcaffee/OPPR/commit/6782466a6113ecfe43125befd210ba5effcc2343))
+- **rest-api:** add Docker support with PostgreSQL and migrations ([#37](https://github.com/themcaffee/OPPR/issues/37)) ([6782466](https://github.com/themcaffee/OPPR/commit/6782466a6113ecfe43125befd210ba5effcc2343))
 
 ## [0.5.2](https://github.com/themcaffee/OPPR/compare/v0.5.1...v0.5.2) (2025-12-31)
 
-
 ### Bug Fixes
 
-* **ci:** release-please publish workflow and docs cleanup ([#27](https://github.com/themcaffee/OPPR/issues/27)) ([ab2c746](https://github.com/themcaffee/OPPR/commit/ab2c74606067d51d1b64c7422d5cf61acde6013c))
+- **ci:** release-please publish workflow and docs cleanup ([#27](https://github.com/themcaffee/OPPR/issues/27)) ([ab2c746](https://github.com/themcaffee/OPPR/commit/ab2c74606067d51d1b64c7422d5cf61acde6013c))
 
 ## [0.5.1](https://github.com/themcaffee/OPPR/compare/v0.5.0...v0.5.1) (2025-12-31)
 
-
 ### Bug Fixes
 
-* **ci:** sync package versions and fix release-please config ([#22](https://github.com/themcaffee/OPPR/issues/22)) ([36ddb60](https://github.com/themcaffee/OPPR/commit/36ddb60ef94e0e1d92675b09793f96cdfb31f480))
+- **ci:** sync package versions and fix release-please config ([#22](https://github.com/themcaffee/OPPR/issues/22)) ([36ddb60](https://github.com/themcaffee/OPPR/commit/36ddb60ef94e0e1d92675b09793f96cdfb31f480))
 
 ## [0.1.0] - 2024-12-29
 
@@ -71,6 +82,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### API Functions
 
 #### Player Functions
+
 - `createPlayer`, `updatePlayer`, `deletePlayer`
 - `findPlayerById`, `findPlayerByEmail`, `findPlayerByExternalId`
 - `getRatedPlayers`, `getTopPlayersByRating`, `getTopPlayersByRanking`
@@ -78,6 +90,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `searchPlayers`, `updatePlayerRating`
 
 #### Tournament Functions
+
 - `createTournament`, `updateTournament`, `deleteTournament`
 - `findTournamentById`, `findTournamentByExternalId`
 - `getRecentTournaments`, `getMajorTournaments`
@@ -86,6 +99,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `searchTournaments`
 
 #### Result Functions
+
 - `createResult`, `createManyResults`
 - `updateResult`, `deleteResult`
 - `getPlayerResults`, `getTournamentResults`
