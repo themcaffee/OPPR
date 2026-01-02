@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.1.4
+
+### Patch Changes
+
+- b75d627: chore: final test of Docker publish on release
+
+## 1.1.3
+
+### Patch Changes
+
+- 9623514: chore: verify Docker publish on release commits
+
+## 1.1.2
+
+### Patch Changes
+
+- 35a4242: chore: test Docker publish on release commits
+
 ## 1.0.0
 
 ### Minor Changes

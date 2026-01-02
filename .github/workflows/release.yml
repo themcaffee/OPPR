@@ -14,6 +14,9 @@ permissions:
   id-token: write
   packages: write
 
+env:
+  REGISTRY: ghcr.io
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -21,6 +24,7 @@ jobs:
       published: ${{ steps.changesets.outputs.published }}
       publishedPackages: ${{ steps.changesets.outputs.publishedPackages }}
       version: ${{ steps.get-version.outputs.version }}
+      should_publish_docker: ${{ steps.check-release.outputs.should_publish_docker }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
@@ -54,20 +58,92 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
-      - name: Get published version
+      - name: Check if should publish Docker images
+        id: check-release
+        run: |
+          # Publish Docker images if:
+          # 1. Packages were published to npm, OR
+          # 2. This is a release commit (from merging Version Packages PR)
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          if [[ "${{ steps.changesets.outputs.published }}" == "true" ]]; then
+            echo "should_publish_docker=true" >> $GITHUB_OUTPUT
+            echo "Packages published - will publish Docker images"
+          elif [[ "$COMMIT_MSG" == "chore: release"* ]]; then
+            echo "should_publish_docker=true" >> $GITHUB_OUTPUT
+            echo "Release commit detected - will publish Docker images"
+          else
+            echo "should_publish_docker=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get version
         id: get-version
-        if: steps.changesets.outputs.published == 'true'
+        if: steps.check-release.outputs.should_publish_docker == 'true'
         run: |
           VERSION=$(node -p "require('./packages/core/package.json').version")
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
 
   docker-publish:
     needs: release
-    if: needs.release.outputs.published == 'true'
-    uses: ./.github/workflows/docker-publish.yml
-    with:
-      is_stable_release: true
-      version: ${{ needs.release.outputs.version }}
-    permissions:
-      contents: read
-      packages: write
+    if: needs.release.outputs.should_publish_docker == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app:
+          - name: rest-api
+            image: oppr-rest-api
+            dockerfile: apps/rest-api/Dockerfile
+          - name: frontend-next
+            image: oppr-frontend
+            dockerfile: apps/frontend-next/Dockerfile
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Calculate image tags
+        id: tags
+        run: |
+          VERSION="${{ needs.release.outputs.version }}"
+          IMAGE_NAME="${{ github.repository_owner }}/${{ matrix.app.image }}"
+
+          # Stable release: version + latest tags
+          echo "tags=${{ env.REGISTRY }}/${IMAGE_NAME}:${VERSION},${{ env.REGISTRY }}/${IMAGE_NAME}:latest" >> $GITHUB_OUTPUT
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "image_name=${IMAGE_NAME}" >> $GITHUB_OUTPUT
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ steps.tags.outputs.image_name }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6
+        with:
+          context: .
+          file: ${{ matrix.app.dockerfile }}
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            TURBO_TEAM=${{ github.repository_owner }}
+            TURBO_TOKEN=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Report success
+        run: |
+          echo "Successfully published Docker image for ${{ matrix.app.name }}:"
+          echo "  Tags: ${{ steps.tags.outputs.tags }}"
+          echo ""
+          echo "Pull with: docker pull ${{ env.REGISTRY }}/${{ steps.tags.outputs.image_name }}:${{ steps.tags.outputs.version }}"
