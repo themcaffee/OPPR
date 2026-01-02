@@ -64,14 +64,17 @@ jobs:
           ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
 
       - name: Test SSH connection
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
         run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no root@${{ secrets.DEPLOY_HOST }} "echo 'SSH connection successful'"
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${SSH_USER:-root}@${{ secrets.DEPLOY_HOST }} "echo 'SSH connection successful'"
 
       - name: Deploy to production
         env:
           REMOTE_HOST: ${{ secrets.DEPLOY_HOST }}
           IMAGE_TAG: ${{ steps.tag.outputs.tag }}
           SSH_KEY: ~/.ssh/deploy_key
+          SSH_USER: ${{ secrets.SSH_USER }}
         run: |
           chmod +x ./deploy/scripts/deploy.sh
           ./deploy/scripts/deploy.sh
