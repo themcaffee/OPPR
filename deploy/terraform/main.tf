@@ -103,20 +103,8 @@ resource "digitalocean_droplet" "oppr" {
     destination = "/opt/oppr/Caddyfile"
   }
 
-  # Deploy the application
-  provisioner "remote-exec" {
-    inline = [
-      "cd /opt/oppr",
-      "echo 'Pulling Docker images...'",
-      "docker compose pull",
-      "echo 'Starting services...'",
-      "docker compose up -d",
-      "echo 'Waiting for services to be healthy...'",
-      "sleep 10",
-      "docker compose ps",
-      "echo 'Deployment completed successfully!'"
-    ]
-  }
+  # Note: Initial deployment must be done manually or via CI/CD
+  # See deploy/scripts/deploy.sh for zero-downtime deployment script
 }
 
 # =============================================================================
