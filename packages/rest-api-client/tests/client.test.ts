@@ -508,11 +508,12 @@ describe('OpprsClient', () => {
         tokenType: 'Bearer',
       };
 
-      mockFetch
-        .mockResolvedValueOnce(createMockResponse(loginResponse))
-        .mockResolvedValueOnce(
-          createMockResponse({ data: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 0 } })
-        );
+      mockFetch.mockResolvedValueOnce(createMockResponse(loginResponse)).mockResolvedValueOnce(
+        createMockResponse({
+          data: [],
+          pagination: { page: 1, limit: 20, total: 0, totalPages: 0 },
+        })
+      );
 
       const client = new OpprsClient({ fetch: mockFetch });
       await client.login({ email: 'test@example.com', password: 'password' });
@@ -529,11 +530,12 @@ describe('OpprsClient', () => {
         tokenType: 'Bearer',
       };
 
-      mockFetch
-        .mockResolvedValueOnce(createMockResponse(loginResponse))
-        .mockResolvedValueOnce(
-          createMockResponse({ data: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 0 } })
-        );
+      mockFetch.mockResolvedValueOnce(createMockResponse(loginResponse)).mockResolvedValueOnce(
+        createMockResponse({
+          data: [],
+          pagination: { page: 1, limit: 20, total: 0, totalPages: 0 },
+        })
+      );
 
       const client = new OpprsClient({ fetch: mockFetch });
       await client.login({ email: 'test@example.com', password: 'password' });
