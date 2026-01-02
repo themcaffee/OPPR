@@ -11,6 +11,9 @@ on:
 jobs:
   quality-checks:
     runs-on: ubuntu-latest
+    env:
+      TURBO_TEAM: ${{ github.repository_owner }}
+      TURBO_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
     steps:
       - name: Checkout code
