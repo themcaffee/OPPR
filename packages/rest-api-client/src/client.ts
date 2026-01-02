@@ -124,9 +124,13 @@ export class OpprsClient {
   async logout(): Promise<void> {
     if (this.useCookies) {
       // Cookie mode: server clears cookies
-      await this.request('/auth/logout', {
-        method: 'POST',
-      }, false);
+      await this.request(
+        '/auth/logout',
+        {
+          method: 'POST',
+        },
+        false
+      );
       return;
     }
 

@@ -95,10 +95,7 @@ export async function createUserWithPlayer(
 /**
  * Finds a user by ID
  */
-export async function findUserById(
-  id: string,
-  include?: Prisma.UserInclude,
-): Promise<User | null> {
+export async function findUserById(id: string, include?: Prisma.UserInclude): Promise<User | null> {
   return prisma.user.findUnique({
     where: { id },
     include,
