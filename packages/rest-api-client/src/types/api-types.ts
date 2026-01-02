@@ -394,3 +394,24 @@ export interface ExternalServiceError {
   message: string;
   service: string;
 }
+
+// ==================== Users (Admin) ====================
+
+export interface UserWithPlayer {
+  id: string;
+  email: string;
+  role: 'USER' | 'ADMIN';
+  playerId: string | null;
+  player: PlayerProfile | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UserListParams extends PaginationParams {
+  sortBy?: 'email' | 'role' | 'createdAt';
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface UpdateUserRoleRequest {
+  role: 'USER' | 'ADMIN';
+}

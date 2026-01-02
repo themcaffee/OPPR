@@ -254,15 +254,16 @@ export const playerRoutes: FastifyPluginAsync = async (app) => {
     {
       schema: {
         tags: ['Players'],
-        summary: 'Create a new player',
+        summary: 'Create a new player (admin only)',
         security: [{ bearerAuth: [] }],
         body: createPlayerSchema,
         response: {
           201: playerSchema,
           401: errorResponseSchema,
+          403: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
+      preHandler: [app.requireAdmin],
     },
     async (request, reply) => {
       const player = await createPlayer(request.body);
@@ -276,17 +277,18 @@ export const playerRoutes: FastifyPluginAsync = async (app) => {
     {
       schema: {
         tags: ['Players'],
-        summary: 'Update a player',
+        summary: 'Update a player (admin only)',
         security: [{ bearerAuth: [] }],
         params: idParamSchema,
         body: updatePlayerSchema,
         response: {
           200: playerSchema,
           401: errorResponseSchema,
+          403: errorResponseSchema,
           404: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
+      preHandler: [app.requireAdmin],
     },
     async (request, reply) => {
       const existing = await findPlayerById(request.params.id);
@@ -304,16 +306,17 @@ export const playerRoutes: FastifyPluginAsync = async (app) => {
     {
       schema: {
         tags: ['Players'],
-        summary: 'Delete a player',
+        summary: 'Delete a player (admin only)',
         security: [{ bearerAuth: [] }],
         params: idParamSchema,
         response: {
           204: { type: 'null' },
           401: errorResponseSchema,
+          403: errorResponseSchema,
           404: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
+      preHandler: [app.requireAdmin],
     },
     async (request, reply) => {
       const existing = await findPlayerById(request.params.id);

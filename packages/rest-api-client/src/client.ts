@@ -26,6 +26,7 @@ import { TournamentsResource } from './resources/tournaments.js';
 import { ResultsResource } from './resources/results.js';
 import { StatsResource } from './resources/stats.js';
 import { ImportResource } from './resources/import.js';
+import { UsersResource } from './resources/users.js';
 
 const DEFAULT_BASE_URL = '/api/v1';
 const DEFAULT_TIMEOUT = 30000;
@@ -413,5 +414,12 @@ export class OpprsClient {
    */
   get import(): ImportResource {
     return new ImportResource(this.request.bind(this));
+  }
+
+  /**
+   * Users resource (admin only)
+   */
+  get users(): UsersResource {
+    return new UsersResource(this.request.bind(this), this.buildQueryString.bind(this));
   }
 }

@@ -271,15 +271,16 @@ export const tournamentRoutes: FastifyPluginAsync = async (app) => {
     {
       schema: {
         tags: ['Tournaments'],
-        summary: 'Create a new tournament',
+        summary: 'Create a new tournament (admin only)',
         security: [{ bearerAuth: [] }],
         body: createTournamentSchema,
         response: {
           201: tournamentSchema,
           401: errorResponseSchema,
+          403: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
+      preHandler: [app.requireAdmin],
     },
     async (request, reply) => {
       const { date, ...rest } = request.body;
@@ -297,17 +298,18 @@ export const tournamentRoutes: FastifyPluginAsync = async (app) => {
     {
       schema: {
         tags: ['Tournaments'],
-        summary: 'Update a tournament',
+        summary: 'Update a tournament (admin only)',
         security: [{ bearerAuth: [] }],
         params: idParamSchema,
         body: updateTournamentSchema,
         response: {
           200: tournamentSchema,
           401: errorResponseSchema,
+          403: errorResponseSchema,
           404: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
+      preHandler: [app.requireAdmin],
     },
     async (request, reply) => {
       const existing = await findTournamentById(request.params.id);
@@ -329,16 +331,17 @@ export const tournamentRoutes: FastifyPluginAsync = async (app) => {
     {
       schema: {
         tags: ['Tournaments'],
-        summary: 'Delete a tournament',
+        summary: 'Delete a tournament (admin only)',
         security: [{ bearerAuth: [] }],
         params: idParamSchema,
         response: {
           204: { type: 'null' },
           401: errorResponseSchema,
+          403: errorResponseSchema,
           404: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
+      preHandler: [app.requireAdmin],
     },
     async (request, reply) => {
       const existing = await findTournamentById(request.params.id);

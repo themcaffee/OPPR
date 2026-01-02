@@ -4,6 +4,7 @@ import cookiePlugin from './plugins/cookie.js';
 import swaggerPlugin from './plugins/swagger.js';
 import databasePlugin from './plugins/database.js';
 import authPlugin from './plugins/auth.js';
+import adminPlugin from './plugins/admin.js';
 import errorHandlerPlugin from './middleware/error-handler.js';
 import { registerRoutes } from './routes/index.js';
 
@@ -35,10 +36,13 @@ export async function buildApp(options: AppOptions = {}): Promise<FastifyInstanc
   // 3. Authentication
   await app.register(authPlugin);
 
-  // 4. Error handling
+  // 4. Admin authorization (depends on auth)
+  await app.register(adminPlugin);
+
+  // 5. Error handling
   await app.register(errorHandlerPlugin);
 
-  // 5. Routes
+  // 6. Routes
   await registerRoutes(app);
 
   return app;

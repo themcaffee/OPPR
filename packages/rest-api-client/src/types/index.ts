@@ -52,4 +52,8 @@ export type {
   ImportMatchplayTournamentRequest,
   ImportTournamentResponse,
   ExternalServiceError,
+  // Users (Admin)
+  UserWithPlayer,
+  UserListParams,
+  UpdateUserRoleRequest,
 } from './api-types.js';

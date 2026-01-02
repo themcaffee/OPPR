@@ -209,3 +209,35 @@ export async function deleteUser(id: string): Promise<User> {
 export async function countUsers(where?: Prisma.UserWhereInput): Promise<number> {
   return prisma.user.count({ where });
 }
+
+/**
+ * Finds users with pagination and optional filtering
+ */
+export async function findUsers(params: {
+  take?: number;
+  skip?: number;
+  where?: Prisma.UserWhereInput;
+  orderBy?: Prisma.UserOrderByWithRelationInput;
+}): Promise<UserWithPlayer[]> {
+  const users = await prisma.user.findMany({
+    take: params.take,
+    skip: params.skip,
+    where: params.where,
+    orderBy: params.orderBy,
+    include: {
+      player: {
+        select: {
+          id: true,
+          name: true,
+          rating: true,
+          ratingDeviation: true,
+          ranking: true,
+          isRated: true,
+          eventCount: true,
+        },
+      },
+    },
+  });
+
+  return users as UserWithPlayer[];
+}
