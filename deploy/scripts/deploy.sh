@@ -16,6 +16,7 @@ set -e  # Exit on error
 DEPLOY_DIR="/opt/oppr"
 IMAGE_TAG="${IMAGE_TAG:-latest}"
 SSH_KEY="${SSH_KEY:-$HOME/.ssh/id_rsa}"
+SSH_USER="${SSH_USER:-root}"
 REMOTE_HOST="${REMOTE_HOST:-}"
 
 # Colors for output
@@ -54,6 +55,7 @@ Usage: $0 [OPTIONS]
 Options:
     --tag=<version>       Docker image tag to deploy (default: latest)
     --host=<server>       Remote server hostname/IP (required if REMOTE_HOST not set)
+    --user=<username>     SSH username for remote connection (default: root)
     --key=<path>          Path to SSH private key (default: ~/.ssh/id_rsa)
     --dry-run             Show what would be deployed without executing
     --help                Show this help message
@@ -61,6 +63,7 @@ Options:
 Environment Variables:
     REMOTE_HOST           Remote server hostname/IP
     IMAGE_TAG             Docker image tag
+    SSH_USER              SSH username for remote connection
     SSH_KEY               Path to SSH private key
 
 Examples:
@@ -69,6 +72,9 @@ Examples:
 
     # Deploy specific version
     $0 --host=oppr.example.com --tag=v1.2.3
+
+    # Deploy as specific user
+    $0 --host=oppr.example.com --user=deploy
 
     # Use environment variables
     REMOTE_HOST=oppr.example.com IMAGE_TAG=v1.2.3 $0
@@ -79,7 +85,7 @@ EOF
 }
 
 remote_exec() {
-    ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no root@"$REMOTE_HOST" "$@"
+    ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "$SSH_USER@$REMOTE_HOST" "$@"
 }
 
 check_service_health() {
@@ -117,6 +123,9 @@ for arg in "$@"; do
             ;;
         --host=*)
             REMOTE_HOST="${arg#*=}"
+            ;;
+        --user=*)
+            SSH_USER="${arg#*=}"
             ;;
         --key=*)
             SSH_KEY="${arg#*=}"
@@ -159,6 +168,7 @@ log_info "==================================================================="
 log_info "OPPR Zero-Downtime Deployment"
 log_info "==================================================================="
 log_info "Remote Host: $REMOTE_HOST"
+log_info "SSH User:    $SSH_USER"
 log_info "Image Tag:   $IMAGE_TAG"
 log_info "SSH Key:     $SSH_KEY"
 log_info "Deploy Dir:  $DEPLOY_DIR"
@@ -225,7 +235,7 @@ log_success "===================================================================
 log_info "Services are now running with image tag: $IMAGE_TAG"
 log_info ""
 log_info "View logs:"
-log_info "  ssh -i $SSH_KEY root@$REMOTE_HOST 'cd $DEPLOY_DIR && docker compose logs -f'"
+log_info "  ssh -i $SSH_KEY $SSH_USER@$REMOTE_HOST 'cd $DEPLOY_DIR && docker compose logs -f'"
 log_info ""
 log_info "Rollback if needed:"
 log_info "  $0 --host=$REMOTE_HOST --tag=<previous-version>"
