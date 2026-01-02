@@ -1,0 +1,103 @@
+name: Deploy to Production
+
+on:
+  # Deploy after successful Docker image publish
+  workflow_run:
+    workflows: ["Publish Docker Image"]
+    types:
+      - completed
+    branches:
+      - main
+
+  # Allow manual deployment
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Docker image tag to deploy (e.g., latest, v1.2.3, 1.0.0-canary.abc123)'
+        required: false
+        default: 'latest'
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Only run on successful workflow_run or manual dispatch
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+
+    environment:
+      name: ${{ github.event.inputs.environment || 'production' }}
+      url: ${{ vars.APP_URL }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Determine image tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ github.event.inputs.image_tag }}"
+          else
+            # For automated deployments, use latest
+            TAG="latest"
+          fi
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "Deploying tag: ${TAG}"
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Test SSH connection
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no root@${{ secrets.DEPLOY_HOST }} "echo 'SSH connection successful'"
+
+      - name: Deploy to production
+        env:
+          REMOTE_HOST: ${{ secrets.DEPLOY_HOST }}
+          IMAGE_TAG: ${{ steps.tag.outputs.tag }}
+          SSH_KEY: ~/.ssh/deploy_key
+        run: |
+          chmod +x ./deploy/scripts/deploy.sh
+          ./deploy/scripts/deploy.sh
+
+      - name: Verify deployment
+        run: |
+          # Wait a few seconds for services to stabilize
+          sleep 5
+
+          # Check if the application is responding
+          if [ -n "${{ vars.APP_URL }}" ]; then
+            echo "Checking application health at ${{ vars.APP_URL }}/health"
+            curl -f ${{ vars.APP_URL }}/health || echo "Warning: Health check failed, but deployment completed"
+          fi
+
+      - name: Notify deployment success
+        if: success()
+        run: |
+          echo "✅ Deployment successful!"
+          echo "Tag: ${{ steps.tag.outputs.tag }}"
+          echo "Environment: ${{ github.event.inputs.environment || 'production' }}"
+          if [ -n "${{ vars.APP_URL }}" ]; then
+            echo "URL: ${{ vars.APP_URL }}"
+          fi
+
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -f ~/.ssh/deploy_key

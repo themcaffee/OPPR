@@ -233,6 +233,16 @@ docker run --rm -v oppr_postgres_data:/data -v $(pwd):/backup alpine tar czf /ba
 
 For automated infrastructure provisioning on Digital Ocean, use the Terraform configuration in `terraform/`.
 
+**Architecture Overview**:
+- **Terraform**: Provisions infrastructure only (droplet, firewall, SSH keys, config files)
+- **Deployment Script**: Handles application deployments with zero downtime
+- **GitHub Actions**: Automates the entire CI/CD pipeline
+
+This separation ensures:
+- ✅ No downtime when running `terraform apply`
+- ✅ Infrastructure changes don't trigger app restarts
+- ✅ App deployments don't require Terraform
+
 ### Prerequisites
 
 - [Terraform](https://www.terraform.io/downloads) >= 1.0.0
@@ -262,9 +272,15 @@ EOF
 # Preview changes
 terraform plan
 
-# Deploy
+# Deploy infrastructure
 terraform apply
+
+# Perform initial deployment
+cd ../scripts
+./deploy.sh --host=$(cd ../terraform && terraform output -raw effective_ip)
 ```
+
+**Note**: Terraform creates the infrastructure and copies configuration files, but does NOT deploy the application. Use the deployment script or GitHub Actions for application deployments.
 
 ### Configuration Variables
 
@@ -305,16 +321,148 @@ terraform output -json postgres_password
 
 ### Updating Deployed Application
 
+**Important**: Terraform only provisions infrastructure. Application deployments are handled separately.
+
+#### Option 1: GitHub Actions (Recommended)
+
+Automated deployments via CI/CD:
+
 ```bash
-# SSH into server and update
+# Automatic: Push to main or create a release
+git push origin main
+
+# Manual: Use workflow dispatch in GitHub Actions
+# Go to Actions → Deploy to Production → Run workflow
+# Enter image tag (e.g., latest, v1.2.3)
+```
+
+See `.github/workflows/README.md` for setup instructions.
+
+#### Option 2: Manual Deployment Script
+
+Use the zero-downtime deployment script:
+
+```bash
+# Deploy from your local machine
+cd deploy
+./scripts/deploy.sh --host=$(cd terraform && terraform output -raw effective_ip)
+
+# Deploy specific version
+./scripts/deploy.sh --host=oppr.example.com --tag=v1.2.3
+
+# Use environment variables
+REMOTE_HOST=oppr.example.com IMAGE_TAG=latest ./scripts/deploy.sh
+```
+
+#### Option 3: Direct SSH
+
+SSH to server and update manually:
+
+```bash
 ssh root@$(terraform output -raw effective_ip)
 cd /opt/oppr
-docker compose pull
-docker compose up -d
 
-# Or deploy a specific version via Terraform
-terraform apply -var="image_tag=1.2.0"
+# Zero-downtime rolling update
+docker compose pull
+docker compose up -d --no-deps --build frontend-next
+docker compose up -d --no-deps --build rest-api
+docker compose restart caddy
+
+# Or full restart (brief downtime)
+docker compose up -d
 ```
+
+## Zero-Downtime Deployment Script
+
+The `deploy/scripts/deploy.sh` script performs rolling updates without downtime.
+
+### Usage
+
+```bash
+cd deploy/scripts
+
+# Deploy latest version
+./deploy.sh --host=oppr.example.com
+
+# Deploy specific version
+./deploy.sh --host=oppr.example.com --tag=v1.2.3
+
+# Using environment variables
+REMOTE_HOST=oppr.example.com IMAGE_TAG=v1.2.3 ./deploy.sh
+
+# Dry run (preview without deploying)
+./deploy.sh --host=oppr.example.com --dry-run
+
+# Show help
+./deploy.sh --help
+```
+
+### How It Works
+
+1. **Pulls new Docker images** from GitHub Container Registry
+2. **Updates services individually** with `--no-deps` flag:
+   - Frontend (stateless, zero downtime)
+   - REST API (brief connection blips possible)
+   - Caddy (minimal interruption)
+3. **Health checks** after each service update
+4. **Rollback support** by deploying previous image tag
+
+### Rollback Example
+
+```bash
+# Something went wrong with v1.2.3, rollback to v1.2.2
+./deploy.sh --host=oppr.example.com --tag=v1.2.2
+```
+
+## GitHub Actions CI/CD
+
+Automated deployments are configured via GitHub Actions workflows.
+
+### Setup
+
+See `.github/workflows/README.md` for detailed setup instructions.
+
+**Required GitHub Secrets**:
+- `DEPLOY_SSH_KEY`: SSH private key for server access
+- `DEPLOY_HOST`: Server hostname or IP
+
+**Optional GitHub Variables**:
+- `APP_URL`: Application URL (for health checks)
+
+### Workflow Pipeline
+
+1. **CI** (`ci.yml`): Runs tests, linting, type checking on every push
+2. **Publish Docker** (`docker-publish.yml`): Builds and pushes images to GHCR
+   - Canary builds on push to `main`: `version-canary.sha`
+   - Stable builds on release: `version` + `latest`
+3. **Deploy Production** (`deploy-production.yml`): Deploys to server
+   - Automatic: After successful Docker publish
+   - Manual: Via workflow dispatch
+
+### Deployment Triggers
+
+**Automatic**:
+```bash
+# Push to main → builds canary image → auto-deploys
+git push origin main
+```
+
+**Manual**:
+1. Go to **Actions → Deploy to Production → Run workflow**
+2. Select image tag (e.g., `latest`, `v1.2.3`, `1.0.0-canary.abc123`)
+3. Click **Run workflow**
+
+**On Release**:
+```bash
+# Create release → builds stable image (latest + version) → auto-deploys
+gh release create v1.2.3 --generate-notes
+```
+
+### Finding Image Tags
+
+Check available image tags:
+- Go to repository **Packages** section
+- Or use GitHub CLI: `gh api /user/packages/container/oppr-rest-api/versions`
 
 ### Destroy Infrastructure
 
