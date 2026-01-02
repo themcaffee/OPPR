@@ -53,6 +53,17 @@ jobs:
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${SSH_USER:-root}@${{ secrets.DEPLOY_HOST }} "echo 'SSH connection successful'"
 
+      - name: Run database migrations
+        env:
+          REMOTE_HOST: ${{ secrets.DEPLOY_HOST }}
+          IMAGE_TAG: ${{ steps.tag.outputs.tag }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          GITHUB_OWNER: ${{ github.repository_owner }}
+        run: |
+          export SSH_KEY="$HOME/.ssh/deploy_key"
+          chmod +x ./deploy/scripts/migrate.sh
+          ./deploy/scripts/migrate.sh
+
       - name: Deploy to production
         env:
           REMOTE_HOST: ${{ secrets.DEPLOY_HOST }}
