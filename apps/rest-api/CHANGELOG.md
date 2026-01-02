@@ -1,5 +1,25 @@
 # rest-api
 
+## 1.2.0
+
+### Minor Changes
+
+- e403a1b: feat: add admin page with full CRUD for all models
+  - Add admin authorization middleware to REST API
+  - Create user management endpoints (list, get, update role, delete)
+  - Apply admin-only protection to write operations (players, tournaments, results)
+  - Add Users resource to rest-api-client
+  - Add findUsers function to db-prisma
+  - Create Next.js middleware for admin route protection
+  - Add admin dashboard with stats overview
+  - Add admin pages for Players, Tournaments, Results, and Users management
+  - Include reusable admin components (DataTable, Pagination, SearchInput, Modal, ConfirmDialog)
+
+### Patch Changes
+
+- Updated dependencies [e403a1b]
+  - @opprs/db-prisma@1.2.0
+
 ## 1.1.5
 
 ### Patch Changes
