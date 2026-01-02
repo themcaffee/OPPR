@@ -64,5 +64,19 @@ export {
   recalculateTimeDecay,
 } from './results.js';
 
+// Export user functions
+export {
+  createUser,
+  createUserWithPlayer,
+  findUserById,
+  findUserByEmail,
+  getUserWithPlayer,
+  getUserByEmailWithPlayer,
+  updateUser,
+  updateUserRefreshToken,
+  deleteUser,
+  countUsers,
+} from './users.js';
+
 // Export all types
 export * from './types.js';

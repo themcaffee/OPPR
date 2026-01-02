@@ -1,5 +1,6 @@
 import Fastify, { FastifyInstance, FastifyServerOptions } from 'fastify';
 import corsPlugin from './plugins/cors.js';
+import cookiePlugin from './plugins/cookie.js';
 import swaggerPlugin from './plugins/swagger.js';
 import databasePlugin from './plugins/database.js';
 import authPlugin from './plugins/auth.js';
@@ -23,6 +24,7 @@ export async function buildApp(options: AppOptions = {}): Promise<FastifyInstanc
 
   // 1. Core plugins (no dependencies)
   await app.register(corsPlugin);
+  await app.register(cookiePlugin);
   await app.register(swaggerPlugin);
 
   // 2. Database connection (can be skipped for testing)

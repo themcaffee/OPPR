@@ -6,6 +6,9 @@ import type {
   RefreshRequest,
   RefreshResponse,
   User,
+  RegisterRequest,
+  AuthResponse,
+  AuthUser,
 } from './types/index.js';
 import {
   OpprsApiError,
@@ -37,6 +40,7 @@ export class OpprsClient {
   private readonly fetchImpl: typeof fetch;
   private readonly onTokenRefresh?: (_t: TokenPair) => void;
   private readonly onAuthError?: () => void;
+  private readonly useCookies: boolean;
 
   private accessToken: string | null = null;
   private refreshToken: string | null = null;
@@ -49,6 +53,7 @@ export class OpprsClient {
     this.fetchImpl = options.fetch ?? globalThis.fetch.bind(globalThis);
     this.onTokenRefresh = options.onTokenRefresh;
     this.onAuthError = options.onAuthError;
+    this.useCookies = options.useCookies ?? false;
 
     if (options.accessToken) {
       this.accessToken = options.accessToken;
@@ -61,9 +66,43 @@ export class OpprsClient {
   // ==================== Authentication Management ====================
 
   /**
-   * Login with email and password
+   * Register a new user (cookie mode only)
+   * Creates a new user account with a linked player profile.
+   * In cookie mode, authentication cookies are set by the server.
    */
-  async login(credentials: LoginRequest): Promise<LoginResponse> {
+  async register(data: RegisterRequest): Promise<AuthResponse> {
+    const response = await this.request<AuthResponse>(
+      '/auth/register',
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+      },
+      false
+    );
+
+    return response;
+  }
+
+  /**
+   * Login with email and password
+   * In cookie mode, authentication cookies are set by the server.
+   * In token mode, tokens are returned in the response body.
+   */
+  async login(credentials: LoginRequest): Promise<LoginResponse | AuthResponse> {
+    if (this.useCookies) {
+      // Cookie mode: server sets HTTP-only cookies
+      const response = await this.request<AuthResponse>(
+        '/auth/login',
+        {
+          method: 'POST',
+          body: JSON.stringify(credentials),
+        },
+        false
+      );
+      return response;
+    }
+
+    // Token mode: tokens in response body
     const response = await this.request<LoginResponse>(
       '/auth/login',
       {
@@ -71,7 +110,7 @@ export class OpprsClient {
         body: JSON.stringify(credentials),
       },
       false
-    ); // Don't require auth for login
+    );
 
     this.setTokens(response);
     return response;
@@ -79,8 +118,19 @@ export class OpprsClient {
 
   /**
    * Logout and invalidate tokens
+   * In cookie mode, clears authentication cookies.
+   * In token mode, invalidates the refresh token.
    */
   async logout(): Promise<void> {
+    if (this.useCookies) {
+      // Cookie mode: server clears cookies
+      await this.request('/auth/logout', {
+        method: 'POST',
+      }, false);
+      return;
+    }
+
+    // Token mode
     if (!this.refreshToken) {
       this.clearTokens();
       return;
@@ -98,15 +148,26 @@ export class OpprsClient {
 
   /**
    * Get current authenticated user
+   * In cookie mode, returns AuthUser with player profile.
+   * In token mode, returns basic User info.
    */
-  async getMe(): Promise<User> {
+  async getMe(): Promise<User | AuthUser> {
+    if (this.useCookies) {
+      return this.request<AuthUser>('/auth/me');
+    }
     return this.request<User>('/auth/me');
   }
 
   /**
    * Check if client has valid authentication
+   * In cookie mode, this always returns false since cookies are HTTP-only.
+   * Use getMe() to check authentication status in cookie mode.
    */
   isAuthenticated(): boolean {
+    if (this.useCookies) {
+      // Can't check cookies directly - they're HTTP-only
+      return false;
+    }
     return this.accessToken !== null;
   }
 
@@ -204,7 +265,7 @@ export class OpprsClient {
   // ==================== HTTP Request Infrastructure ====================
 
   private async request<T>(path: string, options?: RequestInit, requireAuth = true): Promise<T> {
-    if (requireAuth) {
+    if (requireAuth && !this.useCookies) {
       await this.ensureValidToken();
     }
 
@@ -218,18 +279,25 @@ export class OpprsClient {
         'Content-Type': 'application/json',
       };
 
-      if (this.accessToken && requireAuth) {
+      if (this.accessToken && requireAuth && !this.useCookies) {
         headers['Authorization'] = `Bearer ${this.accessToken}`;
       }
 
-      const response = await this.fetchImpl(url, {
+      const fetchOptions: RequestInit = {
         ...options,
         headers: {
           ...headers,
           ...(options?.headers as Record<string, string>),
         },
         signal: controller.signal,
-      });
+      };
+
+      // Include credentials for cookie-based auth
+      if (this.useCookies) {
+        fetchOptions.credentials = 'include';
+      }
+
+      const response = await this.fetchImpl(url, fetchOptions);
 
       clearTimeout(timeoutId);
 

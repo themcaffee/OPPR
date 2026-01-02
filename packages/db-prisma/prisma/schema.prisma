@@ -34,6 +34,7 @@ model Player {
 
   // Relations
   tournamentResults TournamentResult[]
+  user              User?
 
   @@index([email])
   @@index([externalId])
@@ -120,4 +121,33 @@ enum EventBoosterType {
   CERTIFIED_PLUS
   CHAMPIONSHIP_SERIES
   MAJOR
+}
+
+// Enum for user roles
+enum Role {
+  USER
+  ADMIN
+}
+
+// User model - represents an authenticated user account
+model User {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Authentication
+  email            String   @unique
+  passwordHash     String
+
+  // Authorization
+  role             Role     @default(USER)
+
+  // Link to Player profile
+  playerId         String?  @unique
+  player           Player?  @relation(fields: [playerId], references: [id], onDelete: SetNull)
+
+  // Session management (for token revocation)
+  refreshTokenHash String?
+
+  @@index([email])
 }

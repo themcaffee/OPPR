@@ -15,6 +15,10 @@ export type {
   RefreshRequest,
   RefreshResponse,
   User,
+  RegisterRequest,
+  PlayerProfile,
+  AuthUser,
+  AuthResponse,
   // Players
   Player,
   CreatePlayerRequest,
