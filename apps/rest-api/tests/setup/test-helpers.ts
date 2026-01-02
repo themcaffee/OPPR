@@ -43,6 +43,10 @@ export async function getAuthToken(): Promise<string> {
     },
   });
 
+  if (response.statusCode !== 200) {
+    console.error('Login failed:', response.statusCode, response.body);
+    throw new Error(`Login failed with status ${response.statusCode}: ${response.body}`);
+  }
   const body = response.json();
   cachedToken = body.accessToken;
   return cachedToken;

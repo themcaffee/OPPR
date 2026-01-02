@@ -42,6 +42,14 @@ export interface OpprsClientOptions {
    * Custom fetch implementation (for testing or special environments)
    */
   fetch?: typeof fetch;
+
+  /**
+   * Use cookie-based authentication (for browser environments)
+   * When true, tokens are managed via HTTP-only cookies set by the server.
+   * The client will include credentials in requests.
+   * @default false
+   */
+  useCookies?: boolean;
 }
 
 /**

@@ -1,0 +1,211 @@
+import { prisma } from './client.js';
+import type { User, Prisma } from '@prisma/client';
+
+/**
+ * Input for creating a new user
+ */
+export interface CreateUserInput {
+  email: string;
+  passwordHash: string;
+  playerId?: string;
+  role?: 'USER' | 'ADMIN';
+}
+
+/**
+ * Input for updating a user
+ */
+export interface UpdateUserInput {
+  email?: string;
+  passwordHash?: string;
+  playerId?: string;
+  role?: 'USER' | 'ADMIN';
+  refreshTokenHash?: string | null;
+}
+
+/**
+ * User with linked player profile
+ */
+export interface UserWithPlayer {
+  id: string;
+  email: string;
+  role: 'USER' | 'ADMIN';
+  createdAt: Date;
+  updatedAt: Date;
+  player: {
+    id: string;
+    name: string | null;
+    rating: number;
+    ratingDeviation: number;
+    ranking: number | null;
+    isRated: boolean;
+    eventCount: number;
+  } | null;
+}
+
+/**
+ * Creates a new user
+ */
+export async function createUser(data: CreateUserInput): Promise<User> {
+  return prisma.user.create({
+    data,
+  });
+}
+
+/**
+ * Creates a user with a linked player in a transaction
+ */
+export async function createUserWithPlayer(
+  userData: Omit<CreateUserInput, 'playerId'>,
+  playerData: { name?: string; email?: string },
+): Promise<UserWithPlayer> {
+  return prisma.$transaction(async (tx) => {
+    // Create the player first
+    const player = await tx.player.create({
+      data: {
+        name: playerData.name,
+        email: playerData.email,
+      },
+    });
+
+    // Create the user linked to the player
+    const user = await tx.user.create({
+      data: {
+        ...userData,
+        playerId: player.id,
+      },
+      include: {
+        player: {
+          select: {
+            id: true,
+            name: true,
+            rating: true,
+            ratingDeviation: true,
+            ranking: true,
+            isRated: true,
+            eventCount: true,
+          },
+        },
+      },
+    });
+
+    return user as UserWithPlayer;
+  });
+}
+
+/**
+ * Finds a user by ID
+ */
+export async function findUserById(id: string, include?: Prisma.UserInclude): Promise<User | null> {
+  return prisma.user.findUnique({
+    where: { id },
+    include,
+  });
+}
+
+/**
+ * Finds a user by email
+ */
+export async function findUserByEmail(
+  email: string,
+  include?: Prisma.UserInclude,
+): Promise<User | null> {
+  return prisma.user.findUnique({
+    where: { email },
+    include,
+  });
+}
+
+/**
+ * Gets a user with their linked player profile
+ */
+export async function getUserWithPlayer(id: string): Promise<UserWithPlayer | null> {
+  const user = await prisma.user.findUnique({
+    where: { id },
+    include: {
+      player: {
+        select: {
+          id: true,
+          name: true,
+          rating: true,
+          ratingDeviation: true,
+          ranking: true,
+          isRated: true,
+          eventCount: true,
+        },
+      },
+    },
+  });
+
+  if (!user) {
+    return null;
+  }
+
+  return user as UserWithPlayer;
+}
+
+/**
+ * Gets a user by email with their linked player profile
+ */
+export async function getUserByEmailWithPlayer(email: string): Promise<UserWithPlayer | null> {
+  const user = await prisma.user.findUnique({
+    where: { email },
+    include: {
+      player: {
+        select: {
+          id: true,
+          name: true,
+          rating: true,
+          ratingDeviation: true,
+          ranking: true,
+          isRated: true,
+          eventCount: true,
+        },
+      },
+    },
+  });
+
+  if (!user) {
+    return null;
+  }
+
+  return user as UserWithPlayer;
+}
+
+/**
+ * Updates a user
+ */
+export async function updateUser(id: string, data: UpdateUserInput): Promise<User> {
+  return prisma.user.update({
+    where: { id },
+    data,
+  });
+}
+
+/**
+ * Updates a user's refresh token hash
+ */
+export async function updateUserRefreshToken(
+  id: string,
+  refreshTokenHash: string | null,
+): Promise<User> {
+  return prisma.user.update({
+    where: { id },
+    data: { refreshTokenHash },
+  });
+}
+
+/**
+ * Deletes a user
+ */
+export async function deleteUser(id: string): Promise<User> {
+  return prisma.user.delete({
+    where: { id },
+  });
+}
+
+/**
+ * Counts total users
+ */
+export async function countUsers(where?: Prisma.UserWhereInput): Promise<number> {
+  return prisma.user.count({ where });
+}

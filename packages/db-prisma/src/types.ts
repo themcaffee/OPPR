@@ -5,7 +5,9 @@ export type {
   Player,
   Tournament,
   TournamentResult,
+  User,
   EventBoosterType,
+  Role,
   Prisma,
 } from '@prisma/client';
 
@@ -21,6 +23,8 @@ export type {
 } from './tournaments.js';
 
 export type { CreateResultInput, UpdateResultInput, FindResultsOptions } from './results.js';
+
+export type { CreateUserInput, UpdateUserInput, UserWithPlayer } from './users.js';
 
 /**
  * Player with full tournament results

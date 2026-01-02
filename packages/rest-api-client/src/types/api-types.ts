@@ -56,6 +56,35 @@ export interface User {
   role: 'user' | 'admin';
 }
 
+// Cookie-based auth types
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  name: string;
+}
+
+export interface PlayerProfile {
+  id: string;
+  name: string | null;
+  rating: number;
+  ratingDeviation: number;
+  ranking: number | null;
+  isRated: boolean;
+  eventCount: number;
+}
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  role: 'user' | 'admin';
+  player: PlayerProfile | null;
+}
+
+export interface AuthResponse {
+  user: AuthUser;
+  message: string;
+}
+
 // ==================== Players ====================
 
 export interface Player {
