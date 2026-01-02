@@ -76,9 +76,9 @@ jobs:
         env:
           REMOTE_HOST: ${{ secrets.DEPLOY_HOST }}
           IMAGE_TAG: ${{ steps.tag.outputs.tag }}
-          SSH_KEY: ~/.ssh/deploy_key
           SSH_USER: ${{ secrets.SSH_USER }}
         run: |
+          export SSH_KEY="$HOME/.ssh/deploy_key"
           chmod +x ./deploy/scripts/deploy.sh
           ./deploy/scripts/deploy.sh
 
