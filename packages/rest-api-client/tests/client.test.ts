@@ -1,7 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { OpprsClient } from '../src/client.js';
 import {
+  OpprsApiError,
   OpprsAuthError,
+  OpprsConflictError,
+  OpprsExternalServiceError,
   OpprsNotFoundError,
   OpprsValidationError,
   OpprsTimeoutError,
@@ -303,6 +306,286 @@ describe('OpprsClient', () => {
       });
 
       expect(client.isAuthenticated()).toBe(true);
+    });
+  });
+
+  describe('register', () => {
+    it('should register a new user', async () => {
+      const registerResponse = {
+        user: {
+          id: 'user-1',
+          email: 'newuser@example.com',
+          role: 'user',
+          player: {
+            id: 'player-1',
+            name: 'New User',
+          },
+        },
+        message: 'Registration successful',
+      };
+
+      mockFetch.mockResolvedValueOnce(createMockResponse(registerResponse, 201));
+
+      const client = new OpprsClient({ fetch: mockFetch });
+      const result = await client.register({
+        email: 'newuser@example.com',
+        password: 'password123',
+        name: 'New User',
+      });
+
+      expect(result).toEqual(registerResponse);
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/v1/auth/register',
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({
+            email: 'newuser@example.com',
+            password: 'password123',
+            name: 'New User',
+          }),
+        })
+      );
+    });
+  });
+
+  describe('cookie mode', () => {
+    it('should use credentials include when useCookies is true', async () => {
+      const authResponse = {
+        user: {
+          id: 'user-1',
+          email: 'test@example.com',
+          role: 'user',
+          player: null,
+        },
+        message: 'Login successful',
+      };
+
+      mockFetch.mockResolvedValueOnce(createMockResponse(authResponse));
+
+      const client = new OpprsClient({ fetch: mockFetch, useCookies: true });
+      await client.login({ email: 'test@example.com', password: 'password' });
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/v1/auth/login',
+        expect.objectContaining({
+          credentials: 'include',
+        })
+      );
+    });
+
+    it('should return false for isAuthenticated in cookie mode', () => {
+      const client = new OpprsClient({ useCookies: true });
+      expect(client.isAuthenticated()).toBe(false);
+    });
+
+    it('should logout with cookies (POST to /auth/logout)', async () => {
+      mockFetch.mockResolvedValueOnce(createMockResponse(null, 204));
+
+      const client = new OpprsClient({ fetch: mockFetch, useCookies: true });
+      await client.logout();
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/v1/auth/logout',
+        expect.objectContaining({
+          method: 'POST',
+          credentials: 'include',
+        })
+      );
+    });
+
+    it('should get me with cookies returning AuthUser', async () => {
+      const authUser = {
+        id: 'user-1',
+        email: 'test@example.com',
+        role: 'user',
+        player: { id: 'player-1', name: 'Test Player' },
+      };
+
+      mockFetch.mockResolvedValueOnce(createMockResponse(authUser));
+
+      const client = new OpprsClient({ fetch: mockFetch, useCookies: true });
+      const result = await client.getMe();
+
+      expect(result).toEqual(authUser);
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/v1/auth/me',
+        expect.objectContaining({
+          credentials: 'include',
+        })
+      );
+    });
+
+    it('should not include Authorization header in cookie mode', async () => {
+      const authResponse = {
+        user: { id: 'user-1', email: 'test@example.com', role: 'user', player: null },
+        message: 'Login successful',
+      };
+
+      mockFetch.mockResolvedValueOnce(createMockResponse(authResponse));
+
+      const client = new OpprsClient({
+        fetch: mockFetch,
+        useCookies: true,
+        accessToken: 'should-not-be-used',
+      });
+      await client.login({ email: 'test@example.com', password: 'password' });
+
+      const callArgs = mockFetch.mock.calls[0][1] as RequestInit;
+      const headers = callArgs.headers as Record<string, string>;
+      expect(headers.Authorization).toBeUndefined();
+    });
+  });
+
+  describe('logout without refresh token', () => {
+    it('should clear tokens without making request if no refresh token', async () => {
+      const client = new OpprsClient({ fetch: mockFetch, accessToken: 'access-only' });
+
+      expect(client.isAuthenticated()).toBe(true);
+      await client.logout();
+      expect(client.isAuthenticated()).toBe(false);
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('additional error handling', () => {
+    it('should throw OpprsConflictError for 409 responses', async () => {
+      mockFetch.mockResolvedValueOnce(
+        createMockResponse({ message: 'Resource already exists', details: { field: 'email' } }, 409)
+      );
+
+      const client = new OpprsClient({ fetch: mockFetch });
+      await expect(client.login({ email: 'test@example.com', password: 'pass' })).rejects.toThrow(
+        OpprsConflictError
+      );
+    });
+
+    it('should throw OpprsExternalServiceError for 502 responses', async () => {
+      mockFetch.mockResolvedValueOnce(
+        createMockResponse({ message: 'External service failed', service: 'matchplay' }, 502)
+      );
+
+      const client = new OpprsClient({ fetch: mockFetch });
+      await expect(client.login({ email: 'test@example.com', password: 'pass' })).rejects.toThrow(
+        OpprsExternalServiceError
+      );
+    });
+
+    it('should throw OpprsApiError for unknown status codes', async () => {
+      mockFetch.mockResolvedValueOnce(createMockResponse({ message: 'Unknown error' }, 418));
+
+      const client = new OpprsClient({ fetch: mockFetch });
+      await expect(client.login({ email: 'test@example.com', password: 'pass' })).rejects.toThrow(
+        OpprsApiError
+      );
+    });
+
+    it('should throw OpprsNotFoundError with unknown resource when path has no ID', async () => {
+      mockFetch
+        .mockResolvedValueOnce(
+          createMockResponse({
+            accessToken: 'token',
+            refreshToken: 'refresh',
+            expiresIn: 900,
+            tokenType: 'Bearer',
+          })
+        )
+        .mockResolvedValueOnce(createMockResponse({ message: 'Not found' }, 404));
+
+      const client = new OpprsClient({ fetch: mockFetch });
+      await client.login({ email: 'test@example.com', password: 'password' });
+
+      // Access getMe which hits /auth/me - a path without resource ID pattern
+      await expect(client.getMe()).rejects.toThrow(OpprsNotFoundError);
+    });
+  });
+
+  describe('resource getters', () => {
+    it('should return tournaments resource', async () => {
+      const loginResponse: LoginResponse = {
+        accessToken: 'access-token',
+        refreshToken: 'refresh-token',
+        expiresIn: 900,
+        tokenType: 'Bearer',
+      };
+
+      mockFetch
+        .mockResolvedValueOnce(createMockResponse(loginResponse))
+        .mockResolvedValueOnce(
+          createMockResponse({ data: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 0 } })
+        );
+
+      const client = new OpprsClient({ fetch: mockFetch });
+      await client.login({ email: 'test@example.com', password: 'password' });
+
+      const result = await client.tournaments.list({ page: 1, limit: 20 });
+      expect(result.data).toEqual([]);
+    });
+
+    it('should return results resource', async () => {
+      const loginResponse: LoginResponse = {
+        accessToken: 'access-token',
+        refreshToken: 'refresh-token',
+        expiresIn: 900,
+        tokenType: 'Bearer',
+      };
+
+      mockFetch
+        .mockResolvedValueOnce(createMockResponse(loginResponse))
+        .mockResolvedValueOnce(
+          createMockResponse({ data: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 0 } })
+        );
+
+      const client = new OpprsClient({ fetch: mockFetch });
+      await client.login({ email: 'test@example.com', password: 'password' });
+
+      const result = await client.results.list({ page: 1, limit: 20 });
+      expect(result.data).toEqual([]);
+    });
+
+    it('should return stats resource', async () => {
+      const loginResponse: LoginResponse = {
+        accessToken: 'access-token',
+        refreshToken: 'refresh-token',
+        expiresIn: 900,
+        tokenType: 'Bearer',
+      };
+
+      mockFetch
+        .mockResolvedValueOnce(createMockResponse(loginResponse))
+        .mockResolvedValueOnce(
+          createMockResponse({ totalPlayers: 0, totalTournaments: 0, totalResults: 0 })
+        );
+
+      const client = new OpprsClient({ fetch: mockFetch });
+      await client.login({ email: 'test@example.com', password: 'password' });
+
+      const result = await client.stats.overview();
+      expect(result.totalPlayers).toBe(0);
+    });
+
+    it('should return import resource', async () => {
+      const loginResponse: LoginResponse = {
+        accessToken: 'access-token',
+        refreshToken: 'refresh-token',
+        expiresIn: 900,
+        tokenType: 'Bearer',
+      };
+
+      const importResponse = {
+        tournament: { id: 't1', name: 'Test' },
+        resultsImported: 10,
+        message: 'Import successful',
+      };
+
+      mockFetch
+        .mockResolvedValueOnce(createMockResponse(loginResponse))
+        .mockResolvedValueOnce(createMockResponse(importResponse));
+
+      const client = new OpprsClient({ fetch: mockFetch });
+      await client.login({ email: 'test@example.com', password: 'password' });
+
+      const result = await client.import.matchplayTournament(12345);
+      expect(result.resultsImported).toBe(10);
     });
   });
 });
