@@ -19,6 +19,7 @@ beforeEach(async () => {
   // Clean all tables before each test (order matters due to foreign keys)
   await prisma.tournamentResult.deleteMany();
   await prisma.tournament.deleteMany();
+  await prisma.user.deleteMany();
   await prisma.player.deleteMany();
 });
 

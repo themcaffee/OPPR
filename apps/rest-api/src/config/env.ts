@@ -8,6 +8,11 @@ export interface EnvConfig {
   jwtRefreshExpiresIn: string;
   nodeEnv: string;
   matchplayApiToken?: string;
+  cookieSecret: string;
+  cookieDomain?: string;
+  secureCookies: boolean;
+  /** When true, allows any email/password for login (dev/test only) */
+  authDevMode: boolean;
 }
 
 function getEnvVar(name: string, defaultValue?: string): string {
@@ -19,6 +24,7 @@ function getEnvVar(name: string, defaultValue?: string): string {
 }
 
 export function loadEnvConfig(): EnvConfig {
+  const nodeEnv = getEnvVar('NODE_ENV', 'development');
   return {
     host: getEnvVar('HOST', '0.0.0.0'),
     port: parseInt(getEnvVar('PORT', '3000'), 10),
@@ -30,8 +36,12 @@ export function loadEnvConfig(): EnvConfig {
     ),
     jwtAccessExpiresIn: getEnvVar('JWT_ACCESS_EXPIRES_IN', '15m'),
     jwtRefreshExpiresIn: getEnvVar('JWT_REFRESH_EXPIRES_IN', '7d'),
-    nodeEnv: getEnvVar('NODE_ENV', 'development'),
+    nodeEnv,
     matchplayApiToken: process.env.MATCHPLAY_API_TOKEN,
+    cookieSecret: getEnvVar('COOKIE_SECRET', 'development-cookie-secret-change-in-production'),
+    cookieDomain: process.env.COOKIE_DOMAIN,
+    secureCookies: nodeEnv === 'production',
+    authDevMode: nodeEnv !== 'production' && process.env.AUTH_DEV_MODE !== 'false',
   };
 }
 

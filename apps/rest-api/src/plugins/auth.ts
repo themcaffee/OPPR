@@ -24,6 +24,8 @@ declare module '@fastify/jwt' {
   }
 }
 
+const ACCESS_TOKEN_COOKIE = 'opprs_access';
+
 export default fp(
   async (fastify: FastifyInstance) => {
     await fastify.register(jwt, {
@@ -35,7 +37,25 @@ export default fp(
 
     fastify.decorate('authenticate', async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        await request.jwtVerify();
+        // Try cookie first, then Authorization header (for API clients)
+        const cookieToken = request.cookies?.[ACCESS_TOKEN_COOKIE];
+        const authHeader = request.headers.authorization;
+        const headerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+
+        const token = cookieToken || headerToken;
+
+        if (!token) {
+          reply.status(401).send({
+            statusCode: 401,
+            error: 'Unauthorized',
+            message: 'No authentication token provided',
+          });
+          return;
+        }
+
+        // Manually verify the token and set user
+        const decoded = fastify.jwt.verify<{ sub: string; email: string; role: 'user' | 'admin' }>(token);
+        request.user = decoded;
       } catch {
         reply.status(401).send({
           statusCode: 401,
