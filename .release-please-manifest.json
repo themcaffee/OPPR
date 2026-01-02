@@ -1,4 +1,4 @@
 {
-  "packages/core": "0.5.3",
+  "packages/core": "0.6.0",
   "packages/db-prisma": "0.6.0"
 }
