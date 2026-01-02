@@ -6,6 +6,16 @@ on:
       - main
   release:
     types: [published]
+  workflow_call:
+    inputs:
+      is_stable_release:
+        description: 'Whether this is a stable release (vs canary)'
+        required: true
+        type: boolean
+      version:
+        description: 'Version to tag the images with'
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -17,9 +27,10 @@ env:
 jobs:
   docker-publish:
     runs-on: ubuntu-latest
-    # Skip release-please commits for canary builds
+    # Skip release commits for canary builds (push events only)
     if: |
       github.event_name == 'release' ||
+      github.event_name == 'workflow_call' ||
       (github.event_name == 'push' && !startsWith(github.event.head_commit.message, 'chore: release'))
 
     strategy:
@@ -39,10 +50,16 @@ jobs:
       - name: Calculate image tags
         id: tags
         run: |
-          BASE_VERSION=$(node -p "require('./packages/core/package.json').version")
+          # Use provided version or read from package.json
+          if [ -n "${{ inputs.version }}" ]; then
+            BASE_VERSION="${{ inputs.version }}"
+          else
+            BASE_VERSION=$(node -p "require('./packages/core/package.json').version")
+          fi
           IMAGE_NAME="${{ github.repository_owner }}/${{ matrix.app.image }}"
 
-          if [ "${{ github.event_name }}" = "release" ]; then
+          # Determine if this is a stable release
+          if [ "${{ inputs.is_stable_release }}" = "true" ] || [ "${{ github.event_name }}" = "release" ]; then
             # Stable release: version + latest
             echo "tags=${{ env.REGISTRY }}/${IMAGE_NAME}:${BASE_VERSION},${{ env.REGISTRY }}/${IMAGE_NAME}:latest" >> $GITHUB_OUTPUT
             echo "version=${BASE_VERSION}" >> $GITHUB_OUTPUT
