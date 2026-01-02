@@ -1,56 +1,61 @@
 # =============================================================================
-# Stage 1: Base - Install pnpm and set up common configuration
+# Stage 1: Base - Install pnpm and turbo
 # =============================================================================
 FROM node:22-alpine AS base
 
 RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+
+# Set up pnpm global bin directory
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN pnpm add -g turbo@^2
+
 WORKDIR /app
 
 # =============================================================================
-# Stage 2: Dependencies - Install all dependencies with full monorepo context
+# Stage 2: Pruner - Create optimized monorepo subset using turbo prune
 # =============================================================================
-FROM base AS deps
+FROM base AS pruner
 
-# Copy workspace configuration files
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json tsconfig.json ./
+COPY . .
+RUN turbo prune frontend-next --docker
 
-# Copy package.json files for required workspace packages (preserve structure)
-COPY packages/core/package.json ./packages/core/
-COPY packages/rest-api-client/package.json ./packages/rest-api-client/
-COPY apps/frontend-next/package.json ./apps/frontend-next/
+# =============================================================================
+# Stage 3: Installer - Install dependencies with pruned lockfile (cached layer)
+# =============================================================================
+FROM base AS installer
 
-# Install all dependencies (frozen lockfile for reproducibility)
+# Copy only files needed for dependency installation
+# This layer is cached unless lockfile or package.json changes
+COPY --from=pruner /app/out/json/ .
+COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=pruner /app/out/pnpm-workspace.yaml ./pnpm-workspace.yaml
+
+# Install dependencies
 RUN pnpm install --frozen-lockfile
 
 # =============================================================================
-# Stage 3: Builder - Build all packages
+# Stage 4: Builder - Build all packages with remote caching support
 # =============================================================================
-FROM deps AS builder
+FROM installer AS builder
 
-# Copy source files for core package
-COPY packages/core/src ./packages/core/src/
-COPY packages/core/tsconfig.json ./packages/core/
+# Copy source files from pruned subset
+COPY --from=pruner /app/out/full/ .
 
-# Copy source files for rest-api-client package
-COPY packages/rest-api-client/src ./packages/rest-api-client/src/
-COPY packages/rest-api-client/tsconfig.json ./packages/rest-api-client/
+# Copy root tsconfig.json (needed for packages that extend it)
+COPY --from=pruner /app/tsconfig.json ./tsconfig.json
 
-# Copy source files for frontend-next
-COPY apps/frontend-next/app ./apps/frontend-next/app/
-COPY apps/frontend-next/components ./apps/frontend-next/components/
-COPY apps/frontend-next/lib ./apps/frontend-next/lib/
-COPY apps/frontend-next/tsconfig.json ./apps/frontend-next/
-COPY apps/frontend-next/next.config.ts ./apps/frontend-next/
-COPY apps/frontend-next/postcss.config.js ./apps/frontend-next/
+# Remote caching support (optional, passed via --build-arg)
+ARG TURBO_TEAM
+ARG TURBO_TOKEN
+ENV TURBO_TEAM=${TURBO_TEAM}
+ENV TURBO_TOKEN=${TURBO_TOKEN}
 
-# Copy public folder if it exists (optional in Next.js)
-COPY apps/frontend-next/public* ./apps/frontend-next/
-
-# Build packages in dependency order using turbo
-RUN pnpm run build --filter=frontend-next...
+# Build packages in dependency order
+RUN pnpm turbo run build --filter=frontend-next...
 
 # =============================================================================
-# Stage 4: Production - Minimal runtime image with Next.js standalone
+# Stage 5: Production - Minimal runtime image with Next.js standalone
 # =============================================================================
 FROM base AS production
 
@@ -61,6 +66,8 @@ ENV HOSTNAME=0.0.0.0
 # Create non-root user for security
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
+
+WORKDIR /app
 
 # Copy standalone output from builder
 COPY --from=builder --chown=nextjs:nodejs /app/apps/frontend-next/.next/standalone ./
