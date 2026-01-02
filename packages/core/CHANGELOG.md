@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.2
+
+### Patch Changes
+
+- 35a4242: chore: test Docker publish on release commits
+
 ## 1.0.0
 
 ### Minor Changes
