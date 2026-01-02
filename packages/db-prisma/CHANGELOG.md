@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.5
+
+### Patch Changes
+
+- bed085b: Add explicit database migrations to release workflow that run before deployment
+
 ## 1.0.0
 
 ### Minor Changes

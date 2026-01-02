@@ -1,5 +1,12 @@
 # rest-api
 
+## 1.1.5
+
+### Patch Changes
+
+- Updated dependencies [bed085b]
+  - @opprs/db-prisma@1.1.5
+
 ## 1.1.4
 
 ### Patch Changes
