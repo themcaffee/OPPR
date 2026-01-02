@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.3
+
+### Patch Changes
+
+- 9623514: chore: verify Docker publish on release commits
+
 ## 1.1.2
 
 ### Patch Changes
