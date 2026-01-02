@@ -13,6 +13,7 @@
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
     "@opprs/core": "workspace:*",
+    "@opprs/rest-api-client": "workspace:^",
     "next": "^15.3.4",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
