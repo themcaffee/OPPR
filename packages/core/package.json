@@ -1,6 +1,6 @@
 {
   "name": "@opprs/core",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "description": "Open Pinball Player Ranking System - A TypeScript library for calculating pinball tournament rankings and ratings",
   "keywords": [
     "pinball",
