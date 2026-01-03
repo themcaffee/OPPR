@@ -1,5 +1,11 @@
 # frontend-next
 
+## 2.0.1
+
+### Patch Changes
+
+- 4a78048: Fix TypeError on dashboard page when user or player profile is undefined
+
 ## 2.0.0
 
 ### Patch Changes
