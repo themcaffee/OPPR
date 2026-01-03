@@ -2,6 +2,7 @@ import type {
   UserWithPlayer,
   UserListParams,
   UpdateUserRoleRequest,
+  UpdateUserRequest,
   PaginatedResponse,
 } from '../types/index.js';
 
@@ -34,8 +35,20 @@ export class UsersResource {
 
   /**
    * Update user role (admin only)
+   * @deprecated Use update() instead
    */
   async updateRole(id: string, data: UpdateUserRoleRequest): Promise<UserWithPlayer> {
+    return this._request<UserWithPlayer>(`/users/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  /**
+   * Update user (admin only)
+   * Can update role, player link, and password
+   */
+  async update(id: string, data: UpdateUserRequest): Promise<UserWithPlayer> {
     return this._request<UserWithPlayer>(`/users/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(data),

@@ -410,3 +410,9 @@ export interface UserListParams extends PaginationParams {
 export interface UpdateUserRoleRequest {
   role: 'USER' | 'ADMIN';
 }
+
+export interface UpdateUserRequest {
+  role?: 'USER' | 'ADMIN';
+  playerId?: string | null;
+  password?: string;
+}

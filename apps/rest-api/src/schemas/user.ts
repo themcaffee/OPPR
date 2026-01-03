@@ -31,3 +31,12 @@ export const updateUserRoleSchema = {
   },
   required: ['role'],
 } as const;
+
+export const updateUserSchema = {
+  type: 'object',
+  properties: {
+    role: { type: 'string', enum: ['USER', 'ADMIN'] },
+    playerId: { type: 'string', nullable: true },
+    password: { type: 'string', minLength: 8 },
+  },
+} as const;

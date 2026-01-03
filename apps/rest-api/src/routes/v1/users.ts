@@ -1,16 +1,21 @@
 import type { FastifyPluginAsync } from 'fastify';
+import bcrypt from 'bcrypt';
 import {
   findUserById,
+  findUserByPlayerId,
   findUsers,
   updateUser,
   deleteUser,
   countUsers,
   getUserWithPlayer,
+  findPlayerById,
 } from '@opprs/db-prisma';
-import { userSchema, userListQuerySchema, updateUserRoleSchema } from '../../schemas/user.js';
+import { userSchema, userListQuerySchema, updateUserSchema } from '../../schemas/user.js';
 import { idParamSchema, errorResponseSchema, paginatedResponseSchema } from '../../schemas/common.js';
 import { parsePaginationParams, buildPaginatedResponse } from '../../utils/pagination.js';
-import { NotFoundError, ForbiddenError } from '../../utils/errors.js';
+import { NotFoundError, ForbiddenError, BadRequestError } from '../../utils/errors.js';
+
+const BCRYPT_SALT_ROUNDS = 12;
 
 interface UserListQuery {
   page?: number;
@@ -23,8 +28,10 @@ interface IdParams {
   id: string;
 }
 
-interface UpdateUserRoleBody {
-  role: 'USER' | 'ADMIN';
+interface UpdateUserBody {
+  role?: 'USER' | 'ADMIN';
+  playerId?: string | null;
+  password?: string;
 }
 
 export const userRoutes: FastifyPluginAsync = async (app) => {
@@ -87,16 +94,16 @@ export const userRoutes: FastifyPluginAsync = async (app) => {
     }
   );
 
-  // Update user role (admin only)
-  app.patch<{ Params: IdParams; Body: UpdateUserRoleBody }>(
+  // Update user (admin only)
+  app.patch<{ Params: IdParams; Body: UpdateUserBody }>(
     '/:id',
     {
       schema: {
         tags: ['Users'],
-        summary: 'Update user role (admin only)',
+        summary: 'Update user (admin only)',
         security: [{ bearerAuth: [] }],
         params: idParamSchema,
-        body: updateUserRoleSchema,
+        body: updateUserSchema,
         response: {
           200: userSchema,
           401: errorResponseSchema,
@@ -107,8 +114,10 @@ export const userRoutes: FastifyPluginAsync = async (app) => {
       preHandler: [app.requireAdmin],
     },
     async (request, reply) => {
+      const { role, playerId, password } = request.body;
+
       // Prevent admin from demoting themselves
-      if (request.params.id === request.user.sub && request.body.role === 'USER') {
+      if (request.params.id === request.user.sub && role === 'USER') {
         throw new ForbiddenError('Cannot demote your own admin role');
       }
 
@@ -117,7 +126,30 @@ export const userRoutes: FastifyPluginAsync = async (app) => {
         throw new NotFoundError('User', request.params.id);
       }
 
-      await updateUser(request.params.id, { role: request.body.role });
+      // Validate playerId if provided and not null
+      if (playerId) {
+        const player = await findPlayerById(playerId);
+        if (!player) {
+          throw new NotFoundError('Player', playerId);
+        }
+
+        // Check if player is already linked to another user
+        const existingLink = await findUserByPlayerId(playerId);
+        if (existingLink && existingLink.id !== request.params.id) {
+          throw new BadRequestError('Player is already linked to another user');
+        }
+      }
+
+      // Build update data
+      const updateData: { role?: 'USER' | 'ADMIN'; playerId?: string | null; passwordHash?: string } =
+        {};
+      if (role !== undefined) updateData.role = role;
+      if (playerId !== undefined) updateData.playerId = playerId;
+      if (password) {
+        updateData.passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
+      }
+
+      await updateUser(request.params.id, updateData);
       const user = await getUserWithPlayer(request.params.id);
       return reply.send(user);
     }

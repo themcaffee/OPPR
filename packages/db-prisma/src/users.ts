@@ -17,7 +17,7 @@ export interface CreateUserInput {
 export interface UpdateUserInput {
   email?: string;
   passwordHash?: string;
-  playerId?: string;
+  playerId?: string | null;
   role?: 'USER' | 'ADMIN';
   refreshTokenHash?: string | null;
 }
@@ -239,4 +239,13 @@ export async function findUsers(params: {
   });
 
   return users as UserWithPlayer[];
+}
+
+/**
+ * Finds a user by their linked player ID
+ */
+export async function findUserByPlayerId(playerId: string): Promise<User | null> {
+  return prisma.user.findUnique({
+    where: { playerId },
+  });
 }
