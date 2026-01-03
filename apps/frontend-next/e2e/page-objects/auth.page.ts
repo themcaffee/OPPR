@@ -66,10 +66,17 @@ export class SignInPage {
     await this.page.goto('/sign-in');
   }
 
+  async gotoWithRedirect(redirectPath: string) {
+    await this.page.goto(`/sign-in?redirect=${encodeURIComponent(redirectPath)}`);
+  }
+
   async signIn(email: string, password: string) {
     await this.emailInput.fill(email);
     await this.passwordInput.fill(password);
-    await this.submitButton.click();
+    await Promise.all([
+      this.page.waitForURL((url) => !url.pathname.includes('/sign-in'), { timeout: 10000 }),
+      this.submitButton.click(),
+    ]);
   }
 
   async expectError(message: string | RegExp) {
