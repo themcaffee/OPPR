@@ -33,7 +33,7 @@ export default defineConfig({
 
   webServer: {
     command: 'echo "Waiting for Docker Compose stack..."',
-    url: 'http://localhost:8080/health',
+    url: `${process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:8080'}/health`,
     reuseExistingServer: true,
     timeout: 60000,
   },
