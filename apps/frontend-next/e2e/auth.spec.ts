@@ -88,24 +88,21 @@ test.describe('User Login', () => {
     const signInPage = new SignInPage(page);
 
     await signInPage.goto();
-    // In dev mode, any valid email/password works
-    await signInPage.emailInput.fill('testuser@example.com');
+    // Use seeded test user (from packages/db-prisma/prisma/seed.ts)
+    await signInPage.emailInput.fill('e2e-test@example.com');
     await signInPage.passwordInput.fill('TestPassword123!');
     await signInPage.submitButton.click();
 
-    // Wait for cookies to be set
-    await page.waitForTimeout(1000);
+    // Wait for navigation to complete
+    await expect(page).toHaveURL('/dashboard', { timeout: 10000 });
 
     // Verify auth cookies were set
     const cookies = await context.cookies();
     const accessCookie = cookies.find((c) => c.name === 'opprs_access');
     expect(accessCookie).toBeDefined();
 
-    // Navigate to protected route - should work with auth cookie
-    await page.goto('/dashboard');
-
-    // Should be able to access dashboard (not redirected to sign-in)
-    await expect(page).not.toHaveURL(/sign-in/, { timeout: 5000 });
+    // Should be on dashboard (not redirected to sign-in)
+    await expect(page).not.toHaveURL(/sign-in/);
   });
 
   test('should show validation error for missing fields', async ({ page }) => {
