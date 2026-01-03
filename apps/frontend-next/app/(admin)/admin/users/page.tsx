@@ -1,22 +1,22 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api-client';
 import { DataTable } from '@/components/admin/DataTable';
 import { Pagination } from '@/components/admin/Pagination';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Modal } from '@/components/admin/Modal';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 import { UserPlayerLink } from '@/components/admin/UserPlayerLink';
 import type { UserWithPlayer, PaginatedResponse } from '@opprs/rest-api-client';
 
 export default function AdminUsersPage() {
+  const router = useRouter();
   const [data, setData] = useState<PaginatedResponse<UserWithPlayer> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<UserWithPlayer | null>(null);
-  const [showRoleModal, setShowRoleModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -33,19 +33,6 @@ export default function AdminUsersPage() {
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
-
-  const handleRoleChange = async () => {
-    if (!selectedUser) return;
-    setIsUpdating(true);
-    try {
-      const newRole = selectedUser.role === 'ADMIN' ? 'USER' : 'ADMIN';
-      await apiClient.users.updateRole(selectedUser.id, { role: newRole });
-      setShowRoleModal(false);
-      fetchUsers();
-    } finally {
-      setIsUpdating(false);
-    }
-  };
 
   const handleDelete = async () => {
     if (!selectedUser) return;
@@ -94,11 +81,10 @@ export default function AdminUsersPage() {
             className="text-sm py-1 px-2"
             onClick={(e) => {
               e.stopPropagation();
-              setSelectedUser(u);
-              setShowRoleModal(true);
+              router.push(`/admin/users/${u.id}`);
             }}
           >
-            Change Role
+            Edit
           </Button>
           <Button
             variant="outline"
@@ -130,27 +116,6 @@ export default function AdminUsersPage() {
           />
         )}
       </Card>
-
-      <Modal
-        isOpen={showRoleModal}
-        onClose={() => setShowRoleModal(false)}
-        title="Change User Role"
-        footer={
-          <div className="flex justify-end space-x-3">
-            <Button variant="outline" onClick={() => setShowRoleModal(false)} disabled={isUpdating}>
-              Cancel
-            </Button>
-            <Button onClick={handleRoleChange} isLoading={isUpdating}>
-              Set as {selectedUser?.role === 'ADMIN' ? 'User' : 'Admin'}
-            </Button>
-          </div>
-        }
-      >
-        <p>
-          Change role for <strong>{selectedUser?.email}</strong>?
-        </p>
-        <p className="text-sm text-gray-500 mt-2">Current role: {selectedUser?.role}</p>
-      </Modal>
 
       <ConfirmDialog
         isOpen={showDeleteConfirm}

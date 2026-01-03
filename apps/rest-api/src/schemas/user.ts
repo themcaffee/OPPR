@@ -37,5 +37,6 @@ export const updateUserSchema = {
   properties: {
     role: { type: 'string', enum: ['USER', 'ADMIN'] },
     playerId: { type: ['string', 'null'] },
+    password: { type: 'string', minLength: 8 },
   },
 } as const;

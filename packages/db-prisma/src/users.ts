@@ -17,7 +17,7 @@ export interface CreateUserInput {
 export interface UpdateUserInput {
   email?: string;
   passwordHash?: string;
-  playerId?: string;
+  playerId?: string | null;
   role?: 'USER' | 'ADMIN';
   refreshTokenHash?: string | null;
 }

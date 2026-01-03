@@ -72,4 +72,5 @@ export type {
   UserWithPlayer,
   UserListParams,
   UpdateUserRoleRequest,
+  UpdateUserRequest,
 } from './types/index.js';

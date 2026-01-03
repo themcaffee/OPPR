@@ -1,4 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify';
+import bcrypt from 'bcrypt';
 import {
   findUserById,
   findUsers,
@@ -12,6 +13,8 @@ import { userSchema, userListQuerySchema, updateUserSchema } from '../../schemas
 import { idParamSchema, errorResponseSchema, paginatedResponseSchema } from '../../schemas/common.js';
 import { parsePaginationParams, buildPaginatedResponse } from '../../utils/pagination.js';
 import { NotFoundError, ForbiddenError } from '../../utils/errors.js';
+
+const BCRYPT_SALT_ROUNDS = 12;
 
 interface UserListQuery {
   page?: number;
@@ -27,6 +30,7 @@ interface IdParams {
 interface UpdateUserBody {
   role?: 'USER' | 'ADMIN';
   playerId?: string | null;
+  password?: string;
 }
 
 export const userRoutes: FastifyPluginAsync = async (app) => {
@@ -109,7 +113,7 @@ export const userRoutes: FastifyPluginAsync = async (app) => {
       preHandler: [app.requireAdmin],
     },
     async (request, reply) => {
-      const { role, playerId } = request.body;
+      const { role, playerId, password } = request.body;
 
       // Prevent admin from demoting themselves
       if (request.params.id === request.user.sub && role === 'USER') {
@@ -121,12 +125,18 @@ export const userRoutes: FastifyPluginAsync = async (app) => {
         throw new NotFoundError('User', request.params.id);
       }
 
-      // Handle role update if provided
-      if (role !== undefined) {
-        await updateUser(request.params.id, { role });
+      // Handle role and password updates
+      const updateData: { role?: 'USER' | 'ADMIN'; passwordHash?: string } = {};
+      if (role !== undefined) updateData.role = role;
+      if (password) {
+        updateData.passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
       }
 
-      // Handle playerId update if provided
+      if (Object.keys(updateData).length > 0) {
+        await updateUser(request.params.id, updateData);
+      }
+
+      // Handle playerId update if provided (uses transactional linking)
       if (playerId !== undefined) {
         try {
           const user = await linkPlayerToUser(request.params.id, playerId);
