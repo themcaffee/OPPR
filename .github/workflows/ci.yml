@@ -115,3 +115,98 @@ jobs:
           build-args: |
             TURBO_TEAM=${{ github.repository_owner }}
             TURBO_TOKEN=${{ secrets.VERCEL_TOKEN }}
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    env:
+      TURBO_TEAM: ${{ github.repository_owner }}
+      TURBO_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for relevant changes
+        id: filter
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "e2e=true" >> $GITHUB_OUTPUT
+          else
+            CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E '^(apps/|packages/|docker-compose\.yml|\.dockerignore|pnpm-lock\.yaml|pnpm-workspace\.yaml|turbo\.json|\.github/workflows/)' || true)
+            if [ -n "$CHANGED" ]; then
+              echo "e2e=true" >> $GITHUB_OUTPUT
+            else
+              echo "e2e=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: Setup Node.js
+        if: steps.filter.outputs.e2e == 'true'
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 20
+
+      - name: Install pnpm
+        if: steps.filter.outputs.e2e == 'true'
+        run: npm install -g pnpm@9.15.0
+
+      - name: Get pnpm store directory
+        if: steps.filter.outputs.e2e == 'true'
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        if: steps.filter.outputs.e2e == 'true'
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        if: steps.filter.outputs.e2e == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        if: steps.filter.outputs.e2e == 'true'
+        run: pnpm --filter frontend-next exec playwright install --with-deps chromium
+
+      - name: Set up Docker Buildx
+        if: steps.filter.outputs.e2e == 'true'
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - name: Build and start Docker Compose stack
+        if: steps.filter.outputs.e2e == 'true'
+        run: docker compose up -d --build --wait
+        env:
+          POSTGRES_PASSWORD: oppr_dev_password
+          JWT_SECRET: test-jwt-secret
+          JWT_REFRESH_SECRET: test-jwt-refresh-secret
+
+      - name: Wait for services to be ready
+        if: steps.filter.outputs.e2e == 'true'
+        run: |
+          echo "Waiting for services to be ready..."
+          timeout 120 bash -c 'until curl -sf http://localhost:8080/health > /dev/null 2>&1; do sleep 2; done'
+          echo "Services are ready!"
+
+      - name: Run e2e tests
+        if: steps.filter.outputs.e2e == 'true'
+        run: pnpm --filter frontend-next run test:e2e
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:8080
+
+      - name: Upload Playwright report
+        if: steps.filter.outputs.e2e == 'true' && failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: playwright-report
+          path: apps/frontend-next/playwright-report/
+          retention-days: 7
+
+      - name: Show Docker logs on failure
+        if: steps.filter.outputs.e2e == 'true' && failure()
+        run: docker compose logs
