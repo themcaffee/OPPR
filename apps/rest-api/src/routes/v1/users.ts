@@ -6,8 +6,9 @@ import {
   deleteUser,
   countUsers,
   getUserWithPlayer,
+  linkPlayerToUser,
 } from '@opprs/db-prisma';
-import { userSchema, userListQuerySchema, updateUserRoleSchema } from '../../schemas/user.js';
+import { userSchema, userListQuerySchema, updateUserSchema } from '../../schemas/user.js';
 import { idParamSchema, errorResponseSchema, paginatedResponseSchema } from '../../schemas/common.js';
 import { parsePaginationParams, buildPaginatedResponse } from '../../utils/pagination.js';
 import { NotFoundError, ForbiddenError } from '../../utils/errors.js';
@@ -23,8 +24,9 @@ interface IdParams {
   id: string;
 }
 
-interface UpdateUserRoleBody {
-  role: 'USER' | 'ADMIN';
+interface UpdateUserBody {
+  role?: 'USER' | 'ADMIN';
+  playerId?: string | null;
 }
 
 export const userRoutes: FastifyPluginAsync = async (app) => {
@@ -87,16 +89,16 @@ export const userRoutes: FastifyPluginAsync = async (app) => {
     }
   );
 
-  // Update user role (admin only)
-  app.patch<{ Params: IdParams; Body: UpdateUserRoleBody }>(
+  // Update user (admin only)
+  app.patch<{ Params: IdParams; Body: UpdateUserBody }>(
     '/:id',
     {
       schema: {
         tags: ['Users'],
-        summary: 'Update user role (admin only)',
+        summary: 'Update user (admin only)',
         security: [{ bearerAuth: [] }],
         params: idParamSchema,
-        body: updateUserRoleSchema,
+        body: updateUserSchema,
         response: {
           200: userSchema,
           401: errorResponseSchema,
@@ -107,8 +109,10 @@ export const userRoutes: FastifyPluginAsync = async (app) => {
       preHandler: [app.requireAdmin],
     },
     async (request, reply) => {
+      const { role, playerId } = request.body;
+
       // Prevent admin from demoting themselves
-      if (request.params.id === request.user.sub && request.body.role === 'USER') {
+      if (request.params.id === request.user.sub && role === 'USER') {
         throw new ForbiddenError('Cannot demote your own admin role');
       }
 
@@ -117,7 +121,24 @@ export const userRoutes: FastifyPluginAsync = async (app) => {
         throw new NotFoundError('User', request.params.id);
       }
 
-      await updateUser(request.params.id, { role: request.body.role });
+      // Handle role update if provided
+      if (role !== undefined) {
+        await updateUser(request.params.id, { role });
+      }
+
+      // Handle playerId update if provided
+      if (playerId !== undefined) {
+        try {
+          const user = await linkPlayerToUser(request.params.id, playerId);
+          return reply.send(user);
+        } catch (error) {
+          if (error instanceof Error && error.message.includes('not found')) {
+            throw new NotFoundError('Player', playerId ?? 'null');
+          }
+          throw error;
+        }
+      }
+
       const user = await getUserWithPlayer(request.params.id);
       return reply.send(user);
     }

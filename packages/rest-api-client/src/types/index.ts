@@ -56,4 +56,5 @@ export type {
   UserWithPlayer,
   UserListParams,
   UpdateUserRoleRequest,
+  UpdateUserRequest,
 } from './api-types.js';
