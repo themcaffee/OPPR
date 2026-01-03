@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { OpprsAuthError, OpprsNetworkError } from '@opprs/rest-api-client';
@@ -12,7 +12,20 @@ import { Button } from '@/components/ui/Button';
 
 export function SignInForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
+
+  const getRedirectUrl = (): string => {
+    const redirect = searchParams.get('redirect');
+    // Security: Only allow relative paths starting with /
+    // Reject protocol-relative URLs (//evil.com) and absolute URLs
+    if (redirect && redirect.startsWith('/') && !redirect.startsWith('//')) {
+      // Redirect "/" to "/dashboard" directly since "/" just redirects there anyway
+      // This avoids a race condition with middleware cookie detection
+      return redirect === '/' ? '/dashboard' : redirect;
+    }
+    return '/dashboard';
+  };
 
   const {
     register,
@@ -30,7 +43,7 @@ export function SignInForm() {
         email: data.email,
         password: data.password,
       });
-      router.push('/');
+      router.push(getRedirectUrl());
     } catch (err) {
       if (err instanceof OpprsAuthError) {
         setError('Invalid email or password.');
