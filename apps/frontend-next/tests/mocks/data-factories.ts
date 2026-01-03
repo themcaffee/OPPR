@@ -46,14 +46,21 @@ export function createMockTournamentResult(
 ): TournamentResult {
   return {
     id: 'result-1',
-    tournamentId: 'tournament-1',
-    playerId: 'player-1',
     position: 1,
     optedOut: false,
+    linearPoints: null,
+    dynamicPoints: null,
     totalPoints: 100,
+    ageInDays: null,
+    decayMultiplier: null,
     decayedPoints: 100,
-    player: createMockPlayer(),
-    tournament: createMockTournament(),
+    efficiency: null,
+    player: {
+      id: 'player-1',
+      name: 'Test Player',
+      rating: 1500,
+      ranking: null,
+    },
     ...overrides,
   };
 }
@@ -62,8 +69,8 @@ export function createMockUser(overrides: Partial<UserWithPlayer> = {}): UserWit
   return {
     id: 'user-1',
     email: 'test@example.com',
-    name: 'Test User',
     role: 'USER',
+    playerId: null,
     player: null,
     createdAt: '2024-01-01T00:00:00.000Z',
     updatedAt: '2024-01-01T00:00:00.000Z',

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { TournamentResultsManager } from '@/components/admin/TournamentResultsManager';
-import { createMockPlayer, createMockPaginatedResponse } from '../../mocks/data-factories';
+import { createMockPaginatedResponse } from '../../mocks/data-factories';
 import type { TournamentResult } from '@opprs/rest-api-client';
 
 const mockTournamentsGetResults = vi.fn();
@@ -32,25 +32,29 @@ describe('TournamentResultsManager', () => {
   const mockResults: TournamentResult[] = [
     {
       id: 'result-1',
-      tournamentId: 'tour-1',
-      playerId: 'p1',
       position: 1,
       optedOut: false,
+      linearPoints: null,
+      dynamicPoints: null,
       totalPoints: 100,
+      ageInDays: null,
+      decayMultiplier: null,
       decayedPoints: 100,
-      player: createMockPlayer({ id: 'p1', name: 'Alice' }),
-      tournament: null as unknown as TournamentResult['tournament'],
+      efficiency: null,
+      player: { id: 'p1', name: 'Alice', rating: 1500, ranking: 1 },
     },
     {
       id: 'result-2',
-      tournamentId: 'tour-1',
-      playerId: 'p2',
       position: 2,
       optedOut: true,
+      linearPoints: null,
+      dynamicPoints: null,
       totalPoints: 80,
+      ageInDays: null,
+      decayMultiplier: null,
       decayedPoints: 60,
-      player: createMockPlayer({ id: 'p2', name: 'Bob' }),
-      tournament: null as unknown as TournamentResult['tournament'],
+      efficiency: null,
+      player: { id: 'p2', name: 'Bob', rating: 1400, ranking: 2 },
     },
   ];
 
