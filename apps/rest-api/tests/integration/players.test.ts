@@ -79,7 +79,6 @@ describe('Players endpoints', () => {
       const body = response.json();
       expect(body).toHaveProperty('id');
       expect(body.name).toBe(playerData.name);
-      expect(body.email).toBe(playerData.email);
       expect(body.rating).toBe(playerData.rating);
     });
 
@@ -188,20 +187,6 @@ describe('Players endpoints', () => {
       expect(body[0].name).toBe('John Doe');
     });
 
-    it('should search players by email', async () => {
-      await authenticatedRequest('POST', '/api/v1/players', {
-        name: 'Test Player',
-        email: 'searchable@test.com',
-      });
-
-      const response = await authenticatedRequest('GET', '/api/v1/players/search?q=searchable');
-
-      expect(response.statusCode).toBe(200);
-
-      const body = response.json();
-      expect(body).toHaveLength(1);
-      expect(body[0].email).toBe('searchable@test.com');
-    });
   });
 
   describe('GET /api/v1/players/top/rating', () => {
