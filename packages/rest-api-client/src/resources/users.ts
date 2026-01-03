@@ -2,6 +2,7 @@ import type {
   UserWithPlayer,
   UserListParams,
   UpdateUserRoleRequest,
+  UpdateUserRequest,
   PaginatedResponse,
 } from '../types/index.js';
 
@@ -49,5 +50,30 @@ export class UsersResource {
     await this._request<void>(`/users/${id}`, {
       method: 'DELETE',
     });
+  }
+
+  /**
+   * Update user (role and/or player link) (admin only)
+   */
+  async update(id: string, data: UpdateUserRequest): Promise<UserWithPlayer> {
+    return this._request<UserWithPlayer>(`/users/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  /**
+   * Link a player to a user (admin only)
+   * If the player is already linked to another user, it will be unlinked first.
+   */
+  async linkPlayer(id: string, playerId: string): Promise<UserWithPlayer> {
+    return this.update(id, { playerId });
+  }
+
+  /**
+   * Unlink the player from a user (admin only)
+   */
+  async unlinkPlayer(id: string): Promise<UserWithPlayer> {
+    return this.update(id, { playerId: null });
   }
 }

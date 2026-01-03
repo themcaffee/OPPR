@@ -77,6 +77,7 @@ export {
   updateUserRefreshToken,
   deleteUser,
   countUsers,
+  linkPlayerToUser,
 } from './users.js';
 
 // Export all types
