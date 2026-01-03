@@ -8,7 +8,6 @@ export function createPlayerFixture(overrides: Record<string, unknown> = {}) {
   return {
     externalId: `ext-player-${id}`,
     name: `Test Player ${id}`,
-    email: `player-${id}@test.com`,
     rating: 1500,
     ratingDeviation: 200,
     isRated: false,

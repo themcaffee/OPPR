@@ -7,7 +7,6 @@ import type { Player, Prisma } from '@prisma/client';
 export interface CreatePlayerInput {
   externalId?: string;
   name?: string;
-  email?: string;
   rating?: number;
   ratingDeviation?: number;
   ranking?: number;
@@ -20,7 +19,6 @@ export interface CreatePlayerInput {
  */
 export interface UpdatePlayerInput {
   name?: string;
-  email?: string;
   rating?: number;
   ratingDeviation?: number;
   ranking?: number;
@@ -77,16 +75,17 @@ export async function findPlayerByExternalId(
 }
 
 /**
- * Finds a player by email
+ * Finds a player through their linked User's email
  */
-export async function findPlayerByEmail(
+export async function findPlayerByUserEmail(
   email: string,
   include?: Prisma.PlayerInclude,
 ): Promise<Player | null> {
-  return prisma.player.findUnique({
+  const user = await prisma.user.findUnique({
     where: { email },
-    include,
+    include: { player: include ? { include } : true },
   });
+  return user?.player ?? null;
 }
 
 /**
@@ -221,16 +220,13 @@ export async function getPlayerWithResults(id: string) {
 }
 
 /**
- * Searches players by name or email
+ * Searches players by name
  */
 export async function searchPlayers(query: string, limit: number = 20): Promise<Player[]> {
   return findPlayers({
     take: limit,
     where: {
-      OR: [
-        { name: { contains: query, mode: 'insensitive' } },
-        { email: { contains: query, mode: 'insensitive' } },
-      ],
+      name: { contains: query, mode: 'insensitive' },
     },
   });
 }

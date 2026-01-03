@@ -40,7 +40,6 @@ export const resultWithRelationsSchema = {
       properties: {
         id: { type: 'string' },
         name: { type: 'string', nullable: true },
-        email: { type: 'string', nullable: true },
         rating: { type: 'number' },
         ranking: { type: 'integer', nullable: true },
       },

@@ -32,7 +32,6 @@ export default function AdminPlayerEditPage() {
       apiClient.players.get(id).then((p) => {
         reset({
           name: p.name ?? '',
-          email: p.email ?? '',
           rating: p.rating,
           ratingDeviation: p.ratingDeviation,
           ranking: p.ranking ?? undefined,
@@ -70,13 +69,6 @@ export default function AdminPlayerEditPage() {
       <Card>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <FormField label="Name" id="name" {...register('name')} error={errors.name?.message} />
-          <FormField
-            label="Email"
-            id="email"
-            type="email"
-            {...register('email')}
-            error={errors.email?.message}
-          />
           <FormField
             label="Rating"
             id="rating"

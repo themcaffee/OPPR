@@ -18,14 +18,12 @@ interface SearchOptions {
 
 interface CreateOptions {
   name?: string;
-  email?: string;
   externalId?: string;
   rating?: string;
 }
 
 interface UpdateOptions {
   name?: string;
-  email?: string;
   rating?: string;
   ranking?: string;
 }
@@ -89,7 +87,7 @@ export function registerPlayerCommands(program: Command): void {
 
   players
     .command('search <query>')
-    .description('Search players by name or email')
+    .description('Search players by name')
     .option('--limit <number>', 'Maximum results', '10')
     .action(
       wrapCommand(async (query: string, options: SearchOptions, cmd: Command) => {
@@ -111,7 +109,6 @@ export function registerPlayerCommands(program: Command): void {
     .command('create')
     .description('Create a new player')
     .option('--name <name>', 'Player name')
-    .option('--email <email>', 'Player email')
     .option('--external-id <id>', 'External ID (e.g., IFPA ID)')
     .option('--rating <rating>', 'Initial rating')
     .action(
@@ -127,7 +124,6 @@ export function registerPlayerCommands(program: Command): void {
         const spinner = ora('Creating player...').start();
         const player = await client.players.create({
           name: options.name,
-          email: options.email,
           externalId: options.externalId,
           rating: options.rating ? parseFloat(options.rating) : undefined,
         });
@@ -142,7 +138,6 @@ export function registerPlayerCommands(program: Command): void {
     .command('update <id>')
     .description('Update a player')
     .option('--name <name>', 'Player name')
-    .option('--email <email>', 'Player email')
     .option('--rating <rating>', 'Rating')
     .option('--ranking <ranking>', 'Ranking')
     .action(
@@ -153,7 +148,6 @@ export function registerPlayerCommands(program: Command): void {
         const spinner = ora('Updating player...').start();
         const player = await client.players.update(id, {
           name: options.name,
-          email: options.email,
           rating: options.rating ? parseFloat(options.rating) : undefined,
           ranking: options.ranking ? parseInt(options.ranking) : undefined,
         });

@@ -124,7 +124,7 @@ export function PlayerSelector({
   const filteredPlayers = displayPlayers.filter((p) => !excludePlayerIds.includes(p.id));
 
   const getPlayerDisplayName = (player: Player) => {
-    return player.name || player.email || player.id;
+    return player.name || player.id;
   };
 
   return (
@@ -133,9 +133,6 @@ export function PlayerSelector({
         <div className="flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
           <div>
             <span className="font-medium">{getPlayerDisplayName(selectedPlayer)}</span>
-            {selectedPlayer.email && selectedPlayer.name && (
-              <span className="text-sm text-gray-500 ml-2">({selectedPlayer.email})</span>
-            )}
           </div>
           <button
             type="button"
@@ -189,9 +186,6 @@ export function PlayerSelector({
                   className="w-full px-3 py-2 text-left hover:bg-blue-50 focus:bg-blue-50 focus:outline-none"
                 >
                   <div className="font-medium text-gray-900">{getPlayerDisplayName(player)}</div>
-                  {player.email && player.name && (
-                    <div className="text-sm text-gray-500">{player.email}</div>
-                  )}
                   <div className="text-xs text-gray-400">
                     Rating: {player.rating?.toFixed(0) || 'N/A'}
                     {player.ranking && ` | Rank: #${player.ranking}`}

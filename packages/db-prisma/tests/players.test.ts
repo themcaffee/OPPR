@@ -3,7 +3,7 @@ import {
   createPlayer,
   findPlayerById,
   findPlayerByExternalId,
-  findPlayerByEmail,
+  findPlayerByUserEmail,
   findPlayers,
   getRatedPlayers,
   getTopPlayersByRating,
@@ -17,6 +17,7 @@ import {
 } from '../src/players.js';
 import { createTournament } from '../src/tournaments.js';
 import { createResult } from '../src/results.js';
+import { prisma } from '../src/client.js';
 import { createPlayerInput, createRatedPlayerInput, resetPlayerCounter } from './factories/player.factory.js';
 import { createTournamentInput, resetTournamentCounter } from './factories/tournament.factory.js';
 import { createResultInput } from './factories/result.factory.js';
@@ -45,7 +46,6 @@ describe('players', () => {
 
       expect(player.externalId).toBe(input.externalId);
       expect(player.name).toBe(input.name);
-      expect(player.email).toBe(input.email);
       expect(player.rating).toBe(input.rating);
       expect(player.ratingDeviation).toBe(input.ratingDeviation);
       expect(player.ranking).toBe(10);
@@ -120,30 +120,40 @@ describe('players', () => {
     });
   });
 
-  describe('findPlayerByEmail', () => {
-    it('should find a player by email', async () => {
-      const input = createPlayerInput({ email: 'unique@email.com' });
-      const created = await createPlayer(input);
+  describe('findPlayerByUserEmail', () => {
+    it('should find a player through their linked user email', async () => {
+      const player = await createPlayer(createPlayerInput());
+      await prisma.user.create({
+        data: {
+          email: 'test@example.com',
+          passwordHash: 'hash',
+          playerId: player.id,
+        },
+      });
 
-      const found = await findPlayerByEmail('unique@email.com');
+      const found = await findPlayerByUserEmail('test@example.com');
 
       expect(found).not.toBeNull();
-      expect(found!.id).toBe(created.id);
+      expect(found!.id).toBe(player.id);
     });
 
     it('should return null for non-existent email', async () => {
-      const found = await findPlayerByEmail('nonexistent@email.com');
+      const found = await findPlayerByUserEmail('nonexistent@email.com');
 
       expect(found).toBeNull();
     });
 
-    it('should support include option', async () => {
-      const player = await createPlayer(createPlayerInput());
+    it('should return null for user without linked player', async () => {
+      await prisma.user.create({
+        data: {
+          email: 'nolinkedplayer@example.com',
+          passwordHash: 'hash',
+        },
+      });
 
-      const found = await findPlayerByEmail(player.email!, { tournamentResults: true });
+      const found = await findPlayerByUserEmail('nolinkedplayer@example.com');
 
-      expect(found).not.toBeNull();
-      expect(found!.tournamentResults).toBeDefined();
+      expect(found).toBeNull();
     });
   });
 
@@ -340,7 +350,7 @@ describe('players', () => {
       const updated = await updatePlayer(player.id, { name: 'New Name' });
 
       expect(updated.name).toBe('New Name');
-      expect(updated.email).toBe(player.email);
+      expect(updated.externalId).toBe(player.externalId);
     });
 
     it('should update multiple fields', async () => {
@@ -563,16 +573,6 @@ describe('players', () => {
       expect(results[0].name).toBe('John Doe');
     });
 
-    it('should find players by email (case-insensitive)', async () => {
-      await createPlayer(createPlayerInput({ email: 'john@example.com' }));
-      await createPlayer(createPlayerInput({ email: 'jane@example.com' }));
-
-      const results = await searchPlayers('JOHN@');
-
-      expect(results).toHaveLength(1);
-      expect(results[0].email).toBe('john@example.com');
-    });
-
     it('should match partial strings', async () => {
       await createPlayer(createPlayerInput({ name: 'John Doe' }));
       await createPlayer(createPlayerInput({ name: 'Johnny Appleseed' }));
@@ -608,17 +608,6 @@ describe('players', () => {
       const results = await searchPlayers('xyz');
 
       expect(results).toHaveLength(0);
-    });
-
-    it('should search across both name and email', async () => {
-      await createPlayer(createPlayerInput({ name: 'John', email: 'jane@example.com' }));
-
-      const nameResults = await searchPlayers('John');
-      const emailResults = await searchPlayers('jane@');
-
-      expect(nameResults).toHaveLength(1);
-      expect(emailResults).toHaveLength(1);
-      expect(nameResults[0].id).toBe(emailResults[0].id);
     });
   });
 });
