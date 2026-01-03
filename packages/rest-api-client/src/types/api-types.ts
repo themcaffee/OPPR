@@ -91,7 +91,6 @@ export interface Player {
   id: string;
   externalId: string | null;
   name: string | null;
-  email: string | null;
   rating: number;
   ratingDeviation: number;
   ranking: number | null;
@@ -106,7 +105,6 @@ export interface Player {
 export interface CreatePlayerRequest {
   externalId?: string;
   name?: string;
-  email?: string;
   rating?: number;
   ratingDeviation?: number;
   ranking?: number;
@@ -116,7 +114,6 @@ export interface CreatePlayerRequest {
 
 export interface UpdatePlayerRequest {
   name?: string;
-  email?: string;
   rating?: number;
   ratingDeviation?: number;
   ranking?: number;
@@ -269,7 +266,6 @@ export interface TournamentResult {
   player: {
     id: string;
     name: string | null;
-    email: string | null;
     rating: number;
     ranking: number | null;
   };
@@ -298,7 +294,6 @@ export interface ResultWithRelations extends Result {
   player: {
     id: string;
     name: string | null;
-    email: string | null;
     rating: number;
     ranking: number | null;
   };

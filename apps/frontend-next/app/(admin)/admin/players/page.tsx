@@ -41,7 +41,6 @@ export default function AdminPlayersPage() {
 
   const columns = [
     { key: 'name', header: 'Name', render: (p: Player) => p.name ?? '-' },
-    { key: 'email', header: 'Email', render: (p: Player) => p.email ?? '-' },
     { key: 'rating', header: 'Rating', render: (p: Player) => p.rating.toFixed(0) },
     { key: 'ranking', header: 'Ranking', render: (p: Player) => p.ranking ?? '-' },
     { key: 'eventCount', header: 'Events' },

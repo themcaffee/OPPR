@@ -90,7 +90,7 @@ export const playerRoutes: FastifyPluginAsync = async (app) => {
     {
       schema: {
         tags: ['Players'],
-        summary: 'Search players by name or email',
+        summary: 'Search players by name',
         security: [{ bearerAuth: [] }],
         querystring: playerSearchQuerySchema,
         response: {

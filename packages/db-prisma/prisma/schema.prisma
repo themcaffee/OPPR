@@ -19,7 +19,6 @@ model Player {
   // Player identification
   externalId       String?  @unique // External ID from OPPR or other systems
   name             String?
-  email            String?  @unique
 
   // OPPR Rating fields
   rating           Float    @default(1500) // Glicko rating
@@ -36,7 +35,6 @@ model Player {
   tournamentResults TournamentResult[]
   user              User?
 
-  @@index([email])
   @@index([externalId])
   @@index([rating])
   @@index([ranking])

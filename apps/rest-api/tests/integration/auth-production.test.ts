@@ -42,7 +42,7 @@ describe('Auth endpoints (production mode)', () => {
     // Create a test user with hashed password
     const passwordHash = await bcrypt.hash(testUserPassword, 12);
     const player = await prisma.player.create({
-      data: { name: 'Test Player', email: testUserEmail },
+      data: { name: 'Test Player' },
     });
     const user = await prisma.user.create({
       data: {

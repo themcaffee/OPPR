@@ -14,7 +14,7 @@ export {
   createPlayer,
   findPlayerById,
   findPlayerByExternalId,
-  findPlayerByEmail,
+  findPlayerByUserEmail,
   findPlayers,
   getRatedPlayers,
   getTopPlayersByRating,

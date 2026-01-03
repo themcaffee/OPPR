@@ -31,7 +31,7 @@ export class PlayersResource {
   }
 
   /**
-   * Search players by name or email
+   * Search players by name
    */
   async search(params: PlayerSearchParams): Promise<Player[]> {
     const queryString = this._buildQueryString(params as unknown as Record<string, unknown>);
