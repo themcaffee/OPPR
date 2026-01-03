@@ -2,6 +2,12 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { parsePlayerCSV, ValidationError } from '../src/index.js';
 import { resetConfig } from '../src/config.js';
 import type { ParsePlayerCSVOptions } from '../src/index.js';
+import { getGlickoRating } from './test-helpers.js';
+
+// Helper to get the Glicko rating deviation from a player
+function getGlickoRD(player: { ratings: Record<string, unknown> }): number {
+  return (player.ratings?.glicko as { ratingDeviation: number })?.ratingDeviation ?? 0;
+}
 
 beforeEach(() => {
   resetConfig();
@@ -22,22 +28,22 @@ describe('parsePlayerCSV', () => {
       // Check first player
       expect(result[0].name).toBe('Alice Johnson');
       expect(result[0].player.id).toBe('1001');
-      expect(result[0].player.rating).toBe(1500.5);
+      expect(getGlickoRating(result[0].player)).toBe(1500.5);
       expect(result[0].player.ranking).toBe(1000);
       expect(result[0].player.isRated).toBe(true);
       expect(result[0].player.eventCount).toBe(5);
-      expect(result[0].player.ratingDeviation).toBe(100);
+      expect(getGlickoRD(result[0].player)).toBe(100);
 
       // Check second player
       expect(result[1].name).toBe('Bob Smith');
       expect(result[1].player.id).toBe('1002');
-      expect(result[1].player.rating).toBe(1400.0);
+      expect(getGlickoRating(result[1].player)).toBe(1400.0);
       expect(result[1].player.ranking).toBe(2000);
 
       // Check third player
       expect(result[2].name).toBe('Charlie Davis');
       expect(result[2].player.id).toBe('1003');
-      expect(result[2].player.rating).toBe(1300.25);
+      expect(getGlickoRating(result[2].player)).toBe(1300.25);
       expect(result[2].player.ranking).toBe(3000);
     });
 
@@ -46,7 +52,7 @@ describe('parsePlayerCSV', () => {
       const result = parsePlayerCSV(validCSV, options);
 
       expect(result).toHaveLength(3);
-      expect(result[0].player.rating).toBe(1500.5);
+      expect(getGlickoRating(result[0].player)).toBe(1500.5);
       expect(result[0].player.ranking).toBe(1000);
       expect(result[0].player.isRated).toBe(true);
     });
@@ -190,12 +196,12 @@ describe('parsePlayerCSV', () => {
       // Check that default values are used
       expect(result[0].name).toBe('Alice Johnson');
       expect(result[0].player.id).toBe('1001');
-      expect(result[0].player.rating).toBe(1200); // default
+      expect(getGlickoRating(result[0].player)).toBe(1200); // default
       expect(result[0].player.ranking).toBe(999999); // default
       expect(result[0].player.isRated).toBe(false);
       expect(result[0].player.eventCount).toBe(0);
 
-      expect(result[1].player.rating).toBe(1200);
+      expect(getGlickoRating(result[1].player)).toBe(1200);
       expect(result[1].player.ranking).toBe(999999);
     });
 
@@ -206,8 +212,8 @@ describe('parsePlayerCSV', () => {
       };
       const result = parsePlayerCSV(validCSV, options);
 
-      expect(result[0].player.rating).toBe(1350);
-      expect(result[1].player.rating).toBe(1350);
+      expect(getGlickoRating(result[0].player)).toBe(1350);
+      expect(getGlickoRating(result[1].player)).toBe(1350);
     });
 
     it('should use custom default ranking', () => {
@@ -229,7 +235,7 @@ describe('parsePlayerCSV', () => {
       };
       const result = parsePlayerCSV(validCSV, options);
 
-      expect(result[0].player.rating).toBe(1350);
+      expect(getGlickoRating(result[0].player)).toBe(1350);
       expect(result[0].player.ranking).toBe(500000);
     });
 
@@ -369,17 +375,17 @@ describe('parsePlayerCSV', () => {
       expect(result[0].name).toBe('Adrienne Schroeder');
       expect(result[0].player.id).toBe('51150');
       expect(result[0].player.ranking).toBe(24124);
-      expect(result[0].player.rating).toBe(1173.23);
+      expect(getGlickoRating(result[0].player)).toBe(1173.23);
 
       expect(result[1].name).toBe('Becx Shipper');
       expect(result[1].player.id).toBe('130318');
       expect(result[1].player.ranking).toBe(23130);
-      expect(result[1].player.rating).toBe(1114.98);
+      expect(getGlickoRating(result[1].player)).toBe(1114.98);
 
       expect(result[2].name).toBe('Brenna Bechtold');
       expect(result[2].player.id).toBe('44966');
       expect(result[2].player.ranking).toBe(5705);
-      expect(result[2].player.rating).toBe(1364.52);
+      expect(getGlickoRating(result[2].player)).toBe(1364.52);
     });
   });
 });

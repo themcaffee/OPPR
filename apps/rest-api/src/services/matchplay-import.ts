@@ -8,6 +8,7 @@ import type {
   Tournament as CoreTournament,
   PlayerResult,
   EventBoosterType as CoreEventBoosterType,
+  Player,
 } from '@opprs/core';
 import {
   calculateBaseValue,
@@ -17,7 +18,20 @@ import {
   getEventBoosterMultiplier,
   distributePoints,
   calculateDecayMultiplier,
+  getPrimaryRating,
 } from '@opprs/core';
+import type { GlickoRatingData } from '@opprs/glicko-rating-system';
+
+// Helper to extract Glicko rating value from a player
+function getPlayerRating(player: Player): number {
+  return getPrimaryRating(player.ratings, 'glicko') ?? 1500;
+}
+
+// Helper to extract Glicko rating deviation from a player
+function getPlayerRD(player: Player): number {
+  const glicko = player.ratings?.glicko as GlickoRatingData | undefined;
+  return glicko?.ratingDeviation ?? 200;
+}
 import {
   createTournament,
   updateTournament,
@@ -130,8 +144,8 @@ export async function importTournament(
 
     if (dbPlayer) {
       dbPlayer = await updatePlayer(dbPlayer.id, {
-        rating: player.rating,
-        ratingDeviation: player.ratingDeviation,
+        rating: getPlayerRating(player),
+        ratingDeviation: getPlayerRD(player),
         ranking: player.ranking,
         isRated: player.isRated,
         eventCount: player.eventCount,
@@ -140,8 +154,8 @@ export async function importTournament(
     } else {
       dbPlayer = await createPlayer({
         externalId: playerExternalId,
-        rating: player.rating,
-        ratingDeviation: player.ratingDeviation,
+        rating: getPlayerRating(player),
+        ratingDeviation: getPlayerRD(player),
         ranking: player.ranking,
         isRated: player.isRated,
         eventCount: player.eventCount,

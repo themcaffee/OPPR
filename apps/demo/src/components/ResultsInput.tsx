@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type { PlayerWithName, PlayerResultWithName } from '../utils/calculations';
+import { getPlayerRating } from '../utils/calculations';
 
 interface ResultsInputProps {
   players: PlayerWithName[];
@@ -104,7 +105,7 @@ export function ResultsInput({ players, results, onResultsChange }: ResultsInput
   };
 
   const sortByRating = () => {
-    const sorted = [...results].sort((a, b) => b.player.rating - a.player.rating);
+    const sorted = [...results].sort((a, b) => getPlayerRating(b.player) - getPlayerRating(a.player));
     const finalResults = sorted.map((result, index) => ({
       ...result,
       position: index + 1,
@@ -191,7 +192,7 @@ export function ResultsInput({ players, results, onResultsChange }: ResultsInput
                   <div className="text-sm font-medium text-gray-900">{result.player.name}</div>
                 </td>
                 <td className="px-3 py-2 whitespace-nowrap">
-                  <div className="text-sm text-gray-600">{result.player.rating}</div>
+                  <div className="text-sm text-gray-600">{getPlayerRating(result.player)}</div>
                 </td>
                 <td className="px-3 py-2 whitespace-nowrap">
                   <div className="text-sm text-gray-600">#{result.player.ranking}</div>

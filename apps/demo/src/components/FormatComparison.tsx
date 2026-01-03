@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { TGPConfig } from '@opprs/core';
 import type { PlayerWithName, PlayerResultWithName } from '../utils/calculations';
-import { calculateTournamentResults, formatNumber } from '../utils/calculations';
+import { calculateTournamentResults, formatNumber, getPlayerRating } from '../utils/calculations';
 
 interface FormatComparisonProps {
   players: PlayerWithName[];
@@ -229,7 +229,7 @@ export function FormatComparison({ players, results, baseConfig, eventBooster }:
                   </td>
                   <td className="px-3 py-2 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{result.player.name}</div>
-                    <div className="text-xs text-gray-500">Rating: {result.player.rating}</div>
+                    <div className="text-xs text-gray-500">Rating: {getPlayerRating(result.player)}</div>
                   </td>
                   {calculations.map(({ name, calculation }) => {
                     const dist = calculation.distributions[index];

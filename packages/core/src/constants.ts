@@ -161,24 +161,6 @@ const RANKING = {
 };
 
 /**
- * Rating System Constants (Glicko)
- */
-const RATING = {
-  /** Default/provisional rating for new players */
-  DEFAULT_RATING: 1300,
-  /** Minimum rating deviation */
-  MIN_RD: 10,
-  /** Maximum rating deviation */
-  MAX_RD: 200,
-  /** RD decay rate per day */
-  RD_DECAY_PER_DAY: 0.3,
-  /** Number of players above/below used for rating calculation */
-  OPPONENTS_RANGE: 32,
-  /** Glicko system constant (q value) */
-  Q: Math.LN10 / 400,
-};
-
-/**
  * Tournament Validation Constants
  */
 const VALIDATION = {
@@ -204,6 +186,5 @@ export const DEFAULT_CONSTANTS: OPPRConfig = {
   POINT_DISTRIBUTION,
   TIME_DECAY,
   RANKING,
-  RATING,
   VALIDATION,
 };

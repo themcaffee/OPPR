@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@opprs/core": "workspace:*",
+    "@opprs/glicko-rating-system": "workspace:*",
+    "@opprs/rating-system-base": "workspace:*",
     "@tanstack/react-table": "^8.21.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

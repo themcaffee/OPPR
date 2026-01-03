@@ -6,6 +6,28 @@
  * @packageDocumentation
  */
 
+// Re-export rating system base types and functions for convenience
+export type {
+  RatingSystemId,
+  BaseRatingData,
+  MatchResult,
+  RatingUpdateResult,
+  PlayerRatingResult,
+  RatingSystem,
+  PlayerRatings,
+} from '@opprs/rating-system-base';
+
+export {
+  ratingRegistry,
+  registerRatingSystem,
+  getRatingSystem,
+  hasRatingSystem,
+  getRegisteredRatingSystems,
+  getPrimaryRating,
+  hasRating,
+  getPlayerRatingSystems,
+} from '@opprs/rating-system-base';
+
 // Export all types
 export type {
   Player,
@@ -21,8 +43,6 @@ export type {
   TournamentResult,
   PlayerEvent,
   PlayerProfile,
-  RatingUpdate,
-  RatingResult,
   DecayConfig,
 } from './types.js';
 
@@ -101,14 +121,6 @@ export {
   getEventDecayInfo,
 } from './time-decay.js';
 
-// Export rating functions
-export {
-  updateRating,
-  applyRDDecay,
-  simulateTournamentMatches,
-  createNewPlayerRating,
-  isProvisionalRating,
-} from './rating.js';
 
 // Export efficiency functions
 export {

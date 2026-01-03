@@ -1,6 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import type { TournamentCalculation, PlayerWithName } from '../utils/calculations';
-import { formatNumber, calculatePointsPercentage } from '../utils/calculations';
+import { formatNumber, calculatePointsPercentage, getPlayerRating } from '../utils/calculations';
 
 interface PointsDistributionProps {
   calculation: TournamentCalculation | null;
@@ -116,7 +116,7 @@ export function PointsDistribution({
                       {(distribution.player as PlayerWithName).name}
                     </div>
                     <div className="text-xs text-gray-500">
-                      Rating: {distribution.player.rating} | Rank: #{distribution.player.ranking}
+                      Rating: {getPlayerRating(distribution.player)} | Rank: #{distribution.player.ranking}
                     </div>
                   </td>
                   <td className="px-3 py-2 whitespace-nowrap text-right">

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { PlayerWithName } from '../utils/calculations';
+import { createPlayerWithName, getPlayerRating, getPlayerRD, updatePlayerRating, updatePlayerRD } from '../utils/calculations';
 import { exampleTournaments, generatePlayerNames } from '../data/examples';
 import { parsePlayerCSV, ValidationError } from '@opprs/core';
 
@@ -15,15 +16,7 @@ export function PlayerInput({ players, onPlayersChange }: PlayerInputProps) {
 
   const handleAddPlayer = () => {
     const newId = String(players.length + 1);
-    const newPlayer: PlayerWithName = {
-      id: newId,
-      name: `Player ${newId}`,
-      rating: 1300,
-      ranking: 1000,
-      isRated: false,
-      ratingDeviation: 200,
-      eventCount: 0,
-    };
+    const newPlayer = createPlayerWithName(newId, `Player ${newId}`, 1300, 1000, false, 200, 0);
     onPlayersChange([...players, newPlayer]);
   };
 
@@ -31,18 +24,27 @@ export function PlayerInput({ players, onPlayersChange }: PlayerInputProps) {
     onPlayersChange(players.filter((p) => p.id !== id));
   };
 
-  const handleUpdatePlayer = (id: string, field: keyof PlayerWithName, value: string | number | boolean) => {
+  const handleUpdatePlayer = (id: string, field: string, value: string | number | boolean) => {
     onPlayersChange(
-      players.map((p) =>
-        p.id === id
-          ? {
-              ...p,
-              [field]: value,
-              // Auto-update isRated based on eventCount
-              ...(field === 'eventCount' ? { isRated: (value as number) >= 5 } : {}),
-            }
-          : p
-      )
+      players.map((p) => {
+        if (p.id !== id) return p;
+
+        // Handle rating-related fields specially
+        if (field === 'rating') {
+          return updatePlayerRating(p, value as number);
+        }
+        if (field === 'ratingDeviation') {
+          return updatePlayerRD(p, value as number);
+        }
+
+        // Handle other fields normally
+        return {
+          ...p,
+          [field]: value,
+          // Auto-update isRated based on eventCount
+          ...(field === 'eventCount' ? { isRated: (value as number) >= 5 } : {}),
+        };
+      })
     );
   };
 
@@ -202,7 +204,7 @@ export function PlayerInput({ players, onPlayersChange }: PlayerInputProps) {
                 <td className="px-3 py-2 whitespace-nowrap">
                   <input
                     type="number"
-                    value={player.rating}
+                    value={getPlayerRating(player)}
                     onChange={(e) =>
                       handleUpdatePlayer(player.id, 'rating', Number(e.target.value))
                     }
@@ -232,7 +234,7 @@ export function PlayerInput({ players, onPlayersChange }: PlayerInputProps) {
                 <td className="px-3 py-2 whitespace-nowrap">
                   <input
                     type="number"
-                    value={player.ratingDeviation || 100}
+                    value={getPlayerRD(player)}
                     onChange={(e) =>
                       handleUpdatePlayer(player.id, 'ratingDeviation', Number(e.target.value))
                     }

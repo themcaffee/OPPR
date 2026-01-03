@@ -183,11 +183,16 @@ export function parsePlayerCSV(
 
       const player: Player = {
         id,
-        rating,
         ranking,
         isRated,
         eventCount,
-        ratingDeviation: 100,
+        ratings: {
+          // Using type assertion for Glicko-specific ratingDeviation property
+          glicko: {
+            value: rating,
+            ratingDeviation: 100,
+          } as { value: number; ratingDeviation: number },
+        },
       };
 
       // Validate the player object

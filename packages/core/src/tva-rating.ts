@@ -1,5 +1,19 @@
 import { getConfig } from './config.js';
 import type { Player } from './types.js';
+import { getPrimaryRating, type RatingSystemId } from '@opprs/rating-system-base';
+
+/**
+ * Default rating system ID for TVA calculations
+ */
+const DEFAULT_RATING_SYSTEM: RatingSystemId = 'glicko';
+
+/**
+ * Helper to get a player's rating value for a given system
+ * @internal
+ */
+function getPlayerRating(player: Player, ratingSystemId: RatingSystemId): number {
+  return getPrimaryRating(player.ratings, ratingSystemId) ?? 0;
+}
 
 /**
  * Calculates a single player's contribution to the rating-based TVA
@@ -27,28 +41,32 @@ export function calculatePlayerRatingContribution(rating: number): number {
  * Maximum possible value is 25 points.
  *
  * @param players - Array of players participating in the tournament
+ * @param ratingSystemId - Rating system to use (default: 'glicko')
  * @returns Total rating-based TVA for the tournament
  *
  * @example
  * ```typescript
  * const players = [
- *   { id: '1', rating: 2000, ranking: 1, isRated: true },
- *   { id: '2', rating: 1800, ranking: 5, isRated: true },
- *   { id: '3', rating: 1200, ranking: 100, isRated: true }, // Below threshold
+ *   { id: '1', ranking: 1, isRated: true, ratings: { glicko: { value: 2000, ratingDeviation: 50 } } },
+ *   { id: '2', ranking: 5, isRated: true, ratings: { glicko: { value: 1800, ratingDeviation: 75 } } },
+ *   { id: '3', ranking: 100, isRated: true, ratings: { glicko: { value: 1200, ratingDeviation: 100 } } }, // Below threshold
  * ];
  * const tva = calculateRatingTVA(players);
  * ```
  */
-export function calculateRatingTVA(players: Player[]): number {
+export function calculateRatingTVA(
+  players: Player[],
+  ratingSystemId: RatingSystemId = DEFAULT_RATING_SYSTEM
+): number {
   const config = getConfig();
   // Sort players by rating (highest first) and take top 64
   const topRatedPlayers = [...players]
-    .sort((a, b) => b.rating - a.rating)
+    .sort((a, b) => getPlayerRating(b, ratingSystemId) - getPlayerRating(a, ratingSystemId))
     .slice(0, config.TVA.MAX_PLAYERS_CONSIDERED);
 
   // Sum contributions from all top-rated players
   const totalTVA = topRatedPlayers.reduce((sum, player) => {
-    return sum + calculatePlayerRatingContribution(player.rating);
+    return sum + calculatePlayerRatingContribution(getPlayerRating(player, ratingSystemId));
   }, 0);
 
   // Cap at maximum rating TVA value
@@ -71,8 +89,15 @@ export function ratingContributesToTVA(rating: number): boolean {
  *
  * @param players - Array of players
  * @param count - Number of top players to return (default 64)
+ * @param ratingSystemId - Rating system to use for sorting (default: 'glicko')
  * @returns Array of top N rated players, sorted by rating descending
  */
-export function getTopRatedPlayers(players: Player[], count = 64): Player[] {
-  return [...players].sort((a, b) => b.rating - a.rating).slice(0, count);
+export function getTopRatedPlayers(
+  players: Player[],
+  count = 64,
+  ratingSystemId: RatingSystemId = DEFAULT_RATING_SYSTEM
+): Player[] {
+  return [...players]
+    .sort((a, b) => getPlayerRating(b, ratingSystemId) - getPlayerRating(a, ratingSystemId))
+    .slice(0, count);
 }

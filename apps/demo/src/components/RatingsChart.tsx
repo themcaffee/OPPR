@@ -1,6 +1,6 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import type { PlayerResultWithName } from '../utils/calculations';
-import { calculateRatingChanges, formatNumber, formatRatingChange } from '../utils/calculations';
+import { calculateRatingChanges, formatNumber, formatRatingChange, getPlayerRating } from '../utils/calculations';
 
 interface RatingsChartProps {
   results: PlayerResultWithName[];
@@ -26,8 +26,8 @@ export function RatingsChart({ results, maxPlayers = 10 }: RatingsChartProps) {
     return {
       player: result.player.name,
       position: result.position,
-      'Old Rating': change?.oldRating || result.player.rating,
-      'New Rating': change?.newRating || result.player.rating,
+      'Old Rating': change?.oldRating || getPlayerRating(result.player),
+      'New Rating': change?.newRating || getPlayerRating(result.player),
     };
   });
 

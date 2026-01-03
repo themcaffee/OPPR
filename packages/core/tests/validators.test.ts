@@ -97,9 +97,11 @@ describe('validatePrivateTournament', () => {
 describe('validatePlayer', () => {
   const validPlayer: Player = {
     id: 'player1',
-    rating: 1500,
     ranking: 100,
     isRated: true,
+    ratings: {
+      glicko: { value: 1500, ratingDeviation: 100 } as { value: number; ratingDeviation: number },
+    },
   };
 
   it('should not throw for valid player', () => {
@@ -107,7 +109,14 @@ describe('validatePlayer', () => {
   });
 
   it('should not throw for player with zero rating and ranking', () => {
-    expect(() => validatePlayer({ ...validPlayer, rating: 0, ranking: 0 })).not.toThrow();
+    const player = {
+      ...validPlayer,
+      ranking: 0,
+      ratings: {
+        glicko: { value: 0, ratingDeviation: 100 } as { value: number; ratingDeviation: number },
+      },
+    };
+    expect(() => validatePlayer(player)).not.toThrow();
   });
 
   it('should not throw for player with isRated false', () => {
@@ -119,17 +128,15 @@ describe('validatePlayer', () => {
     expect(() => validatePlayer({ ...validPlayer, id: '' })).toThrow('Player must have an ID');
   });
 
-  it('should throw for player with negative rating', () => {
-    expect(() => validatePlayer({ ...validPlayer, rating: -1 })).toThrow(ValidationError);
-    expect(() => validatePlayer({ ...validPlayer, rating: -1 })).toThrow(
-      'Player player1 has invalid rating: -1'
-    );
+  it('should throw for player without ratings object', () => {
+    const invalidPlayer = { id: 'p1', ranking: 1, isRated: true } as Player;
+    expect(() => validatePlayer(invalidPlayer)).toThrow(ValidationError);
+    expect(() => validatePlayer(invalidPlayer)).toThrow('Player p1 must have a ratings object');
   });
 
-  it('should throw for player with non-number type rating', () => {
-    expect(() =>
-      validatePlayer({ ...validPlayer, rating: 'invalid' as unknown as number })
-    ).toThrow(ValidationError);
+  it('should throw for player with non-object ratings', () => {
+    const playerWithInvalidRatings = { ...validPlayer, ratings: 'invalid' as unknown } as Player;
+    expect(() => validatePlayer(playerWithInvalidRatings)).toThrow(ValidationError);
   });
 
   it('should throw for player with negative ranking', () => {
@@ -166,16 +173,20 @@ describe('validatePlayer', () => {
 describe('validatePlayers', () => {
   const validPlayer1: Player = {
     id: 'player1',
-    rating: 1500,
     ranking: 100,
     isRated: true,
+    ratings: {
+      glicko: { value: 1500, ratingDeviation: 100 } as { value: number; ratingDeviation: number },
+    },
   };
 
   const validPlayer2: Player = {
     id: 'player2',
-    rating: 1600,
     ranking: 50,
     isRated: true,
+    ratings: {
+      glicko: { value: 1600, ratingDeviation: 100 } as { value: number; ratingDeviation: number },
+    },
   };
 
   it('should not throw for valid players array', () => {
@@ -196,7 +207,7 @@ describe('validatePlayers', () => {
   });
 
   it('should throw if any player is invalid', () => {
-    const invalidPlayer = { ...validPlayer1, rating: -1 };
+    const invalidPlayer = { ...validPlayer1, ratings: null } as unknown as Player;
     expect(() => validatePlayers([validPlayer1, invalidPlayer])).toThrow(ValidationError);
   });
 
@@ -349,9 +360,11 @@ describe('validateTGPConfig', () => {
 describe('validateTournament', () => {
   const validPlayer: Player = {
     id: 'player1',
-    rating: 1500,
     ranking: 100,
     isRated: true,
+    ratings: {
+      glicko: { value: 1500, ratingDeviation: 100 } as { value: number; ratingDeviation: number },
+    },
   };
 
   const validTGPConfig: TGPConfig = {
@@ -434,9 +447,11 @@ describe('validateTournament', () => {
 describe('validatePlayerResults', () => {
   const validPlayer: Player = {
     id: 'player1',
-    rating: 1500,
     ranking: 100,
     isRated: true,
+    ratings: {
+      glicko: { value: 1500, ratingDeviation: 100 } as { value: number; ratingDeviation: number },
+    },
   };
 
   const validResult1: PlayerResult = {
@@ -469,7 +484,7 @@ describe('validatePlayerResults', () => {
   });
 
   it('should throw for result with invalid player', () => {
-    const invalidResult = { ...validResult1, player: { ...validPlayer, rating: -1 } };
+    const invalidResult = { ...validResult1, player: { ...validPlayer, ratings: null } as unknown as Player };
     expect(() => validatePlayerResults([invalidResult])).toThrow(ValidationError);
   });
 
@@ -750,9 +765,11 @@ describe('Configuration Tests', () => {
         isPrivate: false,
         players: Array.from({ length: 4 }, (_, i) => ({
           id: `${i}`,
-          rating: 1500,
           ranking: i + 1,
           isRated: true,
+          ratings: {
+            glicko: { value: 1500, ratingDeviation: 100 } as { value: number; ratingDeviation: number },
+          },
         })),
         tgpConfig,
       };
@@ -770,9 +787,11 @@ describe('Configuration Tests', () => {
         isPrivate: false,
         players: Array.from({ length: 4 }, (_, i) => ({
           id: `${i}`,
-          rating: 1500,
           ranking: i + 1,
           isRated: true,
+          ratings: {
+            glicko: { value: 1500, ratingDeviation: 100 } as { value: number; ratingDeviation: number },
+          },
         })),
         tgpConfig,
       };

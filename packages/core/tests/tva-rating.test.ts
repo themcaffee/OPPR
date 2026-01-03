@@ -7,6 +7,7 @@ import {
 } from '../src/tva-rating.js';
 import { resetConfig, configureOPPR } from '../src/config.js';
 import type { Player } from '../src/types.js';
+import { createPlayer, getGlickoRating } from './test-helpers.js';
 
 beforeEach(() => {
   resetConfig();
@@ -38,9 +39,9 @@ describe('calculatePlayerRatingContribution', () => {
 describe('calculateRatingTVA', () => {
   it('should calculate TVA for multiple players', () => {
     const players: Player[] = [
-      { id: '1', rating: 2000, ranking: 1, isRated: true },
-      { id: '2', rating: 1800, ranking: 5, isRated: true },
-      { id: '3', rating: 1600, ranking: 10, isRated: true },
+      createPlayer('1', 2000, 1, true),
+      createPlayer('2', 1800, 5, true),
+      createPlayer('3', 1600, 10, true),
     ];
 
     const tva = calculateRatingTVA(players);
@@ -50,12 +51,9 @@ describe('calculateRatingTVA', () => {
 
   it('should cap at maximum of 25 points', () => {
     // Create 64 perfect players
-    const players: Player[] = Array.from({ length: 64 }, (_, i) => ({
-      id: `${i}`,
-      rating: 2000,
-      ranking: i + 1,
-      isRated: true,
-    }));
+    const players: Player[] = Array.from({ length: 64 }, (_, i) =>
+      createPlayer(`${i}`, 2000, i + 1, true)
+    );
 
     const tva = calculateRatingTVA(players);
     expect(tva).toBeCloseTo(25, 1);
@@ -64,18 +62,12 @@ describe('calculateRatingTVA', () => {
   it('should only consider top 64 players', () => {
     // Create 100 players, first 64 with rating 2000, rest with 1500
     const players: Player[] = [
-      ...Array.from({ length: 64 }, (_, i) => ({
-        id: `top${i}`,
-        rating: 2000,
-        ranking: i + 1,
-        isRated: true,
-      })),
-      ...Array.from({ length: 36 }, (_, i) => ({
-        id: `bottom${i}`,
-        rating: 1500,
-        ranking: i + 65,
-        isRated: true,
-      })),
+      ...Array.from({ length: 64 }, (_, i) =>
+        createPlayer(`top${i}`, 2000, i + 1, true)
+      ),
+      ...Array.from({ length: 36 }, (_, i) =>
+        createPlayer(`bottom${i}`, 1500, i + 65, true)
+      ),
     ];
 
     const tva = calculateRatingTVA(players);
@@ -84,8 +76,8 @@ describe('calculateRatingTVA', () => {
 
   it('should return 0 for players all below threshold', () => {
     const players: Player[] = [
-      { id: '1', rating: 1200, ranking: 100, isRated: true },
-      { id: '2', rating: 1100, ranking: 200, isRated: true },
+      createPlayer('1', 1200, 100, true),
+      createPlayer('2', 1100, 200, true),
     ];
 
     const tva = calculateRatingTVA(players);
@@ -110,21 +102,21 @@ describe('ratingContributesToTVA', () => {
 describe('getTopRatedPlayers', () => {
   it('should return top rated players sorted by rating', () => {
     const players: Player[] = [
-      { id: '1', rating: 1500, ranking: 50, isRated: true },
-      { id: '2', rating: 1800, ranking: 10, isRated: true },
-      { id: '3', rating: 1600, ranking: 30, isRated: true },
+      createPlayer('1', 1500, 50, true),
+      createPlayer('2', 1800, 10, true),
+      createPlayer('3', 1600, 30, true),
     ];
 
     const topPlayers = getTopRatedPlayers(players, 2);
     expect(topPlayers).toHaveLength(2);
-    expect(topPlayers[0].rating).toBe(1800);
-    expect(topPlayers[1].rating).toBe(1600);
+    expect(getGlickoRating(topPlayers[0])).toBe(1800);
+    expect(getGlickoRating(topPlayers[1])).toBe(1600);
   });
 
   it('should return all players if count exceeds array length', () => {
     const players: Player[] = [
-      { id: '1', rating: 1500, ranking: 50, isRated: true },
-      { id: '2', rating: 1800, ranking: 10, isRated: true },
+      createPlayer('1', 1500, 50, true),
+      createPlayer('2', 1800, 10, true),
     ];
 
     const topPlayers = getTopRatedPlayers(players, 10);
@@ -175,12 +167,9 @@ describe('Configuration Tests', () => {
   describe('calculateRatingTVA with custom config', () => {
     it('should use custom MAX_VALUE', () => {
       // Create 64 perfect players (2000 rating each)
-      const players: Player[] = Array.from({ length: 64 }, (_, i) => ({
-        id: `${i}`,
-        rating: 2000,
-        ranking: i + 1,
-        isRated: true,
-      }));
+      const players: Player[] = Array.from({ length: 64 }, (_, i) =>
+        createPlayer(`${i}`, 2000, i + 1, true)
+      );
 
       // Default: MAX_VALUE = 25
       const defaultTVA = calculateRatingTVA(players);
@@ -194,12 +183,9 @@ describe('Configuration Tests', () => {
 
     it('should use custom MAX_PLAYERS_CONSIDERED', () => {
       // Create 100 players with rating 2000
-      const players: Player[] = Array.from({ length: 100 }, (_, i) => ({
-        id: `${i}`,
-        rating: 2000,
-        ranking: i + 1,
-        isRated: true,
-      }));
+      const players: Player[] = Array.from({ length: 100 }, (_, i) =>
+        createPlayer(`${i}`, 2000, i + 1, true)
+      );
 
       // Default: considers top 64 players
       const defaultTVA = calculateRatingTVA(players);
@@ -214,12 +200,9 @@ describe('Configuration Tests', () => {
     });
 
     it('should combine multiple custom values', () => {
-      const players: Player[] = Array.from({ length: 100 }, (_, i) => ({
-        id: `${i}`,
-        rating: 2000,
-        ranking: i + 1,
-        isRated: true,
-      }));
+      const players: Player[] = Array.from({ length: 100 }, (_, i) =>
+        createPlayer(`${i}`, 2000, i + 1, true)
+      );
 
       configureOPPR({
         TVA: {

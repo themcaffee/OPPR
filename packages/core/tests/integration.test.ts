@@ -11,6 +11,7 @@ import {
   type PlayerResult,
 } from '../src/index.js';
 import { resetConfig, configureOPPR } from '../src/config.js';
+import { createPlayer } from './test-helpers.js';
 
 beforeEach(() => {
   resetConfig();
@@ -20,26 +21,26 @@ describe('Full Tournament Calculation Integration', () => {
   it('should calculate complete tournament value and distribute points', () => {
     // Setup: 20 player tournament with mixed ratings and rankings
     const players: Player[] = [
-      { id: '1', rating: 1900, ranking: 1, isRated: true },
-      { id: '2', rating: 1850, ranking: 2, isRated: true },
-      { id: '3', rating: 1800, ranking: 5, isRated: true },
-      { id: '4', rating: 1750, ranking: 10, isRated: true },
-      { id: '5', rating: 1700, ranking: 15, isRated: true },
-      { id: '6', rating: 1650, ranking: 20, isRated: true },
-      { id: '7', rating: 1600, ranking: 25, isRated: true },
-      { id: '8', rating: 1550, ranking: 30, isRated: true },
-      { id: '9', rating: 1500, ranking: 40, isRated: true },
-      { id: '10', rating: 1450, ranking: 50, isRated: true },
-      { id: '11', rating: 1400, ranking: 60, isRated: true },
-      { id: '12', rating: 1350, ranking: 80, isRated: true },
-      { id: '13', rating: 1300, ranking: 100, isRated: true },
-      { id: '14', rating: 1300, ranking: 120, isRated: true },
-      { id: '15', rating: 1300, ranking: 150, isRated: true },
-      { id: '16', rating: 1300, ranking: 180, isRated: true },
-      { id: '17', rating: 1300, ranking: 200, isRated: true },
-      { id: '18', rating: 1300, ranking: 250, isRated: true },
-      { id: '19', rating: 1300, ranking: 300, isRated: true },
-      { id: '20', rating: 1300, ranking: 500, isRated: true },
+      createPlayer('1', 1900, 1, true),
+      createPlayer('2', 1850, 2, true),
+      createPlayer('3', 1800, 5, true),
+      createPlayer('4', 1750, 10, true),
+      createPlayer('5', 1700, 15, true),
+      createPlayer('6', 1650, 20, true),
+      createPlayer('7', 1600, 25, true),
+      createPlayer('8', 1550, 30, true),
+      createPlayer('9', 1500, 40, true),
+      createPlayer('10', 1450, 50, true),
+      createPlayer('11', 1400, 60, true),
+      createPlayer('12', 1350, 80, true),
+      createPlayer('13', 1300, 100, true),
+      createPlayer('14', 1300, 120, true),
+      createPlayer('15', 1300, 150, true),
+      createPlayer('16', 1300, 180, true),
+      createPlayer('17', 1300, 200, true),
+      createPlayer('18', 1300, 250, true),
+      createPlayer('19', 1300, 300, true),
+      createPlayer('20', 1300, 500, true),
     ];
 
     // Step 1: Calculate Base Value
@@ -104,12 +105,9 @@ describe('Full Tournament Calculation Integration', () => {
 
   it('should handle Major championship with high TGP', () => {
     // Pinburgh-style tournament
-    const players: Player[] = Array.from({ length: 400 }, (_, i) => ({
-      id: `${i + 1}`,
-      rating: 1800 - i * 2,
-      ranking: i + 1,
-      isRated: true,
-    }));
+    const players: Player[] = Array.from({ length: 400 }, (_, i) =>
+      createPlayer(`${i + 1}`, 1800 - i * 2, i + 1, true)
+    );
 
     const baseValue = calculateBaseValue(players);
     expect(baseValue).toBe(32); // Maxed out
@@ -146,14 +144,14 @@ describe('Full Tournament Calculation Integration', () => {
   it('should handle small local tournament correctly', () => {
     // 8 player local tournament
     const players: Player[] = [
-      { id: '1', rating: 1600, ranking: 50, isRated: true },
-      { id: '2', rating: 1550, ranking: 75, isRated: true },
-      { id: '3', rating: 1500, ranking: 100, isRated: true },
-      { id: '4', rating: 1450, ranking: 150, isRated: true },
-      { id: '5', rating: 1400, ranking: 200, isRated: true },
-      { id: '6', rating: 1350, ranking: 300, isRated: true },
-      { id: '7', rating: 1300, ranking: 400, isRated: false }, // Unrated
-      { id: '8', rating: 1300, ranking: 500, isRated: false }, // Unrated
+      createPlayer('1', 1600, 50, true),
+      createPlayer('2', 1550, 75, true),
+      createPlayer('3', 1500, 100, true),
+      createPlayer('4', 1450, 150, true),
+      createPlayer('5', 1400, 200, true),
+      createPlayer('6', 1350, 300, true),
+      createPlayer('7', 1300, 400, false), // Unrated
+      createPlayer('8', 1300, 500, false), // Unrated
     ];
 
     const baseValue = calculateBaseValue(players);
@@ -184,12 +182,9 @@ describe('Full Tournament Calculation Integration', () => {
 
   it('should calculate tournament with custom configuration', () => {
     // 20 player tournament
-    const players: Player[] = Array.from({ length: 20 }, (_, i) => ({
-      id: `${i}`,
-      rating: 1800 - i * 20,
-      ranking: i + 1,
-      isRated: true,
-    }));
+    const players: Player[] = Array.from({ length: 20 }, (_, i) =>
+      createPlayer(`${i}`, 1800 - i * 20, i + 1, true)
+    );
 
     // Configure higher tournament values
     configureOPPR({

@@ -53,8 +53,8 @@ export function validatePlayer(player: Player): void {
     throw new ValidationError('Player must have an ID');
   }
 
-  if (typeof player.rating !== 'number' || player.rating < 0) {
-    throw new ValidationError(`Player ${player.id} has invalid rating: ${player.rating}`);
+  if (!player.ratings || typeof player.ratings !== 'object') {
+    throw new ValidationError(`Player ${player.id} must have a ratings object`);
   }
 
   if (typeof player.ranking !== 'number' || player.ranking < 0) {

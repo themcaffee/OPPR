@@ -78,7 +78,6 @@ function calculateDerivedValues(partial: PartialOPPRConfig): PartialOPPRConfig {
   if (!derived.TVA.RANKING) derived.TVA.RANKING = {};
   if (!derived.EVENT_BOOSTERS) derived.EVENT_BOOSTERS = {};
   if (!derived.TIME_DECAY) derived.TIME_DECAY = {};
-  if (!derived.RATING) derived.RATING = {};
 
   // Apply fixed constants
   derived.BASE_VALUE.POINTS_PER_PLAYER = FIXED_CONSTANTS.POINTS_PER_PLAYER;
@@ -90,7 +89,6 @@ function calculateDerivedValues(partial: PartialOPPRConfig): PartialOPPRConfig {
   derived.TIME_DECAY.YEAR_0_TO_1 = FIXED_CONSTANTS.YEAR_0_TO_1;
   derived.TIME_DECAY.YEAR_3_PLUS = FIXED_CONSTANTS.YEAR_3_PLUS;
   derived.TIME_DECAY.DAYS_PER_YEAR = FIXED_CONSTANTS.DAYS_PER_YEAR;
-  derived.RATING.Q = FIXED_CONSTANTS.Q;
 
   // Get default config to fill in missing values
   const defaults = getDefaultConfig();
@@ -154,24 +152,6 @@ export function useConfiguration() {
         field: 'TGP.MAX_WITH_FINALS',
         message: 'Max TGP with finals must be greater than without finals',
         suggestedValue: cfg.TGP.MAX_WITHOUT_FINALS + 0.5,
-      });
-    }
-
-    // Rating: MAX_RD must be greater than MIN_RD
-    if (cfg.RATING.MAX_RD <= cfg.RATING.MIN_RD) {
-      errors.push({
-        field: 'RATING.MAX_RD',
-        message: 'Max rating deviation must be greater than min rating deviation',
-        suggestedValue: cfg.RATING.MIN_RD + 50,
-      });
-    }
-
-    // Rating: RD values must be positive
-    if (cfg.RATING.MIN_RD <= 0) {
-      errors.push({
-        field: 'RATING.MIN_RD',
-        message: 'Min rating deviation must be positive',
-        suggestedValue: 10,
       });
     }
 

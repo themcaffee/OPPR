@@ -24,6 +24,7 @@
     "@fastify/swagger-ui": "^5.0.0",
     "@opprs/core": "workspace:*",
     "@opprs/db-prisma": "workspace:*",
+    "@opprs/glicko-rating-system": "workspace:*",
     "@opprs/matchplay-api": "workspace:*",
     "bcrypt": "^6.0.0",
     "fastify": "^5.2.1",

@@ -1,4 +1,5 @@
 import type { Player, TGPConfig } from '@opprs/core';
+import type { GlickoRatingData } from '@opprs/glicko-rating-system';
 
 export interface ExampleTournament {
   id: string;
@@ -9,6 +10,26 @@ export interface ExampleTournament {
   eventBooster: 'none' | 'certified' | 'certified-plus' | 'major';
 }
 
+// Helper to create a player with Glicko rating
+function createPlayer(
+  id: string,
+  rating: number,
+  ranking: number,
+  isRated: boolean,
+  ratingDeviation: number,
+  eventCount: number
+): Player {
+  return {
+    id,
+    ranking,
+    isRated,
+    eventCount,
+    ratings: {
+      glicko: { value: rating, ratingDeviation } as GlickoRatingData,
+    },
+  };
+}
+
 // Small Local Tournament (20 players)
 export const localTournament: ExampleTournament = {
   id: 'local-1',
@@ -16,26 +37,26 @@ export const localTournament: ExampleTournament = {
   description: 'Small local tournament with 20 players, limited qualifying and match play finals',
   eventBooster: 'none',
   players: [
-    { id: '1', rating: 1650, ranking: 45, isRated: true, ratingDeviation: 80, eventCount: 12 },
-    { id: '2', rating: 1600, ranking: 78, isRated: true, ratingDeviation: 90, eventCount: 10 },
-    { id: '3', rating: 1580, ranking: 95, isRated: true, ratingDeviation: 75, eventCount: 15 },
-    { id: '4', rating: 1550, ranking: 120, isRated: true, ratingDeviation: 85, eventCount: 8 },
-    { id: '5', rating: 1520, ranking: 150, isRated: true, ratingDeviation: 95, eventCount: 7 },
-    { id: '6', rating: 1500, ranking: 180, isRated: true, ratingDeviation: 100, eventCount: 6 },
-    { id: '7', rating: 1480, ranking: 210, isRated: true, ratingDeviation: 90, eventCount: 9 },
-    { id: '8', rating: 1450, ranking: 250, isRated: true, ratingDeviation: 110, eventCount: 5 },
-    { id: '9', rating: 1420, ranking: 300, isRated: true, ratingDeviation: 105, eventCount: 8 },
-    { id: '10', rating: 1400, ranking: 350, isRated: true, ratingDeviation: 95, eventCount: 11 },
-    { id: '11', rating: 1380, ranking: 400, isRated: true, ratingDeviation: 115, eventCount: 6 },
-    { id: '12', rating: 1350, ranking: 500, isRated: true, ratingDeviation: 120, eventCount: 7 },
-    { id: '13', rating: 1320, ranking: 650, isRated: false, ratingDeviation: 150, eventCount: 4 },
-    { id: '14', rating: 1300, ranking: 800, isRated: false, ratingDeviation: 160, eventCount: 3 },
-    { id: '15', rating: 1280, ranking: 1000, isRated: false, ratingDeviation: 170, eventCount: 2 },
-    { id: '16', rating: 1300, ranking: 1200, isRated: false, ratingDeviation: 180, eventCount: 1 },
-    { id: '17', rating: 1300, ranking: 1500, isRated: false, ratingDeviation: 200, eventCount: 0 },
-    { id: '18', rating: 1300, ranking: 2000, isRated: false, ratingDeviation: 200, eventCount: 0 },
-    { id: '19', rating: 1300, ranking: 2500, isRated: false, ratingDeviation: 200, eventCount: 0 },
-    { id: '20', rating: 1300, ranking: 3000, isRated: false, ratingDeviation: 200, eventCount: 0 },
+    createPlayer('1', 1650, 45, true, 80, 12),
+    createPlayer('2', 1600, 78, true, 90, 10),
+    createPlayer('3', 1580, 95, true, 75, 15),
+    createPlayer('4', 1550, 120, true, 85, 8),
+    createPlayer('5', 1520, 150, true, 95, 7),
+    createPlayer('6', 1500, 180, true, 100, 6),
+    createPlayer('7', 1480, 210, true, 90, 9),
+    createPlayer('8', 1450, 250, true, 110, 5),
+    createPlayer('9', 1420, 300, true, 105, 8),
+    createPlayer('10', 1400, 350, true, 95, 11),
+    createPlayer('11', 1380, 400, true, 115, 6),
+    createPlayer('12', 1350, 500, true, 120, 7),
+    createPlayer('13', 1320, 650, false, 150, 4),
+    createPlayer('14', 1300, 800, false, 160, 3),
+    createPlayer('15', 1280, 1000, false, 170, 2),
+    createPlayer('16', 1300, 1200, false, 180, 1),
+    createPlayer('17', 1300, 1500, false, 200, 0),
+    createPlayer('18', 1300, 2000, false, 200, 0),
+    createPlayer('19', 1300, 2500, false, 200, 0),
+    createPlayer('20', 1300, 3000, false, 200, 0),
   ],
   tgpConfig: {
     qualifying: {
@@ -56,14 +77,16 @@ export const regionalTournament: ExampleTournament = {
   name: 'Regional Championship',
   description: 'Medium-sized regional tournament with 60 players, PAPA-style qualifying and finals',
   eventBooster: 'certified-plus',
-  players: Array.from({ length: 60 }, (_, i) => ({
-    id: `${i + 1}`,
-    rating: Math.max(1300, 1850 - i * 8),
-    ranking: i < 40 ? i * 3 + 1 : i * 10,
-    isRated: i < 45,
-    ratingDeviation: i < 45 ? 60 + i : 150 + (i - 45) * 5,
-    eventCount: i < 45 ? Math.max(5, 20 - i) : Math.max(0, 5 - (i - 45)),
-  })),
+  players: Array.from({ length: 60 }, (_, i) =>
+    createPlayer(
+      `${i + 1}`,
+      Math.max(1300, 1850 - i * 8),
+      i < 40 ? i * 3 + 1 : i * 10,
+      i < 45,
+      i < 45 ? 60 + i : 150 + (i - 45) * 5,
+      i < 45 ? Math.max(5, 20 - i) : Math.max(0, 5 - (i - 45))
+    )
+  ),
   tgpConfig: {
     qualifying: {
       type: 'limited',
@@ -98,14 +121,14 @@ export const majorTournament: ExampleTournament = {
     // Most players in a major are rated
     const isRated = i < 350;
 
-    return {
-      id: `${i + 1}`,
+    return createPlayer(
+      `${i + 1}`,
       rating,
       ranking,
       isRated,
-      ratingDeviation: isRated ? Math.min(120, 50 + i * 0.15) : 180,
-      eventCount: isRated ? Math.max(5, Math.round(50 - i * 0.1)) : Math.max(0, 5 - (i - 350)),
-    };
+      isRated ? Math.min(120, 50 + i * 0.15) : 180,
+      isRated ? Math.max(5, Math.round(50 - i * 0.1)) : Math.max(0, 5 - (i - 350))
+    );
   }),
   tgpConfig: {
     qualifying: {
@@ -128,14 +151,16 @@ export const bestGameTournament: ExampleTournament = {
   name: 'Best Game Tournament',
   description: 'Best game format with no separate finals - qualifying only',
   eventBooster: 'none',
-  players: Array.from({ length: 40 }, (_, i) => ({
-    id: `${i + 1}`,
-    rating: Math.max(1300, 1750 - i * 10),
-    ranking: i < 30 ? i * 4 + 1 : i * 15,
-    isRated: i < 32,
-    ratingDeviation: i < 32 ? 70 + i : 140 + (i - 32) * 8,
-    eventCount: i < 32 ? Math.max(5, 18 - i) : Math.max(0, 5 - (i - 32)),
-  })),
+  players: Array.from({ length: 40 }, (_, i) =>
+    createPlayer(
+      `${i + 1}`,
+      Math.max(1300, 1750 - i * 10),
+      i < 30 ? i * 4 + 1 : i * 15,
+      i < 32,
+      i < 32 ? 70 + i : 140 + (i - 32) * 8,
+      i < 32 ? Math.max(5, 18 - i) : Math.max(0, 5 - (i - 32))
+    )
+  ),
   tgpConfig: {
     qualifying: {
       type: 'limited',

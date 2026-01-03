@@ -1,21 +1,21 @@
 {
-  "name": "@opprs/core",
-  "version": "1.1.4",
-  "description": "Open Pinball Player Ranking System - A TypeScript library for calculating pinball tournament rankings and ratings",
+  "name": "@opprs/rating-system-base",
+  "version": "1.0.0",
+  "description": "Base interfaces and registry for OPPR rating systems",
   "keywords": [
     "pinball",
     "ranking",
     "rating",
-    "tournament",
     "oppr",
-    "scoring"
+    "glicko",
+    "elo"
   ],
   "author": "Mitch McAffee",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/themcaffee/OPPR",
-    "directory": "packages/core"
+    "directory": "packages/rating-system-base"
   },
   "type": "module",
   "main": "./dist/index.cjs",
@@ -46,19 +46,7 @@
     "clean": "rm -rf dist coverage .turbo",
     "prepublishOnly": "pnpm run typecheck && pnpm run lint && pnpm run test && pnpm run build"
   },
-  "dependencies": {
-    "@opprs/rating-system-base": "workspace:*"
-  },
-  "peerDependencies": {
-    "@opprs/glicko-rating-system": "workspace:^"
-  },
-  "peerDependenciesMeta": {
-    "@opprs/glicko-rating-system": {
-      "optional": true
-    }
-  },
   "devDependencies": {
-    "@opprs/glicko-rating-system": "workspace:*",
     "@types/node": "^22.10.5",
     "@vitest/coverage-v8": "^4.0.16",
     "tsup": "^8.3.5",

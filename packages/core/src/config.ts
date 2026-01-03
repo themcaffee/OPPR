@@ -12,7 +12,6 @@ import type {
   PointDistributionConstants,
   TimeDecayConstants,
   RankingConstants,
-  RatingConstants,
   ValidationConstants,
 } from './types.js';
 
@@ -27,7 +26,6 @@ export interface OPPRConfig {
   POINT_DISTRIBUTION: PointDistributionConstants;
   TIME_DECAY: TimeDecayConstants;
   RANKING: RankingConstants;
-  RATING: RatingConstants;
   VALIDATION: ValidationConstants;
 }
 

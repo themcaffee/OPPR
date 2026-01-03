@@ -1,19 +1,26 @@
+import type { PlayerRatings } from '@opprs/rating-system-base';
+
 /**
  * Player information for OPPR calculations
  */
 export interface Player {
   /** Unique identifier for the player */
   id: string;
-  /** Player's current rating (Glicko-based) */
-  rating: number;
   /** Player's current world ranking position (1 = highest) */
   ranking: number;
   /** Whether the player is rated (has participated in 5+ events) */
   isRated: boolean;
-  /** Player's rating deviation (RD) for Glicko calculations */
-  ratingDeviation?: number;
   /** Number of events player has participated in */
   eventCount?: number;
+  /**
+   * Player's ratings across different rating systems
+   * @example
+   * {
+   *   glicko: { value: 1650, ratingDeviation: 75 },
+   *   elo: { value: 1580 }
+   * }
+   */
+  ratings: PlayerRatings;
 }
 
 /**
@@ -211,34 +218,6 @@ export interface PlayerProfile {
   efficiency: number;
 }
 
-/**
- * Glicko rating calculation input
- */
-export interface RatingUpdate {
-  /** Player's current rating */
-  currentRating: number;
-  /** Player's current rating deviation */
-  currentRD: number;
-  /** Opponents faced (as wins/losses based on finishing order) */
-  results: Array<{
-    /** Opponent rating */
-    opponentRating: number;
-    /** Opponent RD */
-    opponentRD: number;
-    /** Result: 1 = win, 0.5 = tie, 0 = loss */
-    score: number;
-  }>;
-}
-
-/**
- * Glicko rating calculation output
- */
-export interface RatingResult {
-  /** New rating after update */
-  newRating: number;
-  /** New rating deviation after update */
-  newRD: number;
-}
 
 /**
  * Time decay configuration
@@ -404,23 +383,6 @@ export interface RankingConstants {
   ENTRY_RANKING_PERCENTILE: number;
 }
 
-/**
- * Rating System Constants (Glicko) Type
- */
-export interface RatingConstants {
-  /** Default/provisional rating for new players */
-  DEFAULT_RATING: number;
-  /** Minimum rating deviation */
-  MIN_RD: number;
-  /** Maximum rating deviation */
-  MAX_RD: number;
-  /** RD decay rate per day */
-  RD_DECAY_PER_DAY: number;
-  /** Number of players above/below used for rating calculation */
-  OPPONENTS_RANGE: number;
-  /** Glicko system constant (q value) */
-  Q: number;
-}
 
 /**
  * Tournament Validation Constants Type
