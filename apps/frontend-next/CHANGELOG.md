@@ -1,5 +1,11 @@
 # frontend-next
 
+## 1.3.0
+
+### Minor Changes
+
+- f64a12d: Add player dashboard landing page with personal stats, leaderboards, and activity feed
+
 ## 1.2.0
 
 ### Minor Changes
