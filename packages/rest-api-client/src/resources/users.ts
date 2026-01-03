@@ -65,16 +65,6 @@ export class UsersResource {
   }
 
   /**
-   * Update user (role and/or player link) (admin only)
-   */
-  async update(id: string, data: UpdateUserRequest): Promise<UserWithPlayer> {
-    return this._request<UserWithPlayer>(`/users/${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify(data),
-    });
-  }
-
-  /**
    * Link a player to a user (admin only)
    * If the player is already linked to another user, it will be unlinked first.
    */
