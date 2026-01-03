@@ -129,7 +129,7 @@ describe('Auth endpoints', () => {
       expect(response.statusCode).toBe(200);
 
       const body = response.json();
-      expect(body).toHaveProperty('sub');
+      expect(body).toHaveProperty('id');
       expect(body).toHaveProperty('email', 'test@example.com');
       expect(body).toHaveProperty('role');
     });

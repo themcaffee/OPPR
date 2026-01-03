@@ -352,7 +352,7 @@ describe('Auth endpoints (production mode)', () => {
       expect(meResponse.statusCode).toBe(200);
 
       const body = meResponse.json();
-      expect(body).toHaveProperty('sub', testUserId);
+      expect(body).toHaveProperty('id', testUserId);
       expect(body).toHaveProperty('email', testUserEmail);
       expect(body).toHaveProperty('role', 'user');
     });

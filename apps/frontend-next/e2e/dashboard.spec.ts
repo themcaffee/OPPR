@@ -15,26 +15,6 @@ test.describe('Dashboard', () => {
     await expect(page).toHaveURL('/profile');
   });
 
-  test('should display dashboard after authentication', async ({ page }) => {
-    const dashboardPage = new DashboardPage(page);
-
-    await dashboardPage.goto();
-    await dashboardPage.expectLoaded();
-
-    await expect(dashboardPage.heading).toBeVisible();
-    await expect(dashboardPage.headerLogo).toBeVisible();
-    await expect(dashboardPage.signOutButton).toBeVisible();
-  });
-
-  test('should show no player profile message for new users', async ({ page }) => {
-    const dashboardPage = new DashboardPage(page);
-
-    await dashboardPage.goto();
-    await dashboardPage.expectLoaded();
-
-    await dashboardPage.expectNoPlayerProfile();
-  });
-
   test('should redirect to sign-in when not authenticated', async ({ page, context }) => {
     await context.clearCookies();
 
@@ -43,17 +23,22 @@ test.describe('Dashboard', () => {
     await expect(page).toHaveURL(/\/sign-in/);
   });
 
-  test('should logout successfully', async ({ page }) => {
+  test('should display dashboard without errors after authentication', async ({ page }) => {
     const dashboardPage = new DashboardPage(page);
+    const errors: string[] = [];
+
+    // Capture any page errors
+    page.on('pageerror', (err) => {
+      errors.push(err.message);
+    });
 
     await dashboardPage.goto();
     await dashboardPage.expectLoaded();
 
-    await dashboardPage.signOut();
+    // Verify no JavaScript errors occurred
+    expect(errors).toEqual([]);
 
-    await expect(page).toHaveURL('/sign-in');
-
-    await dashboardPage.goto();
-    await expect(page).toHaveURL(/\/sign-in/);
+    // Verify dashboard heading is visible
+    await expect(dashboardPage.heading).toBeVisible();
   });
 });

@@ -20,7 +20,8 @@ export class RegisterPage {
     this.passwordInput = page.getByLabel('Password', { exact: true });
     this.confirmPasswordInput = page.getByLabel('Confirm Password');
     this.submitButton = page.getByRole('button', { name: 'Create Account' });
-    this.errorAlert = page.getByRole('alert');
+    // Use specific class selector to avoid Next.js route announcer
+    this.errorAlert = page.locator('.bg-red-50[role="alert"]');
     this.signInLink = page.getByRole('link', { name: /sign in/i });
   }
 
@@ -56,7 +57,8 @@ export class SignInPage {
     this.emailInput = page.getByLabel('Email');
     this.passwordInput = page.getByLabel('Password');
     this.submitButton = page.getByRole('button', { name: 'Sign In' });
-    this.errorAlert = page.getByRole('alert');
+    // Use specific class selector to avoid Next.js route announcer
+    this.errorAlert = page.locator('.bg-red-50[role="alert"]');
     this.createAccountLink = page.getByRole('link', { name: /create account/i });
   }
 
