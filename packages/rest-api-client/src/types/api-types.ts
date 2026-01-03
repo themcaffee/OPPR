@@ -414,4 +414,5 @@ export interface UpdateUserRoleRequest {
 export interface UpdateUserRequest {
   role?: 'USER' | 'ADMIN';
   playerId?: string | null;
+  password?: string;
 }
