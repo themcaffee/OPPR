@@ -76,14 +76,14 @@ describe('Stats endpoints', () => {
       expect(body.results.total).toBe(1);
     });
 
-    it('should return 401 without authentication', async () => {
+    it('should allow unauthenticated access (public endpoint)', async () => {
       const app = await getTestApp();
       const response = await app.inject({
         method: 'GET',
         url: '/api/v1/stats/overview',
       });
 
-      expect(response.statusCode).toBe(401);
+      expect(response.statusCode).toBe(200);
     });
   });
 
@@ -144,14 +144,14 @@ describe('Stats endpoints', () => {
       expect(body).toHaveLength(3);
     });
 
-    it('should return 401 without authentication', async () => {
+    it('should allow unauthenticated access (public endpoint)', async () => {
       const app = await getTestApp();
       const response = await app.inject({
         method: 'GET',
         url: '/api/v1/stats/leaderboard',
       });
 
-      expect(response.statusCode).toBe(401);
+      expect(response.statusCode).toBe(200);
     });
   });
 });

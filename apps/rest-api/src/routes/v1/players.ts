@@ -52,21 +52,18 @@ interface IdParams {
 }
 
 export const playerRoutes: FastifyPluginAsync = async (app) => {
-  // List players with pagination
+  // List players with pagination (public)
   app.get<{ Querystring: PlayerListQuery }>(
     '/',
     {
       schema: {
         tags: ['Players'],
         summary: 'List players with pagination',
-        security: [{ bearerAuth: [] }],
         querystring: playerListQuerySchema,
         response: {
           200: paginatedResponseSchema(playerSchema),
-          401: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
     },
     async (request, reply) => {
       const { sortBy, sortOrder, isRated } = request.query;
@@ -84,21 +81,18 @@ export const playerRoutes: FastifyPluginAsync = async (app) => {
     }
   );
 
-  // Search players
+  // Search players (public)
   app.get<{ Querystring: PlayerSearchQuery }>(
     '/search',
     {
       schema: {
         tags: ['Players'],
         summary: 'Search players by name',
-        security: [{ bearerAuth: [] }],
         querystring: playerSearchQuerySchema,
         response: {
           200: { type: 'array', items: playerSchema },
-          401: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
     },
     async (request, reply) => {
       const { q, limit = 20 } = request.query;
@@ -107,21 +101,18 @@ export const playerRoutes: FastifyPluginAsync = async (app) => {
     }
   );
 
-  // Top players by rating
+  // Top players by rating (public)
   app.get<{ Querystring: TopPlayersQuery }>(
     '/top/rating',
     {
       schema: {
         tags: ['Players'],
         summary: 'Get top players by rating',
-        security: [{ bearerAuth: [] }],
         querystring: topPlayersQuerySchema,
         response: {
           200: { type: 'array', items: playerSchema },
-          401: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
     },
     async (request, reply) => {
       const { limit = 50 } = request.query;
@@ -130,21 +121,18 @@ export const playerRoutes: FastifyPluginAsync = async (app) => {
     }
   );
 
-  // Top players by ranking
+  // Top players by ranking (public)
   app.get<{ Querystring: TopPlayersQuery }>(
     '/top/ranking',
     {
       schema: {
         tags: ['Players'],
         summary: 'Get top players by ranking',
-        security: [{ bearerAuth: [] }],
         querystring: topPlayersQuerySchema,
         response: {
           200: { type: 'array', items: playerSchema },
-          401: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
     },
     async (request, reply) => {
       const { limit = 50 } = request.query;
@@ -153,22 +141,19 @@ export const playerRoutes: FastifyPluginAsync = async (app) => {
     }
   );
 
-  // Get player by ID
+  // Get player by ID (public)
   app.get<{ Params: IdParams }>(
     '/:id',
     {
       schema: {
         tags: ['Players'],
         summary: 'Get player by ID',
-        security: [{ bearerAuth: [] }],
         params: idParamSchema,
         response: {
           200: playerSchema,
-          401: errorResponseSchema,
           404: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
     },
     async (request, reply) => {
       const player = await findPlayerById(request.params.id);
@@ -179,22 +164,19 @@ export const playerRoutes: FastifyPluginAsync = async (app) => {
     }
   );
 
-  // Get player results
+  // Get player results (public)
   app.get<{ Params: IdParams }>(
     '/:id/results',
     {
       schema: {
         tags: ['Players'],
         summary: "Get player's tournament results",
-        security: [{ bearerAuth: [] }],
         params: idParamSchema,
         response: {
           200: { type: 'array', items: playerResultSchema },
-          401: errorResponseSchema,
           404: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
     },
     async (request, reply) => {
       const playerWithResults = await getPlayerWithResults(request.params.id);
@@ -205,22 +187,19 @@ export const playerRoutes: FastifyPluginAsync = async (app) => {
     }
   );
 
-  // Get player stats
+  // Get player stats (public)
   app.get<{ Params: IdParams }>(
     '/:id/stats',
     {
       schema: {
         tags: ['Players'],
         summary: 'Get player statistics',
-        security: [{ bearerAuth: [] }],
         params: idParamSchema,
         response: {
           200: playerStatsSchema,
-          401: errorResponseSchema,
           404: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
     },
     async (request, reply) => {
       const player = await findPlayerById(request.params.id);
