@@ -122,7 +122,7 @@ export default function DashboardPage() {
   }
 
   const { user, stats, results, rankingLeaderboard, ratingLeaderboard, recentTournaments } = data;
-  const hasPlayerProfile = user?.player !== null;
+  const hasPlayerProfile = user?.player != null;
 
   return (
     <>
