@@ -59,7 +59,12 @@ export default function AdminTournamentsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Tournaments</h1>
-        <Button onClick={() => router.push('/admin/tournaments/new')}>Add Tournament</Button>
+        <div className="flex space-x-3">
+          <Button variant="outline" onClick={() => router.push('/admin/import/matchplay')}>
+            Import from Matchplay
+          </Button>
+          <Button onClick={() => router.push('/admin/tournaments/new')}>Add Tournament</Button>
+        </div>
       </div>
 
       <Card className="p-0">
