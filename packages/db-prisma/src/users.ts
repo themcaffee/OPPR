@@ -242,10 +242,52 @@ export async function findUsers(params: {
 }
 
 /**
- * Finds a user by their linked player ID
+ * Links a player to a user, automatically unlinking from any existing user.
+ * Uses a transaction to ensure atomicity.
+ *
+ * @param userId - The user to link the player to
+ * @param playerId - The player to link (null to unlink)
+ * @returns The updated user with player data
+ * @throws Error if player not found
  */
-export async function findUserByPlayerId(playerId: string): Promise<User | null> {
-  return prisma.user.findUnique({
-    where: { playerId },
+export async function linkPlayerToUser(
+  userId: string,
+  playerId: string | null,
+): Promise<UserWithPlayer> {
+  return prisma.$transaction(async (tx) => {
+    // If linking to a player, first check if that player exists
+    if (playerId) {
+      const player = await tx.player.findUnique({ where: { id: playerId } });
+      if (!player) {
+        throw new Error(`Player with id '${playerId}' not found`);
+      }
+
+      // Unlink the player from any existing user
+      await tx.user.updateMany({
+        where: { playerId },
+        data: { playerId: null },
+      });
+    }
+
+    // Update the target user with the new playerId
+    const user = await tx.user.update({
+      where: { id: userId },
+      data: { playerId },
+      include: {
+        player: {
+          select: {
+            id: true,
+            name: true,
+            rating: true,
+            ratingDeviation: true,
+            ranking: true,
+            isRated: true,
+            eventCount: true,
+          },
+        },
+      },
+    });
+
+    return user as UserWithPlayer;
   });
 }

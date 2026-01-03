@@ -8,6 +8,7 @@ import { Pagination } from '@/components/admin/Pagination';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
+import { UserPlayerLink } from '@/components/admin/UserPlayerLink';
 import type { UserWithPlayer, PaginatedResponse } from '@opprs/rest-api-client';
 
 export default function AdminUsersPage() {
@@ -63,7 +64,7 @@ export default function AdminUsersPage() {
     {
       key: 'player',
       header: 'Linked Player',
-      render: (u: UserWithPlayer) => u.player?.name ?? '-',
+      render: (u: UserWithPlayer) => <UserPlayerLink user={u} onUpdate={fetchUsers} />,
     },
     {
       key: 'createdAt',

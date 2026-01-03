@@ -2,18 +2,17 @@ import type { FastifyPluginAsync } from 'fastify';
 import bcrypt from 'bcrypt';
 import {
   findUserById,
-  findUserByPlayerId,
   findUsers,
   updateUser,
   deleteUser,
   countUsers,
   getUserWithPlayer,
-  findPlayerById,
+  linkPlayerToUser,
 } from '@opprs/db-prisma';
 import { userSchema, userListQuerySchema, updateUserSchema } from '../../schemas/user.js';
 import { idParamSchema, errorResponseSchema, paginatedResponseSchema } from '../../schemas/common.js';
 import { parsePaginationParams, buildPaginatedResponse } from '../../utils/pagination.js';
-import { NotFoundError, ForbiddenError, BadRequestError } from '../../utils/errors.js';
+import { NotFoundError, ForbiddenError } from '../../utils/errors.js';
 
 const BCRYPT_SALT_ROUNDS = 12;
 
@@ -126,30 +125,30 @@ export const userRoutes: FastifyPluginAsync = async (app) => {
         throw new NotFoundError('User', request.params.id);
       }
 
-      // Validate playerId if provided and not null
-      if (playerId) {
-        const player = await findPlayerById(playerId);
-        if (!player) {
-          throw new NotFoundError('Player', playerId);
-        }
-
-        // Check if player is already linked to another user
-        const existingLink = await findUserByPlayerId(playerId);
-        if (existingLink && existingLink.id !== request.params.id) {
-          throw new BadRequestError('Player is already linked to another user');
-        }
-      }
-
-      // Build update data
-      const updateData: { role?: 'USER' | 'ADMIN'; playerId?: string | null; passwordHash?: string } =
-        {};
+      // Handle role and password updates
+      const updateData: { role?: 'USER' | 'ADMIN'; passwordHash?: string } = {};
       if (role !== undefined) updateData.role = role;
-      if (playerId !== undefined) updateData.playerId = playerId;
       if (password) {
         updateData.passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
       }
 
-      await updateUser(request.params.id, updateData);
+      if (Object.keys(updateData).length > 0) {
+        await updateUser(request.params.id, updateData);
+      }
+
+      // Handle playerId update if provided (uses transactional linking)
+      if (playerId !== undefined) {
+        try {
+          const user = await linkPlayerToUser(request.params.id, playerId);
+          return reply.send(user);
+        } catch (error) {
+          if (error instanceof Error && error.message.includes('not found')) {
+            throw new NotFoundError('Player', playerId ?? 'null');
+          }
+          throw error;
+        }
+      }
+
       const user = await getUserWithPlayer(request.params.id);
       return reply.send(user);
     }
