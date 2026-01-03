@@ -6,7 +6,12 @@ import {
   hasRatingSystem,
   getRegisteredRatingSystems,
 } from '../src/registry.js';
-import type { RatingSystem, BaseRatingData, MatchResult, RatingUpdateResult } from '../src/types.js';
+import type {
+  RatingSystem,
+  BaseRatingData,
+  MatchResult,
+  RatingUpdateResult,
+} from '../src/types.js';
 
 // Mock rating system for testing
 class MockRatingSystem implements RatingSystem<BaseRatingData> {

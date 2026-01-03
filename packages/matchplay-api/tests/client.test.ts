@@ -224,7 +224,7 @@ describe('MatchplayClient', () => {
       const player = await client.getPlayer(1001);
 
       expect(player.id).toBe('1001');
-      expect(player.rating).toBe(1850);
+      expect(player.ratings.glicko?.value).toBe(1850);
       expect(player.ranking).toBe(250);
     });
   });
@@ -238,7 +238,7 @@ describe('MatchplayClient', () => {
 
       expect(players).toHaveLength(1);
       expect(players[0].id).toBe('1001');
-      expect(players[0].rating).toBe(1850);
+      expect(players[0].ratings.glicko?.value).toBe(1850);
     });
   });
 

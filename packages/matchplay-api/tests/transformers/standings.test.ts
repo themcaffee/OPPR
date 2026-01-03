@@ -28,11 +28,15 @@ describe('toOPPRResults', () => {
         '1001',
         {
           id: '1001',
-          rating: 1850,
           ranking: 250,
           isRated: true,
-          ratingDeviation: 45,
           eventCount: 120,
+          ratings: {
+            glicko: {
+              value: 1850,
+              ratingDeviation: 45,
+            } as { value: number; ratingDeviation: number },
+          },
         },
       ],
     ]);
@@ -40,11 +44,11 @@ describe('toOPPRResults', () => {
     const results = toOPPRResults(sampleStandings, playerMap);
 
     // First player should have enriched data
-    expect(results[0].player.rating).toBe(1850);
+    expect(results[0].player.ratings.glicko?.value).toBe(1850);
     expect(results[0].player.ranking).toBe(250);
 
     // Second player should have default data (not in map)
-    expect(results[1].player.rating).toBe(1500); // Default
+    expect(results[1].player.ratings.glicko?.value).toBe(1500); // Default
   });
 
   it('should handle empty standings', () => {

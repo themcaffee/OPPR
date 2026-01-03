@@ -484,7 +484,10 @@ describe('validatePlayerResults', () => {
   });
 
   it('should throw for result with invalid player', () => {
-    const invalidResult = { ...validResult1, player: { ...validPlayer, ratings: null } as unknown as Player };
+    const invalidResult = {
+      ...validResult1,
+      player: { ...validPlayer, ratings: null } as unknown as Player,
+    };
     expect(() => validatePlayerResults([invalidResult])).toThrow(ValidationError);
   });
 
@@ -768,7 +771,10 @@ describe('Configuration Tests', () => {
           ranking: i + 1,
           isRated: true,
           ratings: {
-            glicko: { value: 1500, ratingDeviation: 100 } as { value: number; ratingDeviation: number },
+            glicko: { value: 1500, ratingDeviation: 100 } as {
+              value: number;
+              ratingDeviation: number;
+            },
           },
         })),
         tgpConfig,
@@ -790,7 +796,10 @@ describe('Configuration Tests', () => {
           ranking: i + 1,
           isRated: true,
           ratings: {
-            glicko: { value: 1500, ratingDeviation: 100 } as { value: number; ratingDeviation: number },
+            glicko: { value: 1500, ratingDeviation: 100 } as {
+              value: number;
+              ratingDeviation: number;
+            },
           },
         })),
         tgpConfig,

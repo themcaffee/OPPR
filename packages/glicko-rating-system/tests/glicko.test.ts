@@ -189,9 +189,7 @@ describe('GlickoRatingSystem', () => {
       ];
 
       const result = glicko.updateRating(current, results);
-      expect(result.newRating.ratingDeviation).toBeGreaterThanOrEqual(
-        DEFAULT_GLICKO_CONFIG.MIN_RD
-      );
+      expect(result.newRating.ratingDeviation).toBeGreaterThanOrEqual(DEFAULT_GLICKO_CONFIG.MIN_RD);
     });
 
     it('should clamp RD to MAX_RD', () => {
@@ -200,7 +198,10 @@ describe('GlickoRatingSystem', () => {
         ratingDeviation: DEFAULT_GLICKO_CONFIG.MAX_RD,
       };
       const results: MatchResult<GlickoRatingData>[] = [
-        { opponentRating: { value: 1500, ratingDeviation: DEFAULT_GLICKO_CONFIG.MAX_RD }, score: 1 },
+        {
+          opponentRating: { value: 1500, ratingDeviation: DEFAULT_GLICKO_CONFIG.MAX_RD },
+          score: 1,
+        },
       ];
 
       const result = glicko.updateRating(current, results);

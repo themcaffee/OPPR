@@ -35,10 +35,7 @@ export function getPrimaryRating(
  * @param systemId - Rating system to check
  * @returns True if player has a rating for the system
  */
-export function hasRating(
-  ratings: PlayerRatings | undefined,
-  systemId: RatingSystemId
-): boolean {
+export function hasRating(ratings: PlayerRatings | undefined, systemId: RatingSystemId): boolean {
   return ratings?.[systemId] !== undefined;
 }
 

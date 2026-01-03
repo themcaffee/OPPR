@@ -218,7 +218,6 @@ export interface PlayerProfile {
   efficiency: number;
 }
 
-
 /**
  * Time decay configuration
  */
@@ -382,7 +381,6 @@ export interface RankingConstants {
   /** Percentile for entry ranking of first-time players */
   ENTRY_RANKING_PERCENTILE: number;
 }
-
 
 /**
  * Tournament Validation Constants Type

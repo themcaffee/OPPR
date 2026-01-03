@@ -48,11 +48,15 @@ export function toOPPRPlayer(
 
   return {
     id: String(user.userId),
-    rating,
     ranking,
     isRated,
-    ratingDeviation,
     eventCount,
+    ratings: {
+      glicko: {
+        value: rating,
+        ratingDeviation,
+      } as { value: number; ratingDeviation: number },
+    },
   };
 }
 
@@ -79,10 +83,14 @@ export function standingToPlayer(
 
   return {
     id: standing.userId ? String(standing.userId) : String(standing.playerId),
-    rating: opts.defaultRating,
     ranking: opts.defaultRanking,
     isRated: standing.ifpaId !== undefined && standing.ifpaId !== null,
-    ratingDeviation: opts.defaultRD,
+    ratings: {
+      glicko: {
+        value: opts.defaultRating,
+        ratingDeviation: opts.defaultRD,
+      } as { value: number; ratingDeviation: number },
+    },
   };
 }
 
@@ -97,9 +105,13 @@ export function ratingToPlayer(
 
   return {
     id: String(rating.userId),
-    rating: rating.rating,
     ranking: opts.defaultRanking, // Ratings don't include IFPA ranking
     isRated: true, // If they have a rating, they're rated
-    ratingDeviation: rating.rd,
+    ratings: {
+      glicko: {
+        value: rating.rating,
+        ratingDeviation: rating.rd,
+      } as { value: number; ratingDeviation: number },
+    },
   };
 }

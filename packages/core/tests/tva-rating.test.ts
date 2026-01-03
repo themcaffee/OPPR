@@ -62,12 +62,8 @@ describe('calculateRatingTVA', () => {
   it('should only consider top 64 players', () => {
     // Create 100 players, first 64 with rating 2000, rest with 1500
     const players: Player[] = [
-      ...Array.from({ length: 64 }, (_, i) =>
-        createPlayer(`top${i}`, 2000, i + 1, true)
-      ),
-      ...Array.from({ length: 36 }, (_, i) =>
-        createPlayer(`bottom${i}`, 1500, i + 65, true)
-      ),
+      ...Array.from({ length: 64 }, (_, i) => createPlayer(`top${i}`, 2000, i + 1, true)),
+      ...Array.from({ length: 36 }, (_, i) => createPlayer(`bottom${i}`, 1500, i + 65, true)),
     ];
 
     const tva = calculateRatingTVA(players);

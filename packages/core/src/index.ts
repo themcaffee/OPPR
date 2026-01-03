@@ -121,7 +121,6 @@ export {
   getEventDecayInfo,
 } from './time-decay.js';
 
-
 // Export efficiency functions
 export {
   calculateEventEfficiency,

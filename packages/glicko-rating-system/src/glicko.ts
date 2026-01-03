@@ -166,13 +166,18 @@ export class GlickoRatingSystem implements RatingSystem<GlickoRatingData> {
     // Calculate sum of (g(RD) * (score - E))
     const sum = results.reduce((total, result) => {
       const g = this.calculateG(result.opponentRD);
-      const e = this.calculateExpectedScore(currentRating, result.opponentRating, result.opponentRD);
+      const e = this.calculateExpectedScore(
+        currentRating,
+        result.opponentRating,
+        result.opponentRD
+      );
       return total + g * (result.score - e);
     }, 0);
 
     // Calculate new rating
     const qSquared = this.config.Q * this.config.Q;
-    const newRating = currentRating + (qSquared / (1 / (currentRD * currentRD) + 1 / dSquared)) * sum;
+    const newRating =
+      currentRating + (qSquared / (1 / (currentRD * currentRD) + 1 / dSquared)) * sum;
 
     // Calculate new RD
     const newRD = Math.sqrt(1 / (1 / (currentRD * currentRD) + 1 / dSquared));
@@ -214,10 +219,7 @@ export class GlickoRatingSystem implements RatingSystem<GlickoRatingData> {
    *
    * d² = 1 / (q² * Σ(g(RD)² * E * (1 - E)))
    */
-  private calculateDSquared(
-    results: GlickoMatchResult[],
-    rating: number
-  ): number {
+  private calculateDSquared(results: GlickoMatchResult[], rating: number): number {
     const qSquared = this.config.Q * this.config.Q;
 
     const sum = results.reduce((total, result) => {
