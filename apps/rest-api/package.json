@@ -1,7 +1,7 @@
 {
   "name": "rest-api",
   "private": true,
-  "version": "1.1.5",
+  "version": "1.2.0",
   "description": "REST API server for OPPR (Open Pinball Player Ranking System)",
   "type": "module",
   "scripts": {
