@@ -12,6 +12,7 @@ export default defineConfig({
       { text: 'Home', link: '/' },
       { text: 'Getting Started', link: '/getting-started' },
       { text: 'REST API', link: '/rest-api' },
+      { text: 'CLI', link: '/cli' },
       { text: 'Frontend', link: '/frontend-next' },
       { text: 'Demo', link: 'https://themcaffee.github.io/OPPR/demo/' },
     ],
@@ -27,6 +28,7 @@ export default defineConfig({
         text: 'Applications',
         items: [
           { text: 'REST API', link: '/rest-api' },
+          { text: 'CLI', link: '/cli' },
           { text: 'Frontend (Next.js)', link: '/frontend-next' },
         ],
       },
