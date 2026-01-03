@@ -185,6 +185,8 @@ jobs:
           POSTGRES_PASSWORD: oppr_dev_password
           JWT_SECRET: test-jwt-secret
           JWT_REFRESH_SECRET: test-jwt-refresh-secret
+          SEED_DATABASE: "true"
+          AUTH_DEV_MODE: "false"
 
       - name: Wait for services to be ready
         if: steps.filter.outputs.e2e == 'true'
