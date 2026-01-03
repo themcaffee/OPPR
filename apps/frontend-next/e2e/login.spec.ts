@@ -2,6 +2,12 @@ import { test, expect } from '@playwright/test';
 import { SignInPage } from './page-objects/auth.page';
 import { DashboardPage } from './page-objects/dashboard.page';
 
+// Seeded test user credentials (from packages/db-prisma/prisma/seed.ts)
+const SEEDED_USER = {
+  email: 'e2e-test@example.com',
+  password: 'TestPassword123!',
+};
+
 test.describe('Login Redirect Functionality', () => {
   test('should redirect to dashboard after login when accessing protected route', async ({
     page,
@@ -15,8 +21,8 @@ test.describe('Login Redirect Functionality', () => {
     // Should be redirected to sign-in with redirect param
     await expect(page).toHaveURL(/\/sign-in\?redirect=%2Fdashboard/);
 
-    // Login
-    await signInPage.signIn('test@example.com', 'TestPassword123!');
+    // Login with seeded test user
+    await signInPage.signIn(SEEDED_USER.email, SEEDED_USER.password);
 
     // Should redirect to dashboard
     await expect(page).toHaveURL('/dashboard');
@@ -33,8 +39,8 @@ test.describe('Login Redirect Functionality', () => {
     // Should be redirected to sign-in with redirect param
     await expect(page).toHaveURL(/\/sign-in\?redirect=%2F$/);
 
-    // Login
-    await signInPage.signIn('test@example.com', 'TestPassword123!');
+    // Login with seeded test user
+    await signInPage.signIn(SEEDED_USER.email, SEEDED_USER.password);
 
     // Should redirect to dashboard (/ is converted to /dashboard to avoid race conditions)
     await expect(page).toHaveURL('/dashboard');
@@ -48,8 +54,8 @@ test.describe('Login Redirect Functionality', () => {
     // Navigate with pre-encoded redirect param
     await signInPage.gotoWithRedirect('/dashboard');
 
-    // Login
-    await signInPage.signIn('test@example.com', 'TestPassword123!');
+    // Login with seeded test user
+    await signInPage.signIn(SEEDED_USER.email, SEEDED_USER.password);
 
     // Should decode and redirect properly
     await expect(page).toHaveURL('/dashboard');
@@ -64,8 +70,8 @@ test.describe('Login Redirect Functionality', () => {
     await signInPage.goto();
     await expect(page).toHaveURL('/sign-in');
 
-    // Login
-    await signInPage.signIn('test@example.com', 'TestPassword123!');
+    // Login with seeded test user
+    await signInPage.signIn(SEEDED_USER.email, SEEDED_USER.password);
 
     // Should redirect to default dashboard
     await expect(page).toHaveURL('/dashboard');
@@ -104,7 +110,7 @@ test.describe('Session Management', () => {
     const dashboardPage = new DashboardPage(page);
 
     await signInPage.goto();
-    await signInPage.signIn('test@example.com', 'TestPassword123!');
+    await signInPage.signIn(SEEDED_USER.email, SEEDED_USER.password);
 
     // Wait for dashboard to load
     await expect(page).toHaveURL('/dashboard');
@@ -129,15 +135,12 @@ test.describe('Session Management', () => {
 
     // Login first
     await signInPage.goto();
-    await signInPage.signIn('test@example.com', 'TestPassword123!');
+    await signInPage.signIn(SEEDED_USER.email, SEEDED_USER.password);
     await expect(page).toHaveURL('/dashboard');
     await dashboardPage.expectLoaded();
 
     // Logout - wait for navigation to sign-in
-    await Promise.all([
-      page.waitForURL('/sign-in'),
-      dashboardPage.signOut(),
-    ]);
+    await Promise.all([page.waitForURL('/sign-in'), dashboardPage.signOut()]);
 
     // Should be on sign-in page
     await expect(page).toHaveURL('/sign-in');
@@ -149,7 +152,7 @@ test.describe('Session Management', () => {
     const dashboardPage = new DashboardPage(page);
 
     await signInPage.goto();
-    await signInPage.signIn('test@example.com', 'TestPassword123!');
+    await signInPage.signIn(SEEDED_USER.email, SEEDED_USER.password);
     await expect(page).toHaveURL('/dashboard');
     await dashboardPage.expectLoaded();
 
@@ -167,7 +170,7 @@ test.describe('Login Security', () => {
 
     // Attempt to inject external URL
     await page.goto('/sign-in?redirect=https://evil.com');
-    await signInPage.signIn('test@example.com', 'TestPassword123!');
+    await signInPage.signIn(SEEDED_USER.email, SEEDED_USER.password);
 
     // Should redirect to default dashboard, not external site
     await expect(page).toHaveURL('/dashboard');
@@ -180,7 +183,7 @@ test.describe('Login Security', () => {
 
     // Attempt protocol-relative URL injection
     await page.goto('/sign-in?redirect=//evil.com');
-    await signInPage.signIn('test@example.com', 'TestPassword123!');
+    await signInPage.signIn(SEEDED_USER.email, SEEDED_USER.password);
 
     // Should redirect to default dashboard, not external site
     await expect(page).toHaveURL('/dashboard');
@@ -193,7 +196,7 @@ test.describe('Login Security', () => {
 
     // Attempt javascript URL injection
     await page.goto('/sign-in?redirect=javascript:alert(1)');
-    await signInPage.signIn('test@example.com', 'TestPassword123!');
+    await signInPage.signIn(SEEDED_USER.email, SEEDED_USER.password);
 
     // Should redirect to default dashboard, not execute javascript
     await expect(page).toHaveURL('/dashboard');

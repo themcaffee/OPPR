@@ -1,181 +1,237 @@
 import { PrismaClient, EventBoosterType } from '@prisma/client';
+import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
+
+const BCRYPT_SALT_ROUNDS = 12;
 
 async function main() {
   console.log('🌱 Seeding database...');
 
-  // Create sample players
+  // Create sample players (using upsert for idempotency)
   console.log('Creating players...');
-  const player1 = await prisma.player.create({
-    data: {
+  const playerData = [
+    {
       externalId: 'player-1',
       name: 'Alice Champion',
-      email: 'alice@example.com',
       rating: 1850,
       ratingDeviation: 50,
       ranking: 5,
       isRated: true,
       eventCount: 25,
     },
-  });
-
-  const player2 = await prisma.player.create({
-    data: {
+    {
       externalId: 'player-2',
       name: 'Bob Wizard',
-      email: 'bob@example.com',
       rating: 1750,
       ratingDeviation: 60,
       ranking: 12,
       isRated: true,
       eventCount: 18,
     },
-  });
-
-  const player3 = await prisma.player.create({
-    data: {
+    {
       externalId: 'player-3',
       name: 'Charlie Flipper',
-      email: 'charlie@example.com',
       rating: 1650,
       ratingDeviation: 75,
       ranking: 28,
       isRated: true,
       eventCount: 12,
     },
-  });
-
-  const player4 = await prisma.player.create({
-    data: {
+    {
       externalId: 'player-4',
       name: 'Diana Tilt',
-      email: 'diana@example.com',
       rating: 1550,
       ratingDeviation: 100,
       ranking: 45,
       isRated: true,
       eventCount: 8,
     },
-  });
-
-  const player5 = await prisma.player.create({
-    data: {
+    {
       externalId: 'player-5',
       name: 'Eve Plunger',
-      email: 'eve@example.com',
       rating: 1300,
       ratingDeviation: 150,
       ranking: null,
       isRated: false,
       eventCount: 3,
     },
+  ];
+
+  const player1 = await prisma.player.upsert({
+    where: { externalId: 'player-1' },
+    update: playerData[0],
+    create: playerData[0],
+  });
+
+  const player2 = await prisma.player.upsert({
+    where: { externalId: 'player-2' },
+    update: playerData[1],
+    create: playerData[1],
+  });
+
+  const player3 = await prisma.player.upsert({
+    where: { externalId: 'player-3' },
+    update: playerData[2],
+    create: playerData[2],
+  });
+
+  const player4 = await prisma.player.upsert({
+    where: { externalId: 'player-4' },
+    update: playerData[3],
+    create: playerData[3],
+  });
+
+  const player5 = await prisma.player.upsert({
+    where: { externalId: 'player-5' },
+    update: playerData[4],
+    create: playerData[4],
   });
 
   console.log(`✓ Created ${await prisma.player.count()} players`);
 
-  // Create sample tournaments
+  // Create test user for e2e tests (linked to Alice Champion)
+  console.log('Creating test user...');
+  const testPassword = 'TestPassword123!';
+  const passwordHash = await bcrypt.hash(testPassword, BCRYPT_SALT_ROUNDS);
+
+  await prisma.user.upsert({
+    where: { email: 'e2e-test@example.com' },
+    update: {
+      passwordHash,
+      role: 'USER',
+      playerId: player1.id,
+    },
+    create: {
+      email: 'e2e-test@example.com',
+      passwordHash,
+      role: 'USER',
+      playerId: player1.id,
+    },
+  });
+
+  console.log(`✓ Created test user (e2e-test@example.com / ${testPassword})`);
+
+  // Create sample tournaments (using upsert for idempotency)
   console.log('Creating tournaments...');
 
-  // Major Championship Tournament
-  const tournament1 = await prisma.tournament.create({
-    data: {
-      externalId: 'tournament-1',
-      name: 'World Pinball Championship 2024',
-      location: 'Las Vegas, NV',
-      date: new Date('2024-03-15'),
-      eventBooster: EventBoosterType.MAJOR,
-      allowsOptOut: false,
-      tgpConfig: {
-        qualifying: {
-          type: 'limited',
-          meaningfulGames: 12,
-          fourPlayerGroups: true,
-        },
-        finals: {
-          formatType: 'match-play',
-          meaningfulGames: 20,
-          fourPlayerGroups: true,
-          finalistCount: 16,
-        },
-        ballCountAdjustment: 1.0,
+  const tournament1Data = {
+    externalId: 'tournament-1',
+    name: 'World Pinball Championship 2024',
+    location: 'Las Vegas, NV',
+    date: new Date('2024-03-15'),
+    eventBooster: EventBoosterType.MAJOR,
+    allowsOptOut: false,
+    tgpConfig: {
+      qualifying: {
+        type: 'limited',
+        meaningfulGames: 12,
+        fourPlayerGroups: true,
       },
-      baseValue: 32.0,
-      tvaRating: 25.0,
-      tvaRanking: 50.0,
-      totalTVA: 75.0,
-      tgp: 1.92,
-      eventBoosterMultiplier: 2.0,
-      firstPlaceValue: 411.84,
+      finals: {
+        formatType: 'match-play',
+        meaningfulGames: 20,
+        fourPlayerGroups: true,
+        finalistCount: 16,
+      },
+      ballCountAdjustment: 1.0,
     },
+    baseValue: 32.0,
+    tvaRating: 25.0,
+    tvaRanking: 50.0,
+    totalTVA: 75.0,
+    tgp: 1.92,
+    eventBoosterMultiplier: 2.0,
+    firstPlaceValue: 411.84,
+  };
+
+  const tournament1 = await prisma.tournament.upsert({
+    where: { externalId: 'tournament-1' },
+    update: tournament1Data,
+    create: tournament1Data,
   });
 
-  // Certified Tournament
-  const tournament2 = await prisma.tournament.create({
-    data: {
-      externalId: 'tournament-2',
-      name: 'Spring Classics 2024',
-      location: 'Portland, OR',
-      date: new Date('2024-04-20'),
-      eventBooster: EventBoosterType.CERTIFIED,
-      allowsOptOut: true,
-      tgpConfig: {
-        qualifying: {
-          type: 'limited',
-          meaningfulGames: 7,
-        },
-        finals: {
-          formatType: 'double-elimination',
-          meaningfulGames: 15,
-          fourPlayerGroups: false,
-          finalistCount: 8,
-        },
+  const tournament2Data = {
+    externalId: 'tournament-2',
+    name: 'Spring Classics 2024',
+    location: 'Portland, OR',
+    date: new Date('2024-04-20'),
+    eventBooster: EventBoosterType.CERTIFIED,
+    allowsOptOut: true,
+    tgpConfig: {
+      qualifying: {
+        type: 'limited',
+        meaningfulGames: 7,
       },
-      baseValue: 28.0,
-      tvaRating: 18.5,
-      tvaRanking: 32.0,
-      totalTVA: 50.5,
-      tgp: 0.88,
-      eventBoosterMultiplier: 1.25,
-      firstPlaceValue: 87.28,
+      finals: {
+        formatType: 'double-elimination',
+        meaningfulGames: 15,
+        fourPlayerGroups: false,
+        finalistCount: 8,
+      },
     },
+    baseValue: 28.0,
+    tvaRating: 18.5,
+    tvaRanking: 32.0,
+    totalTVA: 50.5,
+    tgp: 0.88,
+    eventBoosterMultiplier: 1.25,
+    firstPlaceValue: 87.28,
+  };
+
+  const tournament2 = await prisma.tournament.upsert({
+    where: { externalId: 'tournament-2' },
+    update: tournament2Data,
+    create: tournament2Data,
   });
 
-  // Local Tournament
-  const tournament3 = await prisma.tournament.create({
-    data: {
-      externalId: 'tournament-3',
-      name: 'Monthly League Finals',
-      location: 'Seattle, WA',
-      date: new Date('2024-05-10'),
-      eventBooster: EventBoosterType.NONE,
-      allowsOptOut: false,
-      tgpConfig: {
-        qualifying: {
-          type: 'none',
-          meaningfulGames: 0,
-        },
-        finals: {
-          formatType: 'match-play',
-          meaningfulGames: 10,
-          fourPlayerGroups: true,
-          finalistCount: 8,
-        },
+  const tournament3Data = {
+    externalId: 'tournament-3',
+    name: 'Monthly League Finals',
+    location: 'Seattle, WA',
+    date: new Date('2024-05-10'),
+    eventBooster: EventBoosterType.NONE,
+    allowsOptOut: false,
+    tgpConfig: {
+      qualifying: {
+        type: 'none',
+        meaningfulGames: 0,
       },
-      baseValue: 15.0,
-      tvaRating: 8.5,
-      tvaRanking: 12.0,
-      totalTVA: 20.5,
-      tgp: 0.80,
-      eventBoosterMultiplier: 1.0,
-      firstPlaceValue: 28.4,
+      finals: {
+        formatType: 'match-play',
+        meaningfulGames: 10,
+        fourPlayerGroups: true,
+        finalistCount: 8,
+      },
     },
+    baseValue: 15.0,
+    tvaRating: 8.5,
+    tvaRanking: 12.0,
+    totalTVA: 20.5,
+    tgp: 0.80,
+    eventBoosterMultiplier: 1.0,
+    firstPlaceValue: 28.4,
+  };
+
+  const tournament3 = await prisma.tournament.upsert({
+    where: { externalId: 'tournament-3' },
+    update: tournament3Data,
+    create: tournament3Data,
   });
 
   console.log(`✓ Created ${await prisma.tournament.count()} tournaments`);
 
-  // Create tournament results
+  // Create tournament results (delete existing first for idempotency)
   console.log('Creating tournament results...');
+
+  // Delete existing results for seeded tournaments
+  await prisma.tournamentResult.deleteMany({
+    where: {
+      tournamentId: {
+        in: [tournament1.id, tournament2.id, tournament3.id],
+      },
+    },
+  });
 
   // World Championship results
   await prisma.tournamentResult.createMany({
@@ -334,6 +390,7 @@ async function main() {
   console.log('');
   console.log('Summary:');
   console.log(`  - ${await prisma.player.count()} players`);
+  console.log(`  - ${await prisma.user.count()} users`);
   console.log(`  - ${await prisma.tournament.count()} tournaments`);
   console.log(`  - ${await prisma.tournamentResult.count()} tournament results`);
 }

@@ -62,7 +62,9 @@
   },
   "devDependencies": {
     "@testcontainers/postgresql": "^11.11.0",
+    "@types/bcrypt": "^6.0.0",
     "@types/node": "^22.10.5",
+    "bcrypt": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^8.19.1",
     "@typescript-eslint/parser": "^8.19.1",
     "@vitest/coverage-v8": "^4.0.16",
