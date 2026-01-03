@@ -17,7 +17,7 @@ import {
   registerRequestSchema,
   authResponseSchema,
   logoutResponseSchema,
-  userResponseSchema,
+  authUserResponseSchema,
 } from '../../schemas/auth.js';
 import { errorResponseSchema } from '../../schemas/common.js';
 
@@ -365,19 +365,20 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
         summary: 'Get current user profile',
         security: [{ bearerAuth: [] }, { cookieAuth: [] }],
         response: {
-          200: userResponseSchema,
+          200: authUserResponseSchema,
           401: errorResponseSchema,
         },
       },
       preHandler: [app.authenticate],
     },
     async (request, reply) => {
-      // In dev mode, return the token payload directly
+      // In dev mode, return a mock user without player profile
       if (env.authDevMode) {
         return reply.send({
-          sub: request.user.sub,
+          id: request.user.sub,
           email: request.user.email,
           role: request.user.role,
+          player: null,
         });
       }
 
@@ -388,9 +389,10 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
       }
 
       return reply.send({
-        sub: user.id,
+        id: user.id,
         email: user.email,
         role: user.role.toLowerCase() as 'user' | 'admin',
+        player: user.player,
       });
     }
   );

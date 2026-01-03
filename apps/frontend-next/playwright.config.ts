@@ -3,9 +3,11 @@ import { defineConfig, devices } from '@playwright/test';
 /**
  * Playwright configuration for frontend-next e2e tests.
  *
- * Tests run against local development servers:
- * - frontend-next: http://localhost:3001
- * - rest-api: http://localhost:3000
+ * Tests run against Docker Compose stack:
+ * - Caddy proxy: http://localhost:8080
+ *
+ * Start the stack with: docker compose up
+ * Run tests with: pnpm --filter frontend-next run test:e2e
  */
 export default defineConfig({
   testDir: './e2e',
@@ -17,7 +19,7 @@ export default defineConfig({
   timeout: 30000,
 
   use: {
-    baseURL: 'http://localhost:3001',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:8080',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
@@ -29,24 +31,10 @@ export default defineConfig({
     },
   ],
 
-  webServer: [
-    {
-      command: 'pnpm --filter rest-api run dev',
-      url: 'http://localhost:3000/api/health',
-      reuseExistingServer: !process.env.CI,
-      cwd: '../..',
-      timeout: 60000,
-    },
-    {
-      command: 'pnpm --filter frontend-next run dev',
-      url: 'http://localhost:3001',
-      reuseExistingServer: !process.env.CI,
-      cwd: '../..',
-      timeout: 60000,
-      env: {
-        PORT: '3001',
-        NEXT_PUBLIC_API_URL: 'http://localhost:3000/api/v1',
-      },
-    },
-  ],
+  webServer: {
+    command: 'echo "Waiting for Docker Compose stack..."',
+    url: 'http://localhost:8080/health',
+    reuseExistingServer: true,
+    timeout: 60000,
+  },
 });
