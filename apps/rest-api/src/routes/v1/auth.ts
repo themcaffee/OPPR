@@ -118,7 +118,7 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
       // Create user with linked player
       const user = await createUserWithPlayer(
         { email, passwordHash },
-        { name, email }
+        { name }
       );
 
       // Generate tokens

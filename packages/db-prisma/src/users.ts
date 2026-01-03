@@ -56,14 +56,13 @@ export async function createUser(data: CreateUserInput): Promise<User> {
  */
 export async function createUserWithPlayer(
   userData: Omit<CreateUserInput, 'playerId'>,
-  playerData: { name?: string; email?: string },
+  playerData: { name?: string },
 ): Promise<UserWithPlayer> {
   return prisma.$transaction(async (tx) => {
     // Create the player first
     const player = await tx.player.create({
       data: {
         name: playerData.name,
-        email: playerData.email,
       },
     });
 

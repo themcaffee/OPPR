@@ -26,7 +26,6 @@ describe('PlayersResource', () => {
     id: '1',
     externalId: null,
     name: 'Test Player',
-    email: 'test@example.com',
     rating: 1500,
     ratingDeviation: 200,
     ranking: null,
@@ -172,7 +171,7 @@ describe('PlayersResource', () => {
 
   describe('create', () => {
     it('should create player', async () => {
-      const createData = { name: 'New Player', email: 'new@example.com' };
+      const createData = { name: 'New Player' };
       mockRequest.mockResolvedValue(mockPlayer);
 
       const result = await resource.create(createData);

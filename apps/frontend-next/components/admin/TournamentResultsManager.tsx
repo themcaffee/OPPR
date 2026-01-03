@@ -128,7 +128,7 @@ export function TournamentResultsManager({
   const existingPlayerIds = results.map((r) => r.player.id);
 
   const getPlayerDisplayName = (result: TournamentResult) => {
-    return result.player.name || result.player.email || result.player.id;
+    return result.player.name || result.player.id;
   };
 
   if (isLoading) {
@@ -318,9 +318,6 @@ export function TournamentResultsManager({
                           <div className="text-sm font-medium text-gray-900">
                             {getPlayerDisplayName(result)}
                           </div>
-                          {result.player.email && result.player.name && (
-                            <div className="text-xs text-gray-500">{result.player.email}</div>
-                          )}
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-500">
                           {result.totalPoints?.toFixed(2) || '-'}

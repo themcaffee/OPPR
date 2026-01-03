@@ -4,7 +4,6 @@ export const playerSchema = {
     id: { type: 'string' },
     externalId: { type: 'string', nullable: true },
     name: { type: 'string', nullable: true },
-    email: { type: 'string', nullable: true },
     rating: { type: 'number' },
     ratingDeviation: { type: 'number' },
     ranking: { type: 'integer', nullable: true },
@@ -22,7 +21,6 @@ export const createPlayerSchema = {
   properties: {
     externalId: { type: 'string' },
     name: { type: 'string' },
-    email: { type: 'string', format: 'email' },
     rating: { type: 'number', default: 1500 },
     ratingDeviation: { type: 'number', default: 200 },
     ranking: { type: 'integer' },
@@ -35,7 +33,6 @@ export const updatePlayerSchema = {
   type: 'object',
   properties: {
     name: { type: 'string' },
-    email: { type: 'string', format: 'email' },
     rating: { type: 'number' },
     ratingDeviation: { type: 'number' },
     ranking: { type: 'integer' },

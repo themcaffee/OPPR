@@ -9,7 +9,6 @@ export function createPlayerInput(overrides: Partial<CreatePlayerInput> = {}): C
   return {
     externalId: `ext-player-${id}`,
     name: `Test Player ${id}`,
-    email: `player-${id}@test.com`,
     rating: 1500,
     ratingDeviation: 200,
     isRated: false,

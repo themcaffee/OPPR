@@ -61,7 +61,6 @@ Represents a pinball player with Glicko rating information.
 | `id` | String | Primary key (CUID) |
 | `externalId` | String? | External system reference |
 | `name` | String? | Player name |
-| `email` | String? | Contact email (unique) |
 | `rating` | Float | Glicko rating (default: 1500) |
 | `ratingDeviation` | Float | Rating uncertainty (default: 200) |
 | `ranking` | Int? | World ranking position |
@@ -150,7 +149,7 @@ import {
   deletePlayer,
   findPlayerById,
   findPlayerByExternalId,
-  findPlayerByEmail,
+  findPlayerByUserEmail,
   findPlayers,
   getRatedPlayers,
   getTopPlayersByRating,
@@ -177,14 +176,14 @@ import {
 |----------|-------------|
 | `findPlayerById(id, include?)` | Get by primary key |
 | `findPlayerByExternalId(externalId, include?)` | Get by external reference |
-| `findPlayerByEmail(email, include?)` | Get by email |
+| `findPlayerByUserEmail(email, include?)` | Get player through linked User's email |
 | `findPlayers(options?)` | Query with filters, pagination, ordering |
 | `getRatedPlayers(options?)` | Get players where isRated = true |
 | `getTopPlayersByRating(limit?)` | Top players by rating (default: 50) |
 | `getTopPlayersByRanking(limit?)` | Top players by ranking (default: 50) |
 | `getPlayerWithResults(id)` | Player with all tournament results |
 | `getPlayerStats(playerId)` | Aggregate statistics |
-| `searchPlayers(query, limit?)` | Case-insensitive name/email search |
+| `searchPlayers(query, limit?)` | Case-insensitive name search |
 | `countPlayers(where?)` | Count matching players |
 
 ### Tournament Functions
