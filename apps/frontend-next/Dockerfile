@@ -51,9 +51,8 @@ ARG TURBO_TOKEN
 ENV TURBO_TEAM=${TURBO_TEAM}
 ENV TURBO_TOKEN=${TURBO_TOKEN}
 
-# Next.js public env vars (must be set at build time)
-ARG NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+# Note: NEXT_PUBLIC_API_URL is NOT set here - defaults to /api/v1 in api-client.ts
+# This allows the frontend to work behind any reverse proxy that routes /api/v1 to the backend
 
 # Build packages in dependency order
 RUN pnpm turbo run build --filter=frontend-next...

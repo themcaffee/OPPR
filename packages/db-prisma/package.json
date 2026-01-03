@@ -54,6 +54,7 @@
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
     "db:reset": "prisma migrate reset",
+    "db:make-admin": "tsx scripts/make-admin.ts",
     "prepublishOnly": "npm run typecheck && npm run lint && npm run build"
   },
   "dependencies": {
