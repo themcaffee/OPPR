@@ -6,7 +6,6 @@ import {
   getTopPlayersByRanking,
   getTopPlayersByRating,
 } from '@opprs/db-prisma';
-import { errorResponseSchema } from '../../schemas/common.js';
 import { playerSchema } from '../../schemas/player.js';
 
 const overviewResponseSchema = {
@@ -48,20 +47,17 @@ interface LeaderboardQuery {
 }
 
 export const statsRoutes: FastifyPluginAsync = async (app) => {
-  // System overview stats
+  // System overview stats (public)
   app.get(
     '/overview',
     {
       schema: {
         tags: ['Stats'],
         summary: 'Get system-wide statistics',
-        security: [{ bearerAuth: [] }],
         response: {
           200: overviewResponseSchema,
-          401: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
     },
     async (_request, reply) => {
       const [totalPlayers, ratedPlayers, totalTournaments, totalResults] = await Promise.all([
@@ -86,21 +82,18 @@ export const statsRoutes: FastifyPluginAsync = async (app) => {
     }
   );
 
-  // Leaderboard
+  // Leaderboard (public)
   app.get<{ Querystring: LeaderboardQuery }>(
     '/leaderboard',
     {
       schema: {
         tags: ['Stats'],
         summary: 'Get player leaderboard',
-        security: [{ bearerAuth: [] }],
         querystring: leaderboardQuerySchema,
         response: {
           200: { type: 'array', items: playerSchema },
-          401: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
     },
     async (request, reply) => {
       const { limit = 50, type = 'ranking' } = request.query;

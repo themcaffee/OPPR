@@ -86,21 +86,18 @@ interface UpdateTournamentBody {
 }
 
 export const tournamentRoutes: FastifyPluginAsync = async (app) => {
-  // List tournaments with pagination
+  // List tournaments with pagination (public)
   app.get<{ Querystring: TournamentListQuery }>(
     '/',
     {
       schema: {
         tags: ['Tournaments'],
         summary: 'List tournaments with pagination',
-        security: [{ bearerAuth: [] }],
         querystring: tournamentListQuerySchema,
         response: {
           200: paginatedResponseSchema(tournamentSchema),
-          401: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
     },
     async (request, reply) => {
       const { sortBy, sortOrder, eventBooster } = request.query;
@@ -118,21 +115,18 @@ export const tournamentRoutes: FastifyPluginAsync = async (app) => {
     }
   );
 
-  // Search tournaments
+  // Search tournaments (public)
   app.get<{ Querystring: TournamentSearchQuery }>(
     '/search',
     {
       schema: {
         tags: ['Tournaments'],
         summary: 'Search tournaments by name or location',
-        security: [{ bearerAuth: [] }],
         querystring: tournamentSearchQuerySchema,
         response: {
           200: { type: 'array', items: tournamentSchema },
-          401: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
     },
     async (request, reply) => {
       const { q, limit = 20 } = request.query;
@@ -141,21 +135,18 @@ export const tournamentRoutes: FastifyPluginAsync = async (app) => {
     }
   );
 
-  // Recent tournaments
+  // Recent tournaments (public)
   app.get<{ Querystring: RecentTournamentsQuery }>(
     '/recent',
     {
       schema: {
         tags: ['Tournaments'],
         summary: 'Get recent tournaments',
-        security: [{ bearerAuth: [] }],
         querystring: recentTournamentsQuerySchema,
         response: {
           200: { type: 'array', items: tournamentSchema },
-          401: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
     },
     async (request, reply) => {
       const { limit = 20 } = request.query;
@@ -164,21 +155,18 @@ export const tournamentRoutes: FastifyPluginAsync = async (app) => {
     }
   );
 
-  // Major tournaments
+  // Major tournaments (public)
   app.get<{ Querystring: RecentTournamentsQuery }>(
     '/majors',
     {
       schema: {
         tags: ['Tournaments'],
         summary: 'Get major tournaments',
-        security: [{ bearerAuth: [] }],
         querystring: recentTournamentsQuerySchema,
         response: {
           200: { type: 'array', items: tournamentSchema },
-          401: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
     },
     async (request, reply) => {
       const { limit } = request.query;
@@ -187,22 +175,19 @@ export const tournamentRoutes: FastifyPluginAsync = async (app) => {
     }
   );
 
-  // Get tournament by ID
+  // Get tournament by ID (public)
   app.get<{ Params: IdParams }>(
     '/:id',
     {
       schema: {
         tags: ['Tournaments'],
         summary: 'Get tournament by ID',
-        security: [{ bearerAuth: [] }],
         params: idParamSchema,
         response: {
           200: tournamentSchema,
-          401: errorResponseSchema,
           404: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
     },
     async (request, reply) => {
       const tournament = await findTournamentById(request.params.id);
@@ -213,22 +198,19 @@ export const tournamentRoutes: FastifyPluginAsync = async (app) => {
     }
   );
 
-  // Get tournament results
+  // Get tournament results (public)
   app.get<{ Params: IdParams }>(
     '/:id/results',
     {
       schema: {
         tags: ['Tournaments'],
         summary: 'Get tournament results (standings)',
-        security: [{ bearerAuth: [] }],
         params: idParamSchema,
         response: {
           200: { type: 'array', items: tournamentResultSchema },
-          401: errorResponseSchema,
           404: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
     },
     async (request, reply) => {
       const tournament = await getTournamentWithResults(request.params.id);
@@ -239,22 +221,19 @@ export const tournamentRoutes: FastifyPluginAsync = async (app) => {
     }
   );
 
-  // Get tournament stats
+  // Get tournament stats (public)
   app.get<{ Params: IdParams }>(
     '/:id/stats',
     {
       schema: {
         tags: ['Tournaments'],
         summary: 'Get tournament statistics',
-        security: [{ bearerAuth: [] }],
         params: idParamSchema,
         response: {
           200: tournamentStatsSchema,
-          401: errorResponseSchema,
           404: errorResponseSchema,
         },
       },
-      preHandler: [app.authenticate],
     },
     async (request, reply) => {
       const stats = await getTournamentStats(request.params.id);

@@ -58,14 +58,14 @@ describe('Tournaments endpoints', () => {
       expect(body.data[0].eventBooster).toBe('MAJOR');
     });
 
-    it('should return 401 without authentication', async () => {
+    it('should allow unauthenticated access (public endpoint)', async () => {
       const app = await getTestApp();
       const response = await app.inject({
         method: 'GET',
         url: '/api/v1/tournaments',
       });
 
-      expect(response.statusCode).toBe(401);
+      expect(response.statusCode).toBe(200);
     });
   });
 

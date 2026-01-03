@@ -5,8 +5,8 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const accessToken = request.cookies.get('opprs_access')?.value;
 
-  // Check if accessing root or dashboard routes (requires authentication)
-  if (pathname === '/' || pathname.startsWith('/dashboard')) {
+  // Check if accessing dashboard routes (requires authentication)
+  if (pathname.startsWith('/dashboard')) {
     if (!accessToken) {
       const signInUrl = new URL('/sign-in', request.url);
       signInUrl.searchParams.set('redirect', pathname);
@@ -48,5 +48,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/admin/:path*', '/dashboard/:path*'],
+  matcher: ['/admin/:path*', '/dashboard/:path*'],
 };

@@ -23,22 +23,15 @@ test.describe('Login Redirect Functionality', () => {
     await dashboardPage.expectLoaded();
   });
 
-  test('should redirect to dashboard after login when accessing root', async ({ page }) => {
-    const signInPage = new SignInPage(page);
-    const dashboardPage = new DashboardPage(page);
-
-    // Access protected root route
+  test('should display public landing page when accessing root without auth', async ({ page }) => {
+    // Access root route (now public)
     await page.goto('/');
 
-    // Should be redirected to sign-in with redirect param
-    await expect(page).toHaveURL(/\/sign-in\?redirect=%2F$/);
+    // Should stay on landing page, not redirect to sign-in
+    await expect(page).toHaveURL('/');
 
-    // Login
-    await signInPage.signIn('test@example.com', 'TestPassword123!');
-
-    // Should redirect to dashboard (/ is converted to /dashboard to avoid race conditions)
-    await expect(page).toHaveURL('/dashboard');
-    await dashboardPage.expectLoaded();
+    // Should show landing page content
+    await expect(page.getByRole('heading', { name: /Open Pinball Player Ranking System/i })).toBeVisible();
   });
 
   test('should handle URL-encoded redirect parameter', async ({ page }) => {
