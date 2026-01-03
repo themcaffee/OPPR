@@ -11,6 +11,12 @@ dist/
 # Testing
 coverage/
 
+# Playwright
+e2e/.auth/
+test-results/
+playwright-report/
+playwright/.cache/
+
 # Debug
 npm-debug.log*
 

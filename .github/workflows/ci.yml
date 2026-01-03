@@ -68,6 +68,89 @@ jobs:
         working-directory: packages/db-prisma
         run: pnpm publish --dry-run --no-git-checks
 
+  e2e-tests:
+    runs-on: ubuntu-latest
+    needs: [quality-checks]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 20
+
+      - name: Install pnpm
+        run: npm install -g pnpm@9.15.0
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
+
+      - name: Install Playwright browsers
+        working-directory: apps/frontend-next
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - name: Build and start Docker services
+        run: docker compose --profile seed up -d --build --wait
+        env:
+          SEED_DATABASE: 'true'
+          NODE_ENV: development
+
+      - name: Wait for services to be healthy
+        run: |
+          echo "Waiting for services..."
+          timeout 120 bash -c 'until curl -sf http://localhost:8080/health; do sleep 2; done'
+          echo "Health check passed"
+
+      - name: Run Playwright tests
+        working-directory: apps/frontend-next
+        run: pnpm test:e2e
+        env:
+          E2E_BASE_URL: http://localhost:8080
+          CI: true
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
+        if: always()
+        with:
+          name: playwright-report
+          path: apps/frontend-next/playwright-report/
+          retention-days: 7
+
+      - name: Upload test results
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
+        if: failure()
+        with:
+          name: test-results
+          path: apps/frontend-next/test-results/
+          retention-days: 7
+
+      - name: Stop Docker services
+        if: always()
+        run: docker compose --profile seed down -v
+
   docker-build:
     runs-on: ubuntu-latest
 
