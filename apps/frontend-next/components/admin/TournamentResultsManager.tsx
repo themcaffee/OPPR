@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { apiClient } from '@/lib/api-client';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -315,9 +316,12 @@ export function TournamentResultsManager({
                           {result.position}
                         </td>
                         <td className="px-4 py-3">
-                          <div className="text-sm font-medium text-gray-900">
+                          <Link
+                            href={`/players/${result.player.id}`}
+                            className="text-sm font-medium text-gray-900 hover:text-blue-600"
+                          >
                             {getPlayerDisplayName(result)}
-                          </div>
+                          </Link>
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-500">
                           {result.totalPoints?.toFixed(2) || '-'}

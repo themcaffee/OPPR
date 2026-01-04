@@ -1,4 +1,5 @@
 import type { ReactElement } from 'react';
+import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import type { PlayerResult } from '@opprs/rest-api-client';
 
@@ -83,7 +84,12 @@ export function RecentResultsTable({ results }: RecentResultsTableProps) {
                   {formatDate(result.tournament.date)}
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-900">
-                  {result.tournament.name}
+                  <Link
+                    href={`/tournaments/${result.tournament.id}`}
+                    className="hover:text-blue-600"
+                  >
+                    {result.tournament.name}
+                  </Link>
                   {getEventBoosterBadge(result.tournament.eventBooster)}
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-900 text-center font-medium">
