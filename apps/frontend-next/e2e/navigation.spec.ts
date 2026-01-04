@@ -80,15 +80,15 @@ test.describe('Navigation', () => {
     test('should display profile dropdown when authenticated', async ({ page }) => {
       await page.goto('/');
 
-      // Profile dropdown button should be visible (shows user name or email)
-      await expect(page.getByRole('button', { name: /e2e-test/i })).toBeVisible();
+      // Profile dropdown button should be visible (shows player name "Alice Champion")
+      await expect(page.getByRole('button', { name: /Alice Champion/i })).toBeVisible();
     });
 
     test('should display Profile link in dropdown when clicked', async ({ page }) => {
       await page.goto('/');
 
       // Click the profile dropdown button
-      await page.getByRole('button', { name: /e2e-test/i }).click();
+      await page.getByRole('button', { name: /Alice Champion/i }).click();
 
       // Profile link should be visible in dropdown
       await expect(page.getByRole('link', { name: 'Profile' })).toBeVisible();
@@ -98,7 +98,7 @@ test.describe('Navigation', () => {
       await page.goto('/');
 
       // Click the profile dropdown button
-      await page.getByRole('button', { name: /e2e-test/i }).click();
+      await page.getByRole('button', { name: /Alice Champion/i }).click();
 
       await expect(page.getByRole('button', { name: 'Sign Out' })).toBeVisible();
     });
@@ -107,7 +107,7 @@ test.describe('Navigation', () => {
       await page.goto('/');
 
       // Wait for auth check to complete (profile dropdown is visible)
-      await expect(page.getByRole('button', { name: /e2e-test/i })).toBeVisible();
+      await expect(page.getByRole('button', { name: /Alice Champion/i })).toBeVisible();
 
       await expect(page.getByRole('link', { name: 'Sign in' })).not.toBeVisible();
       await expect(page.getByRole('link', { name: 'Register' })).not.toBeVisible();
@@ -117,7 +117,7 @@ test.describe('Navigation', () => {
       await page.goto('/');
 
       // Click profile dropdown and then Profile link
-      await page.getByRole('button', { name: /e2e-test/i }).click();
+      await page.getByRole('button', { name: /Alice Champion/i }).click();
       await page.getByRole('link', { name: 'Profile' }).click();
 
       await expect(page).toHaveURL('/profile');
@@ -127,10 +127,10 @@ test.describe('Navigation', () => {
       await page.goto('/');
 
       // Wait for profile dropdown to be visible (indicating auth state is loaded)
-      await expect(page.getByRole('button', { name: /e2e-test/i })).toBeVisible();
+      await expect(page.getByRole('button', { name: /Alice Champion/i })).toBeVisible();
 
       // Click profile dropdown and then Sign Out button
-      await page.getByRole('button', { name: /e2e-test/i }).click();
+      await page.getByRole('button', { name: /Alice Champion/i }).click();
       await page.getByRole('button', { name: 'Sign Out' }).click();
 
       // Should redirect to sign-in page
@@ -163,7 +163,8 @@ test.describe('Footer', () => {
   test('should display OPPRS description', async ({ page }) => {
     await page.goto('/');
 
-    await expect(page.getByText('Open Pinball Player Ranking System')).toBeVisible();
+    const footer = page.locator('footer');
+    await expect(footer.getByText('Open Pinball Player Ranking System')).toBeVisible();
   });
 
   test('should display GitHub link', async ({ page }) => {
