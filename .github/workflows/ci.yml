@@ -186,6 +186,8 @@ jobs:
           JWT_SECRET: test-jwt-secret
           JWT_REFRESH_SECRET: test-jwt-refresh-secret
           SEED_DATABASE: "true"
+          SEED_TEST_EMAIL: "e2e-test@example.com"
+          SEED_TEST_PASSWORD: "TestPassword123!"
           AUTH_DEV_MODE: "false"
 
       - name: Wait for services to be ready
