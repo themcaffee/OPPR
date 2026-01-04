@@ -10,7 +10,6 @@ import type { AuthUser } from '@opprs/rest-api-client';
 const navLinks = [
   { href: '/rankings', label: 'Rankings' },
   { href: '/tournaments', label: 'Tournaments' },
-  { href: '/players', label: 'Players' },
 ];
 
 export function AppHeader() {

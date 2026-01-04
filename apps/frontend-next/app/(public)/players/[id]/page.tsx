@@ -87,8 +87,8 @@ export default function PlayerProfilePage() {
         <Card>
           <p className="text-red-600 text-center">{error || 'Player not found'}</p>
           <div className="mt-4 text-center">
-            <Link href="/players" className="text-blue-600 hover:text-blue-800">
-              ← Back to players
+            <Link href="/rankings" className="text-blue-600 hover:text-blue-800">
+              ← Back to rankings
             </Link>
           </div>
         </Card>
@@ -100,8 +100,8 @@ export default function PlayerProfilePage() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Back link */}
       <div className="mb-6">
-        <Link href="/players" className="text-sm text-gray-600 hover:text-gray-900">
-          ← Back to players
+        <Link href="/rankings" className="text-sm text-gray-600 hover:text-gray-900">
+          ← Back to rankings
         </Link>
       </div>
 
