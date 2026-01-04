@@ -1,9 +1,12 @@
 /**
- * oppr-db - Database backend for OPPR using Prisma and PostgreSQL
+ * @opprs/db-prisma - Database backend for OPPR using Prisma and PostgreSQL
  *
  * This library provides a complete database solution for storing and querying
  * OPPR (Open Pinball Player Ranking System) data including players, tournaments,
  * and tournament results.
+ *
+ * Player model uses split name fields (firstName, middleInitial, lastName)
+ * instead of a single name field.
  */
 
 // Export database client and utilities
