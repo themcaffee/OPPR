@@ -18,6 +18,17 @@
       "inputs": ["src/**", "prisma/**", "tsconfig.json", "package.json"],
       "cache": false
     },
+    "rest-api#build": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "tsconfig.json", "package.json"],
+      "outputs": ["dist/**"],
+      "cache": false
+    },
+    "rest-api#typecheck": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "tsconfig.json", "package.json"],
+      "cache": false
+    },
     "test": {
       "dependsOn": ["build"],
       "inputs": ["src/**", "tests/**", "vitest.config.ts", "tsconfig.json"],
