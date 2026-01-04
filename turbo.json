@@ -5,7 +5,7 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["src/**", "tsconfig.json", "package.json"],
-      "outputs": ["dist/**", ".next/**", ".vite/**"]
+      "outputs": ["dist/**", ".next/**", ".vite/**", "*.tsbuildinfo"]
     },
     "@opprs/db-prisma#build": {
       "dependsOn": ["^build"],
