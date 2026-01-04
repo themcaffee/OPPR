@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import type { Player } from '@opprs/rest-api-client';
 
@@ -69,12 +70,15 @@ export function LeaderboardCard({
                   <span className="text-sm font-medium text-gray-500 w-6">
                     {index + 1}.
                   </span>
-                  <span className={`text-sm ${isCurrentUser ? 'font-semibold text-blue-700' : 'text-gray-900'}`}>
+                  <Link
+                    href={`/players/${player.id}`}
+                    className={`text-sm hover:text-blue-600 ${isCurrentUser ? 'font-semibold text-blue-700' : 'text-gray-900'}`}
+                  >
                     {player.name ?? 'Unknown Player'}
                     {isCurrentUser && (
                       <span className="ml-2 text-xs text-blue-600">(You)</span>
                     )}
-                  </span>
+                  </Link>
                 </div>
                 <span className="text-sm font-medium text-gray-700">{displayValue}</span>
               </li>

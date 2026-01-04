@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import type { Tournament } from '@opprs/rest-api-client';
 
@@ -34,9 +35,12 @@ export function ActivityFeed({ recentTournaments }: ActivityFeedProps) {
             const boosterLabel = getEventBoosterLabel(tournament.eventBooster);
             return (
               <li key={tournament.id} className="border-b border-gray-100 pb-3 last:border-0 last:pb-0">
-                <div className="flex items-start justify-between">
+                <Link
+                  href={`/tournaments/${tournament.id}`}
+                  className="flex items-start justify-between hover:bg-gray-50 -mx-2 px-2 py-1 rounded transition-colors"
+                >
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{tournament.name}</p>
+                    <p className="text-sm font-medium text-gray-900 hover:text-blue-600">{tournament.name}</p>
                     {tournament.location && (
                       <p className="text-xs text-gray-500">{tournament.location}</p>
                     )}
@@ -49,7 +53,7 @@ export function ActivityFeed({ recentTournaments }: ActivityFeedProps) {
                   <span className="text-xs text-gray-500 whitespace-nowrap">
                     {formatDate(tournament.date)}
                   </span>
-                </div>
+                </Link>
               </li>
             );
           })}
