@@ -19,6 +19,12 @@
         reverse_proxy rest-api:3000
     }
 
+    # Minimal frontend (static HTML5)
+    handle /minimal/* {
+        uri strip_prefix /minimal
+        reverse_proxy frontend-minimal:80
+    }
+
     # Everything else goes to frontend
     handle {
         reverse_proxy frontend-next:3000
