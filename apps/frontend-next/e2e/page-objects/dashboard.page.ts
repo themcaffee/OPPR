@@ -6,7 +6,6 @@ export class DashboardPage {
   // Header elements
   readonly heading: Locator;
   readonly headerLogo: Locator;
-  readonly homeLink: Locator;
   readonly signOutButton: Locator;
   readonly welcomeMessage: Locator;
 
@@ -63,7 +62,6 @@ export class DashboardPage {
     // Header elements
     this.heading = page.getByRole('heading', { name: 'Dashboard' });
     this.headerLogo = page.getByRole('link', { name: 'OPPRS' });
-    this.homeLink = page.getByRole('link', { name: 'Home' });
     this.signOutButton = page.getByRole('button', { name: /sign out|logout/i });
     this.welcomeMessage = page.getByText(/Welcome,/);
 
