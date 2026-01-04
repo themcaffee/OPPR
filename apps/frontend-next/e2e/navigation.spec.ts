@@ -92,8 +92,8 @@ test.describe('Navigation', () => {
       await expect(dropdownButton).toBeVisible();
       await dropdownButton.click();
 
-      // Profile link should be visible in dropdown
-      await expect(page.getByRole('link', { name: 'Profile' })).toBeVisible();
+      // Profile menuitem should be visible in dropdown
+      await expect(page.getByRole('menuitem', { name: 'Profile' })).toBeVisible();
     });
 
     test('should display Sign Out button in dropdown when clicked', async ({ page }) => {
@@ -104,7 +104,8 @@ test.describe('Navigation', () => {
       await expect(dropdownButton).toBeVisible();
       await dropdownButton.click();
 
-      await expect(page.getByRole('button', { name: 'Sign Out' })).toBeVisible();
+      // Sign Out menuitem should be visible in dropdown
+      await expect(page.getByRole('menuitem', { name: 'Sign Out' })).toBeVisible();
     });
 
     test('should not display Sign in and Register links when authenticated', async ({ page }) => {
@@ -125,8 +126,8 @@ test.describe('Navigation', () => {
       await expect(dropdownButton).toBeVisible();
       await dropdownButton.click();
 
-      // Click Profile link in dropdown
-      await page.getByRole('link', { name: 'Profile' }).click();
+      // Click Profile menuitem in dropdown
+      await page.getByRole('menuitem', { name: 'Profile' }).click();
 
       await expect(page).toHaveURL('/profile');
     });
@@ -139,8 +140,8 @@ test.describe('Navigation', () => {
       await expect(dropdownButton).toBeVisible();
       await dropdownButton.click();
 
-      // Click Sign Out button in dropdown
-      await page.getByRole('button', { name: 'Sign Out' }).click();
+      // Click Sign Out menuitem in dropdown
+      await page.getByRole('menuitem', { name: 'Sign Out' }).click();
 
       // Should redirect to sign-in page
       await expect(page).toHaveURL('/sign-in');
