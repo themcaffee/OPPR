@@ -25,7 +25,16 @@ export default function AdminPlayerEditPage() {
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<UpdatePlayerRequest>();
+  } = useForm<UpdatePlayerRequest>({
+    defaultValues: isNew
+      ? {
+          name: '',
+          rating: 1500,
+          ratingDeviation: 200,
+          ranking: undefined,
+        }
+      : {},
+  });
 
   useEffect(() => {
     if (!isNew) {
