@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.3.0
+
+### Minor Changes
+
+- 0840995: Add unique 5-digit `playerNumber` field to Player model for stable player identification. Player numbers are auto-generated on creation and range from 10000-99999. Includes new `findPlayerByPlayerNumber()` lookup function and `generateUniquePlayerNumber()` / `isValidPlayerNumber()` utilities.
+
 ## 2.2.1
 
 ### Patch Changes
