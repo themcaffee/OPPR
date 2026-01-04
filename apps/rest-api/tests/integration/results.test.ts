@@ -11,7 +11,7 @@ import {
   createResultFixture,
 } from '../fixtures/index.js';
 
-describe('Results endpoints', () => {
+describe('Standings endpoints', () => {
   beforeEach(() => {
     resetAuthCache();
   });
@@ -38,9 +38,9 @@ describe('Results endpoints', () => {
     return { player, tournament };
   }
 
-  describe('GET /api/v1/results', () => {
+  describe('GET /api/v1/standings', () => {
     it('should return empty list initially', async () => {
-      const response = await authenticatedRequest('GET', '/api/v1/results');
+      const response = await authenticatedRequest('GET', '/api/v1/standings');
 
       expect(response.statusCode).toBe(200);
 
@@ -51,10 +51,10 @@ describe('Results endpoints', () => {
       expect(body.pagination.total).toBe(0);
     });
 
-    it('should return results with pagination', async () => {
+    it('should return standings with pagination', async () => {
       const { player, tournament } = await createPlayerAndTournament();
 
-      // Create another player for multiple results
+      // Create another player for multiple standings
       const player2Response = await authenticatedRequest(
         'POST',
         '/api/v1/players',
@@ -64,16 +64,16 @@ describe('Results endpoints', () => {
 
       await authenticatedRequest(
         'POST',
-        '/api/v1/results',
+        '/api/v1/standings',
         createResultFixture(player.id, tournament.id, { position: 1 })
       );
       await authenticatedRequest(
         'POST',
-        '/api/v1/results',
+        '/api/v1/standings',
         createResultFixture(player2.id, tournament.id, { position: 2 })
       );
 
-      const response = await authenticatedRequest('GET', '/api/v1/results?limit=1');
+      const response = await authenticatedRequest('GET', '/api/v1/standings?limit=1');
 
       expect(response.statusCode).toBe(200);
 
@@ -94,16 +94,16 @@ describe('Results endpoints', () => {
 
       await authenticatedRequest(
         'POST',
-        '/api/v1/results',
+        '/api/v1/standings',
         createResultFixture(player.id, tournament.id, { position: 1 })
       );
       await authenticatedRequest(
         'POST',
-        '/api/v1/results',
+        '/api/v1/standings',
         createResultFixture(player2.id, tournament.id, { position: 2 })
       );
 
-      const response = await authenticatedRequest('GET', `/api/v1/results?playerId=${player.id}`);
+      const response = await authenticatedRequest('GET', `/api/v1/standings?playerId=${player.id}`);
 
       expect(response.statusCode).toBe(200);
 
@@ -124,18 +124,18 @@ describe('Results endpoints', () => {
 
       await authenticatedRequest(
         'POST',
-        '/api/v1/results',
+        '/api/v1/standings',
         createResultFixture(player.id, tournament.id, { position: 1 })
       );
       await authenticatedRequest(
         'POST',
-        '/api/v1/results',
+        '/api/v1/standings',
         createResultFixture(player.id, tournament2.id, { position: 2 })
       );
 
       const response = await authenticatedRequest(
         'GET',
-        `/api/v1/results?tournamentId=${tournament.id}`
+        `/api/v1/standings?tournamentId=${tournament.id}`
       );
 
       expect(response.statusCode).toBe(200);
@@ -149,19 +149,19 @@ describe('Results endpoints', () => {
       const app = await getTestApp();
       const response = await app.inject({
         method: 'GET',
-        url: '/api/v1/results',
+        url: '/api/v1/standings',
       });
 
       expect(response.statusCode).toBe(401);
     });
   });
 
-  describe('POST /api/v1/results', () => {
-    it('should create a new result', async () => {
+  describe('POST /api/v1/standings', () => {
+    it('should create a new standing', async () => {
       const { player, tournament } = await createPlayerAndTournament();
 
-      const resultData = createResultFixture(player.id, tournament.id);
-      const response = await authenticatedRequest('POST', '/api/v1/results', resultData);
+      const standingData = createResultFixture(player.id, tournament.id);
+      const response = await authenticatedRequest('POST', '/api/v1/standings', standingData);
 
       expect(response.statusCode).toBe(201);
 
@@ -169,11 +169,11 @@ describe('Results endpoints', () => {
       expect(body).toHaveProperty('id');
       expect(body.playerId).toBe(player.id);
       expect(body.tournamentId).toBe(tournament.id);
-      expect(body.position).toBe(resultData.position);
+      expect(body.position).toBe(standingData.position);
     });
 
     it('should return 400 for missing required fields', async () => {
-      const response = await authenticatedRequest('POST', '/api/v1/results', {
+      const response = await authenticatedRequest('POST', '/api/v1/standings', {
         position: 1,
       });
 
@@ -181,8 +181,8 @@ describe('Results endpoints', () => {
     });
   });
 
-  describe('POST /api/v1/results/batch', () => {
-    it('should create multiple results at once', async () => {
+  describe('POST /api/v1/standings/batch', () => {
+    it('should create multiple standings at once', async () => {
       const { tournament } = await createPlayerAndTournament();
 
       const player2Response = await authenticatedRequest(
@@ -199,12 +199,12 @@ describe('Results endpoints', () => {
       );
       const player3 = player3Response.json();
 
-      const resultsData = [
+      const standingsData = [
         createResultFixture(player2.id, tournament.id, { position: 1 }),
         createResultFixture(player3.id, tournament.id, { position: 2 }),
       ];
 
-      const response = await authenticatedRequest('POST', '/api/v1/results/batch', resultsData);
+      const response = await authenticatedRequest('POST', '/api/v1/standings/batch', standingsData);
 
       expect(response.statusCode).toBe(201);
 
@@ -213,18 +213,18 @@ describe('Results endpoints', () => {
     });
   });
 
-  describe('GET /api/v1/results/:id', () => {
-    it('should return a result by ID', async () => {
+  describe('GET /api/v1/standings/:id', () => {
+    it('should return a standing by ID', async () => {
       const { player, tournament } = await createPlayerAndTournament();
 
       const createResponse = await authenticatedRequest(
         'POST',
-        '/api/v1/results',
+        '/api/v1/standings',
         createResultFixture(player.id, tournament.id)
       );
       const { id } = createResponse.json();
 
-      const response = await authenticatedRequest('GET', `/api/v1/results/${id}`);
+      const response = await authenticatedRequest('GET', `/api/v1/standings/${id}`);
 
       expect(response.statusCode).toBe(200);
 
@@ -234,25 +234,25 @@ describe('Results endpoints', () => {
       expect(body).toHaveProperty('tournament');
     });
 
-    it('should return 404 for non-existent result', async () => {
-      const response = await authenticatedRequest('GET', '/api/v1/results/non-existent-id');
+    it('should return 404 for non-existent standing', async () => {
+      const response = await authenticatedRequest('GET', '/api/v1/standings/non-existent-id');
 
       expect(response.statusCode).toBe(404);
     });
   });
 
-  describe('PATCH /api/v1/results/:id', () => {
-    it('should update a result', async () => {
+  describe('PATCH /api/v1/standings/:id', () => {
+    it('should update a standing', async () => {
       const { player, tournament } = await createPlayerAndTournament();
 
       const createResponse = await authenticatedRequest(
         'POST',
-        '/api/v1/results',
+        '/api/v1/standings',
         createResultFixture(player.id, tournament.id, { position: 1 })
       );
       const { id } = createResponse.json();
 
-      const response = await authenticatedRequest('PATCH', `/api/v1/results/${id}`, {
+      const response = await authenticatedRequest('PATCH', `/api/v1/standings/${id}`, {
         position: 2,
         totalPoints: 80,
       });
@@ -264,8 +264,8 @@ describe('Results endpoints', () => {
       expect(body.totalPoints).toBe(80);
     });
 
-    it('should return 404 when updating non-existent result', async () => {
-      const response = await authenticatedRequest('PATCH', '/api/v1/results/non-existent-id', {
+    it('should return 404 when updating non-existent standing', async () => {
+      const response = await authenticatedRequest('PATCH', '/api/v1/standings/non-existent-id', {
         position: 2,
       });
 
@@ -273,42 +273,42 @@ describe('Results endpoints', () => {
     });
   });
 
-  describe('DELETE /api/v1/results/:id', () => {
-    it('should delete a result', async () => {
+  describe('DELETE /api/v1/standings/:id', () => {
+    it('should delete a standing', async () => {
       const { player, tournament } = await createPlayerAndTournament();
 
       const createResponse = await authenticatedRequest(
         'POST',
-        '/api/v1/results',
+        '/api/v1/standings',
         createResultFixture(player.id, tournament.id)
       );
       const { id } = createResponse.json();
 
-      const deleteResponse = await authenticatedRequest('DELETE', `/api/v1/results/${id}`);
+      const deleteResponse = await authenticatedRequest('DELETE', `/api/v1/standings/${id}`);
       expect(deleteResponse.statusCode).toBe(204);
 
-      const getResponse = await authenticatedRequest('GET', `/api/v1/results/${id}`);
+      const getResponse = await authenticatedRequest('GET', `/api/v1/standings/${id}`);
       expect(getResponse.statusCode).toBe(404);
     });
 
-    it('should return 404 when deleting non-existent result', async () => {
-      const response = await authenticatedRequest('DELETE', '/api/v1/results/non-existent-id');
+    it('should return 404 when deleting non-existent standing', async () => {
+      const response = await authenticatedRequest('DELETE', '/api/v1/standings/non-existent-id');
 
       expect(response.statusCode).toBe(404);
     });
   });
 
-  describe('POST /api/v1/results/recalculate-decay', () => {
-    it('should recalculate time decay for all results', async () => {
+  describe('POST /api/v1/standings/recalculate-decay', () => {
+    it('should recalculate time decay for all standings', async () => {
       const { player, tournament } = await createPlayerAndTournament();
 
       await authenticatedRequest(
         'POST',
-        '/api/v1/results',
+        '/api/v1/standings',
         createResultFixture(player.id, tournament.id)
       );
 
-      const response = await authenticatedRequest('POST', '/api/v1/results/recalculate-decay');
+      const response = await authenticatedRequest('POST', '/api/v1/standings/recalculate-decay');
 
       expect(response.statusCode).toBe(200);
 

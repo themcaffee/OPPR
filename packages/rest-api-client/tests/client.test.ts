@@ -522,7 +522,7 @@ describe('OpprsClient', () => {
       expect(result.data).toEqual([]);
     });
 
-    it('should return results resource', async () => {
+    it('should return standings resource', async () => {
       const loginResponse: LoginResponse = {
         accessToken: 'access-token',
         refreshToken: 'refresh-token',
@@ -540,7 +540,7 @@ describe('OpprsClient', () => {
       const client = new OpprsClient({ fetch: mockFetch });
       await client.login({ email: 'test@example.com', password: 'password' });
 
-      const result = await client.results.list({ page: 1, limit: 20 });
+      const result = await client.standings.list({ page: 1, limit: 20 });
       expect(result.data).toEqual([]);
     });
 

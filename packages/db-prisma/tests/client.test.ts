@@ -10,10 +10,13 @@ describe('client', () => {
       expect(prisma.$queryRaw).toBeDefined();
     });
 
-    it('should have player, tournament, and tournamentResult models', () => {
+    it('should have player, tournament, standing, round, match, and entry models', () => {
       expect(prisma.player).toBeDefined();
       expect(prisma.tournament).toBeDefined();
-      expect(prisma.tournamentResult).toBeDefined();
+      expect(prisma.standing).toBeDefined();
+      expect(prisma.round).toBeDefined();
+      expect(prisma.match).toBeDefined();
+      expect(prisma.entry).toBeDefined();
     });
   });
 

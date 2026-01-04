@@ -190,7 +190,7 @@ export function registerAuthCommands(program: Command): void {
         const spinner = ora('Registering...').start();
 
         const client = createClient(apiUrl);
-        await client.register({ email, password, name });
+        await client.register({ email, password, name, acceptPolicies: true });
 
         spinner.stop();
         success(`Account created for ${email}`);

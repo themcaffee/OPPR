@@ -34,8 +34,12 @@ describe('Auth endpoints (production mode)', () => {
 
   beforeEach(async () => {
     // Clean up and create test user
-    await prisma.tournamentResult.deleteMany();
+    await prisma.entry.deleteMany();
+    await prisma.standing.deleteMany();
+    await prisma.match.deleteMany();
+    await prisma.round.deleteMany();
     await prisma.tournament.deleteMany();
+    await prisma.location.deleteMany();
     await prisma.user.deleteMany();
     await prisma.player.deleteMany();
 
@@ -69,6 +73,7 @@ describe('Auth endpoints (production mode)', () => {
           email: 'newuser@example.com',
           password: 'password123',
           name: 'New User',
+          acceptPolicies: true,
         },
       });
 
@@ -97,6 +102,7 @@ describe('Auth endpoints (production mode)', () => {
           email: testUserEmail, // Already exists
           password: 'password123',
           name: 'Duplicate User',
+          acceptPolicies: true,
         },
       });
 

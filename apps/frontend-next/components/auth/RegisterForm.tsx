@@ -34,6 +34,7 @@ export function RegisterForm() {
         name: data.name,
         email: data.email,
         password: data.password,
+        acceptPolicies: data.acceptPolicies,
       });
       router.push('/profile');
     } catch (err) {
@@ -97,6 +98,49 @@ export function RegisterForm() {
         error={errors.confirmPassword?.message}
         {...register('confirmPassword')}
       />
+
+      <div className="space-y-1">
+        <div className="flex items-start">
+          <input
+            type="checkbox"
+            id="acceptPolicies"
+            className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            {...register('acceptPolicies')}
+          />
+          <label htmlFor="acceptPolicies" className="ml-2 block text-sm text-gray-700">
+            I agree to the{' '}
+            <a
+              href="/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 underline hover:text-blue-800"
+            >
+              Terms of Service
+            </a>
+            ,{' '}
+            <a
+              href="/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 underline hover:text-blue-800"
+            >
+              Privacy Policy
+            </a>
+            , and{' '}
+            <a
+              href="/code-of-conduct"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 underline hover:text-blue-800"
+            >
+              Code of Conduct
+            </a>
+          </label>
+        </div>
+        {errors.acceptPolicies?.message && (
+          <p className="text-sm text-red-600">{errors.acceptPolicies.message}</p>
+        )}
+      </div>
 
       <Button type="submit" className="w-full" isLoading={isSubmitting}>
         Create Account

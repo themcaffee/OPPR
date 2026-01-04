@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ResultsResource } from '../../src/resources/results.js';
+import { StandingsResource } from '../../src/resources/results.js';
 
-describe('ResultsResource', () => {
+describe('StandingsResource', () => {
   let mockRequest: ReturnType<typeof vi.fn>;
   let mockBuildQueryString: ReturnType<typeof vi.fn>;
-  let resource: ResultsResource;
+  let resource: StandingsResource;
 
   beforeEach(() => {
     mockRequest = vi.fn();
@@ -18,11 +18,11 @@ describe('ResultsResource', () => {
       const queryString = searchParams.toString();
       return queryString ? `?${queryString}` : '';
     });
-    resource = new ResultsResource(mockRequest, mockBuildQueryString);
+    resource = new StandingsResource(mockRequest, mockBuildQueryString);
   });
 
   describe('list', () => {
-    it('should list results with filters', async () => {
+    it('should list standings with filters', async () => {
       const response = {
         data: [],
         pagination: { page: 1, limit: 20, total: 0, totalPages: 0 },
@@ -33,18 +33,19 @@ describe('ResultsResource', () => {
       await resource.list({ playerId: 'player-1', tournamentId: 'tournament-1' });
 
       expect(mockRequest).toHaveBeenCalledWith(
-        '/results?playerId=player-1&tournamentId=tournament-1'
+        '/standings?playerId=player-1&tournamentId=tournament-1'
       );
     });
   });
 
   describe('get', () => {
-    it('should get result by id', async () => {
-      const result = {
-        id: 'result-1',
+    it('should get standing by id', async () => {
+      const standing = {
+        id: 'standing-1',
         playerId: 'player-1',
         tournamentId: 'tournament-1',
         position: 1,
+        isFinals: false,
         optedOut: false,
         linearPoints: 10,
         dynamicPoints: 20,
@@ -65,21 +66,22 @@ describe('ResultsResource', () => {
         },
       };
 
-      mockRequest.mockResolvedValue(result);
+      mockRequest.mockResolvedValue(standing);
 
-      const res = await resource.get('result-1');
+      const res = await resource.get('standing-1');
 
-      expect(res).toEqual(result);
-      expect(mockRequest).toHaveBeenCalledWith('/results/result-1');
+      expect(res).toEqual(standing);
+      expect(mockRequest).toHaveBeenCalledWith('/standings/standing-1');
     });
   });
 
   describe('create', () => {
-    it('should create a result', async () => {
+    it('should create a standing', async () => {
       const createData = { playerId: 'player-1', tournamentId: 'tournament-1', position: 1 };
-      const createdResult = {
-        id: 'result-1',
+      const createdStanding = {
+        id: 'standing-1',
         ...createData,
+        isFinals: false,
         optedOut: false,
         linearPoints: 10,
         dynamicPoints: 20,
@@ -92,12 +94,12 @@ describe('ResultsResource', () => {
         updatedAt: '2025-01-01T00:00:00Z',
       };
 
-      mockRequest.mockResolvedValue(createdResult);
+      mockRequest.mockResolvedValue(createdStanding);
 
       const result = await resource.create(createData);
 
-      expect(result).toEqual(createdResult);
-      expect(mockRequest).toHaveBeenCalledWith('/results', {
+      expect(result).toEqual(createdStanding);
+      expect(mockRequest).toHaveBeenCalledWith('/standings', {
         method: 'POST',
         body: JSON.stringify(createData),
       });
@@ -105,32 +107,33 @@ describe('ResultsResource', () => {
   });
 
   describe('createBatch', () => {
-    it('should create multiple results', async () => {
-      const results = [
+    it('should create multiple standings', async () => {
+      const standings = [
         { playerId: 'player-1', tournamentId: 'tournament-1', position: 1 },
         { playerId: 'player-2', tournamentId: 'tournament-1', position: 2 },
       ];
 
       mockRequest.mockResolvedValue({ count: 2 });
 
-      const result = await resource.createBatch(results);
+      const result = await resource.createBatch(standings);
 
       expect(result.count).toBe(2);
-      expect(mockRequest).toHaveBeenCalledWith('/results/batch', {
+      expect(mockRequest).toHaveBeenCalledWith('/standings/batch', {
         method: 'POST',
-        body: JSON.stringify(results),
+        body: JSON.stringify(standings),
       });
     });
   });
 
   describe('update', () => {
-    it('should update a result', async () => {
+    it('should update a standing', async () => {
       const updateData = { position: 2 };
-      const updatedResult = {
-        id: 'result-1',
+      const updatedStanding = {
+        id: 'standing-1',
         playerId: 'player-1',
         tournamentId: 'tournament-1',
         position: 2,
+        isFinals: false,
         optedOut: false,
         linearPoints: 8,
         dynamicPoints: 15,
@@ -143,12 +146,12 @@ describe('ResultsResource', () => {
         updatedAt: '2025-01-01T00:00:00Z',
       };
 
-      mockRequest.mockResolvedValue(updatedResult);
+      mockRequest.mockResolvedValue(updatedStanding);
 
-      const result = await resource.update('result-1', updateData);
+      const result = await resource.update('standing-1', updateData);
 
-      expect(result).toEqual(updatedResult);
-      expect(mockRequest).toHaveBeenCalledWith('/results/result-1', {
+      expect(result).toEqual(updatedStanding);
+      expect(mockRequest).toHaveBeenCalledWith('/standings/standing-1', {
         method: 'PATCH',
         body: JSON.stringify(updateData),
       });
@@ -156,25 +159,25 @@ describe('ResultsResource', () => {
   });
 
   describe('delete', () => {
-    it('should delete a result', async () => {
+    it('should delete a standing', async () => {
       mockRequest.mockResolvedValue(undefined);
 
-      await resource.delete('result-1');
+      await resource.delete('standing-1');
 
-      expect(mockRequest).toHaveBeenCalledWith('/results/result-1', {
+      expect(mockRequest).toHaveBeenCalledWith('/standings/standing-1', {
         method: 'DELETE',
       });
     });
   });
 
   describe('recalculateDecay', () => {
-    it('should recalculate decay for all results', async () => {
+    it('should recalculate decay for all standings', async () => {
       mockRequest.mockResolvedValue({ count: 100, message: 'Decay recalculated' });
 
       const result = await resource.recalculateDecay();
 
       expect(result.count).toBe(100);
-      expect(mockRequest).toHaveBeenCalledWith('/results/recalculate-decay', {
+      expect(mockRequest).toHaveBeenCalledWith('/standings/recalculate-decay', {
         method: 'POST',
       });
     });

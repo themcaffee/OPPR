@@ -61,6 +61,7 @@ export interface RegisterRequest {
   email: string;
   password: string;
   name: string;
+  acceptPolicies: boolean;
 }
 
 export interface PlayerProfile {
@@ -324,13 +325,14 @@ export interface TournamentResult {
   };
 }
 
-// ==================== Results ====================
+// ==================== Standings ====================
 
-export interface Result {
+export interface Standing {
   id: string;
   playerId: string;
   tournamentId: string;
   position: number;
+  isFinals: boolean;
   optedOut: boolean;
   linearPoints: number | null;
   dynamicPoints: number | null;
@@ -343,7 +345,7 @@ export interface Result {
   updatedAt: string;
 }
 
-export interface ResultWithRelations extends Result {
+export interface StandingWithRelations extends Standing {
   player: {
     id: string;
     name: string | null;
@@ -360,10 +362,11 @@ export interface ResultWithRelations extends Result {
   };
 }
 
-export interface CreateResultRequest {
+export interface CreateStandingRequest {
   playerId: string;
   tournamentId: string;
   position: number;
+  isFinals?: boolean;
   optedOut?: boolean;
   linearPoints?: number;
   dynamicPoints?: number;
@@ -374,7 +377,7 @@ export interface CreateResultRequest {
   efficiency?: number;
 }
 
-export interface UpdateResultRequest {
+export interface UpdateStandingRequest {
   position?: number;
   optedOut?: boolean;
   linearPoints?: number;
@@ -386,14 +389,15 @@ export interface UpdateResultRequest {
   efficiency?: number;
 }
 
-export interface ResultListParams extends PaginationParams {
+export interface StandingListParams extends PaginationParams {
   playerId?: string;
   tournamentId?: string;
+  isFinals?: boolean;
   sortBy?: 'position' | 'totalPoints' | 'decayedPoints' | 'createdAt';
   sortOrder?: 'asc' | 'desc';
 }
 
-export interface BatchCreateResultsResponse {
+export interface BatchCreateStandingsResponse {
   count: number;
 }
 

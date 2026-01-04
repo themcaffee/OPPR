@@ -209,13 +209,13 @@ export async function countPlayers(where?: Prisma.PlayerWhereInput): Promise<num
 }
 
 /**
- * Gets player with their tournament results
+ * Gets player with their tournament standings
  */
 export async function getPlayerWithResults(id: string) {
   const player = await prisma.player.findUnique({
     where: { id },
     include: {
-      tournamentResults: {
+      standings: {
         include: {
           tournament: true,
         },
@@ -232,10 +232,10 @@ export async function getPlayerWithResults(id: string) {
     return null;
   }
 
-  // Map tournamentResults to results for the return object
+  // Map standings to results for backwards compatibility
   return {
     ...player,
-    results: player.tournamentResults,
+    results: player.standings,
   };
 }
 

@@ -5,9 +5,9 @@ import { createMockPaginatedResponse } from '../../mocks/data-factories';
 import type { TournamentResult } from '@opprs/rest-api-client';
 
 const mockTournamentsGetResults = vi.fn();
-const mockResultsCreate = vi.fn();
-const mockResultsUpdate = vi.fn();
-const mockResultsDelete = vi.fn();
+const mockStandingsCreate = vi.fn();
+const mockStandingsUpdate = vi.fn();
+const mockStandingsDelete = vi.fn();
 const mockPlayersList = vi.fn();
 const mockPlayersSearch = vi.fn();
 
@@ -16,10 +16,10 @@ vi.mock('@/lib/api-client', () => ({
     tournaments: {
       getResults: (...args: unknown[]) => mockTournamentsGetResults(...args),
     },
-    results: {
-      create: (...args: unknown[]) => mockResultsCreate(...args),
-      update: (...args: unknown[]) => mockResultsUpdate(...args),
-      delete: (...args: unknown[]) => mockResultsDelete(...args),
+    standings: {
+      create: (...args: unknown[]) => mockStandingsCreate(...args),
+      update: (...args: unknown[]) => mockStandingsUpdate(...args),
+      delete: (...args: unknown[]) => mockStandingsDelete(...args),
     },
     players: {
       list: (...args: unknown[]) => mockPlayersList(...args),
@@ -171,9 +171,9 @@ describe('TournamentResultsManager', () => {
     expect(screen.getByText(/are you sure you want to delete/i)).toBeInTheDocument();
   });
 
-  it('calls apiClient.results.delete when confirmed', async () => {
+  it('calls apiClient.standings.delete when confirmed', async () => {
     mockTournamentsGetResults.mockResolvedValue(mockResults);
-    mockResultsDelete.mockResolvedValue({});
+    mockStandingsDelete.mockResolvedValue({});
 
     render(<TournamentResultsManager tournamentId="tour-1" />);
 
@@ -194,7 +194,7 @@ describe('TournamentResultsManager', () => {
     fireEvent.click(confirmButton);
 
     await waitFor(() => {
-      expect(mockResultsDelete).toHaveBeenCalledWith('result-1');
+      expect(mockStandingsDelete).toHaveBeenCalledWith('result-1');
     });
   });
 
@@ -218,9 +218,9 @@ describe('TournamentResultsManager', () => {
     });
   });
 
-  it('calls apiClient.results.update when saving edit', async () => {
+  it('calls apiClient.standings.update when saving edit', async () => {
     mockTournamentsGetResults.mockResolvedValue(mockResults);
-    mockResultsUpdate.mockResolvedValue({});
+    mockStandingsUpdate.mockResolvedValue({});
 
     render(<TournamentResultsManager tournamentId="tour-1" />);
 
@@ -239,7 +239,7 @@ describe('TournamentResultsManager', () => {
     fireEvent.click(screen.getByRole('button', { name: /save/i }));
 
     await waitFor(() => {
-      expect(mockResultsUpdate).toHaveBeenCalledWith('result-1', {
+      expect(mockStandingsUpdate).toHaveBeenCalledWith('result-1', {
         position: 3,
         optedOut: false,
       });

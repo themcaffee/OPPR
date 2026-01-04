@@ -13,8 +13,12 @@ describe('Error handlers', () => {
 
   beforeEach(async () => {
     // Clean up test data
-    await prisma.tournamentResult.deleteMany();
+    await prisma.entry.deleteMany();
+    await prisma.standing.deleteMany();
+    await prisma.match.deleteMany();
+    await prisma.round.deleteMany();
     await prisma.tournament.deleteMany();
+    await prisma.location.deleteMany();
     await prisma.user.deleteMany();
     await prisma.player.deleteMany();
   });
@@ -92,8 +96,8 @@ describe('Error handlers', () => {
       });
       const tournament = tournamentResponse.json();
 
-      // Create a result for this player
-      await authenticatedRequest('POST', '/api/v1/results', {
+      // Create a standing for this player
+      await authenticatedRequest('POST', '/api/v1/standings', {
         playerId: player.id,
         tournamentId: tournament.id,
         position: 1,

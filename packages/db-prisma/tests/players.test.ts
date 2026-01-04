@@ -17,11 +17,11 @@ import {
   searchPlayers,
 } from '../src/players.js';
 import { createTournament } from '../src/tournaments.js';
-import { createResult } from '../src/results.js';
+import { createStanding } from '../src/standings.js';
 import { prisma } from '../src/client.js';
 import { createPlayerInput, createRatedPlayerInput, resetPlayerCounter } from './factories/player.factory.js';
 import { createTournamentInput, resetTournamentCounter } from './factories/tournament.factory.js';
-import { createResultInput } from './factories/result.factory.js';
+import { createStandingInput } from './factories/result.factory.js';
 
 beforeEach(() => {
   resetPlayerCounter();
@@ -104,13 +104,13 @@ describe('players', () => {
     it('should support include option for relations', async () => {
       const player = await createPlayer(createPlayerInput());
       const tournament = await createTournament(createTournamentInput());
-      await createResult(createResultInput(player.id, tournament.id));
+      await createStanding(createStandingInput(player.id, tournament.id));
 
-      const found = await findPlayerById(player.id, { tournamentResults: true });
+      const found = await findPlayerById(player.id, { standings: true });
 
       expect(found).not.toBeNull();
-      expect(found!.tournamentResults).toBeDefined();
-      expect(found!.tournamentResults).toHaveLength(1);
+      expect(found!.standings).toBeDefined();
+      expect(found!.standings).toHaveLength(1);
     });
   });
 
@@ -134,10 +134,10 @@ describe('players', () => {
     it('should support include option', async () => {
       const player = await createPlayer(createPlayerInput());
 
-      const found = await findPlayerByExternalId(player.externalId!, { tournamentResults: true });
+      const found = await findPlayerByExternalId(player.externalId!, { standings: true });
 
       expect(found).not.toBeNull();
-      expect(found!.tournamentResults).toBeDefined();
+      expect(found!.standings).toBeDefined();
     });
   });
 
@@ -162,13 +162,13 @@ describe('players', () => {
     it('should support include option', async () => {
       const player = await createPlayer(createPlayerInput());
       const tournament = await createTournament(createTournamentInput());
-      await createResult(createResultInput(player.id, tournament.id));
+      await createStanding(createStandingInput(player.id, tournament.id));
 
-      const found = await findPlayerByPlayerNumber(player.playerNumber, { tournamentResults: true });
+      const found = await findPlayerByPlayerNumber(player.playerNumber, { standings: true });
 
       expect(found).not.toBeNull();
-      expect(found!.tournamentResults).toBeDefined();
-      expect(found!.tournamentResults).toHaveLength(1);
+      expect(found!.standings).toBeDefined();
+      expect(found!.standings).toHaveLength(1);
     });
   });
 
@@ -257,11 +257,11 @@ describe('players', () => {
     it('should support include option', async () => {
       const player = await createPlayer(createPlayerInput());
       const tournament = await createTournament(createTournamentInput());
-      await createResult(createResultInput(player.id, tournament.id));
+      await createStanding(createStandingInput(player.id, tournament.id));
 
-      const players = await findPlayers({ include: { tournamentResults: true } });
+      const players = await findPlayers({ include: { standings: true } });
 
-      expect(players[0].tournamentResults).toBeDefined();
+      expect(players[0].standings).toBeDefined();
     });
   });
 
@@ -512,10 +512,10 @@ describe('players', () => {
       expect(found).toBeNull();
     });
 
-    it('should cascade delete tournament results', async () => {
+    it('should cascade delete standings', async () => {
       const player = await createPlayer(createPlayerInput());
       const tournament = await createTournament(createTournamentInput());
-      await createResult(createResultInput(player.id, tournament.id));
+      await createStanding(createStandingInput(player.id, tournament.id));
 
       await deletePlayer(player.id);
 
@@ -559,8 +559,8 @@ describe('players', () => {
       const player = await createPlayer(createPlayerInput());
       const tournament1 = await createTournament(createTournamentInput({ date: new Date('2024-01-01') }));
       const tournament2 = await createTournament(createTournamentInput({ date: new Date('2024-06-01') }));
-      await createResult(createResultInput(player.id, tournament1.id, { position: 1 }));
-      await createResult(createResultInput(player.id, tournament2.id, { position: 2 }));
+      await createStanding(createStandingInput(player.id, tournament1.id, { position: 1 }));
+      await createStanding(createStandingInput(player.id, tournament2.id, { position: 2 }));
 
       const result = await getPlayerWithResults(player.id);
 
@@ -574,8 +574,8 @@ describe('players', () => {
       const player = await createPlayer(createPlayerInput());
       const oldTournament = await createTournament(createTournamentInput({ date: new Date('2023-01-01') }));
       const newTournament = await createTournament(createTournamentInput({ date: new Date('2024-06-01') }));
-      await createResult(createResultInput(player.id, oldTournament.id));
-      await createResult(createResultInput(player.id, newTournament.id));
+      await createStanding(createStandingInput(player.id, oldTournament.id));
+      await createStanding(createStandingInput(player.id, newTournament.id));
 
       const result = await getPlayerWithResults(player.id);
 
@@ -593,7 +593,7 @@ describe('players', () => {
     it('should include tournament data in results', async () => {
       const player = await createPlayer(createPlayerInput());
       const tournament = await createTournament(createTournamentInput({ name: 'Test Tournament' }));
-      await createResult(createResultInput(player.id, tournament.id));
+      await createStanding(createStandingInput(player.id, tournament.id));
 
       const result = await getPlayerWithResults(player.id);
 
@@ -601,16 +601,16 @@ describe('players', () => {
       expect(result!.results[0].tournament.name).toBe('Test Tournament');
     });
 
-    it('should map tournamentResults to results property', async () => {
+    it('should map standings to results property', async () => {
       const player = await createPlayer(createPlayerInput());
       const tournament = await createTournament(createTournamentInput());
-      await createResult(createResultInput(player.id, tournament.id));
+      await createStanding(createStandingInput(player.id, tournament.id));
 
       const result = await getPlayerWithResults(player.id);
 
       expect(result!.results).toBeDefined();
-      expect(result!.tournamentResults).toBeDefined();
-      expect(result!.results).toEqual(result!.tournamentResults);
+      expect(result!.standings).toBeDefined();
+      expect(result!.results).toEqual(result!.standings);
     });
   });
 
