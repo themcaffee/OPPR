@@ -144,6 +144,26 @@ async function main() {
 
   console.log(`✓ Created admin user (admin@example.com / ${adminPassword})`);
 
+  // Create admin user
+  console.log('Creating admin user...');
+  const adminPassword = 'AdminPassword123!';
+  const adminPasswordHash = await bcrypt.hash(adminPassword, BCRYPT_SALT_ROUNDS);
+
+  await prisma.user.upsert({
+    where: { email: 'admin@example.com' },
+    update: {
+      passwordHash: adminPasswordHash,
+      role: 'ADMIN',
+    },
+    create: {
+      email: 'admin@example.com',
+      passwordHash: adminPasswordHash,
+      role: 'ADMIN',
+    },
+  });
+
+  console.log(`✓ Created admin user (admin@example.com / ${adminPassword})`);
+
   // Create sample tournaments (using upsert for idempotency)
   console.log('Creating tournaments...');
 
