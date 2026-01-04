@@ -286,7 +286,9 @@ export function formatPlayerName(player: {
 }): string {
   const parts = [player.firstName];
   if (player.middleInitial) {
-    parts.push(player.middleInitial.endsWith('.') ? player.middleInitial : `${player.middleInitial}.`);
+    parts.push(
+      player.middleInitial.endsWith('.') ? player.middleInitial : `${player.middleInitial}.`,
+    );
   }
   parts.push(player.lastName);
   return parts.join(' ');
