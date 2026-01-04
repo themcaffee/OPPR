@@ -1,6 +1,6 @@
 {
   "name": "@opprs/matchplay-api",
-  "version": "1.0.0",
+  "version": "2.2.1",
   "description": "Matchplay Events API client with transformers for OPPR types",
   "keywords": [
     "matchplay",
