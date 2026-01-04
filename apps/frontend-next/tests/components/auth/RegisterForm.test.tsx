@@ -28,13 +28,14 @@ describe('RegisterForm', () => {
     vi.clearAllMocks();
   });
 
-  it('renders name, email, password, and confirm password fields', () => {
+  it('renders name, email, password, confirm password fields, and policy checkbox', () => {
     render(<RegisterForm />);
 
     expect(screen.getByLabelText(/^name$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/confirm password/i)).toBeInTheDocument();
+    expect(screen.getByRole('checkbox')).toBeInTheDocument();
   });
 
   it('renders Create Account button', () => {
@@ -68,6 +69,7 @@ describe('RegisterForm', () => {
     fireEvent.change(screen.getByLabelText(/confirm password/i), {
       target: { value: 'Password123' },
     });
+    fireEvent.click(screen.getByRole('checkbox'));
     fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
     await waitFor(() => {
@@ -75,6 +77,7 @@ describe('RegisterForm', () => {
         name: 'Test User',
         email: 'test@example.com',
         password: 'Password123',
+        acceptPolicies: true,
       });
     });
   });
@@ -96,6 +99,7 @@ describe('RegisterForm', () => {
     fireEvent.change(screen.getByLabelText(/confirm password/i), {
       target: { value: 'Password123' },
     });
+    fireEvent.click(screen.getByRole('checkbox'));
     fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
     await waitFor(() => {
@@ -120,6 +124,7 @@ describe('RegisterForm', () => {
     fireEvent.change(screen.getByLabelText(/confirm password/i), {
       target: { value: 'Password123' },
     });
+    fireEvent.click(screen.getByRole('checkbox'));
     fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
     await waitFor(() => {
@@ -144,6 +149,7 @@ describe('RegisterForm', () => {
     fireEvent.change(screen.getByLabelText(/confirm password/i), {
       target: { value: 'Password123' },
     });
+    fireEvent.click(screen.getByRole('checkbox'));
     fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
     await waitFor(() => {
@@ -168,6 +174,7 @@ describe('RegisterForm', () => {
     fireEvent.change(screen.getByLabelText(/confirm password/i), {
       target: { value: 'Password123' },
     });
+    fireEvent.click(screen.getByRole('checkbox'));
     fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
     await waitFor(() => {
@@ -192,6 +199,7 @@ describe('RegisterForm', () => {
     fireEvent.change(screen.getByLabelText(/confirm password/i), {
       target: { value: 'Password123' },
     });
+    fireEvent.click(screen.getByRole('checkbox'));
     fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
     await waitFor(() => {
@@ -221,6 +229,7 @@ describe('RegisterForm', () => {
     fireEvent.change(screen.getByLabelText(/confirm password/i), {
       target: { value: 'Password123' },
     });
+    fireEvent.click(screen.getByRole('checkbox'));
     fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
     await waitFor(() => {

@@ -61,6 +61,7 @@ export interface RegisterRequest {
   email: string;
   password: string;
   name: string;
+  acceptPolicies: boolean;
 }
 
 export interface PlayerProfile {

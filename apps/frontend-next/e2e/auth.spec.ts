@@ -38,6 +38,7 @@ test.describe('User Registration', () => {
     await registerPage.emailInput.fill(testUser.email);
     await registerPage.passwordInput.fill('weak');
     await registerPage.confirmPasswordInput.fill('weak');
+    await registerPage.acceptPoliciesCheckbox.check();
     await registerPage.submitButton.click();
 
     await expect(page.getByText(/at least 8 characters/i)).toBeVisible();
@@ -52,6 +53,7 @@ test.describe('User Registration', () => {
     await registerPage.emailInput.fill(testUser.email);
     await registerPage.passwordInput.fill('StrongPassword123!');
     await registerPage.confirmPasswordInput.fill('DifferentPassword123!');
+    await registerPage.acceptPoliciesCheckbox.check();
     await registerPage.submitButton.click();
 
     await expect(page.getByText(/passwords do not match/i)).toBeVisible();

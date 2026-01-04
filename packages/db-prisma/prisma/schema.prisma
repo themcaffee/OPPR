@@ -160,6 +160,11 @@ model User {
   // Session management (for token revocation)
   refreshTokenHash String?
 
+  // Policy acceptance timestamps (null = not accepted)
+  tosAcceptedAt           DateTime?
+  privacyPolicyAcceptedAt DateTime?
+  codeOfConductAcceptedAt DateTime?
+
   @@index([email])
 }
 

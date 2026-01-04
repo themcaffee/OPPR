@@ -9,11 +9,12 @@ export const loginRequestSchema = {
 
 export const registerRequestSchema = {
   type: 'object',
-  required: ['email', 'password', 'name'],
+  required: ['email', 'password', 'name', 'acceptPolicies'],
   properties: {
     email: { type: 'string', format: 'email' },
     password: { type: 'string', minLength: 8 },
     name: { type: 'string', minLength: 1 },
+    acceptPolicies: { type: 'boolean' },
   },
 } as const;
 

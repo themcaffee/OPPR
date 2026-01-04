@@ -8,6 +8,7 @@ export class RegisterPage {
   readonly emailInput: Locator;
   readonly passwordInput: Locator;
   readonly confirmPasswordInput: Locator;
+  readonly acceptPoliciesCheckbox: Locator;
   readonly submitButton: Locator;
   readonly errorAlert: Locator;
   readonly signInLink: Locator;
@@ -19,6 +20,7 @@ export class RegisterPage {
     this.emailInput = page.getByLabel('Email');
     this.passwordInput = page.getByLabel('Password', { exact: true });
     this.confirmPasswordInput = page.getByLabel('Confirm Password');
+    this.acceptPoliciesCheckbox = page.getByRole('checkbox');
     this.submitButton = page.getByRole('button', { name: 'Create Account' });
     // Use specific class selector to avoid Next.js route announcer
     this.errorAlert = page.locator('.bg-red-50[role="alert"]');
@@ -34,6 +36,7 @@ export class RegisterPage {
     await this.emailInput.fill(user.email);
     await this.passwordInput.fill(user.password);
     await this.confirmPasswordInput.fill(user.password);
+    await this.acceptPoliciesCheckbox.check();
     await this.submitButton.click();
   }
 
