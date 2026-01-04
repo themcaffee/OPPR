@@ -72,7 +72,7 @@ describe('SignInForm', () => {
     });
   });
 
-  it('redirects to /dashboard on successful login (default)', async () => {
+  it('redirects to /profile on successful login (default)', async () => {
     mockLogin.mockResolvedValue({ user: { id: '1', email: 'test@example.com' } });
 
     render(<SignInForm />);
@@ -86,7 +86,7 @@ describe('SignInForm', () => {
     fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/dashboard');
+      expect(mockPush).toHaveBeenCalledWith('/profile');
     });
   });
 
@@ -109,7 +109,7 @@ describe('SignInForm', () => {
     });
   });
 
-  it('redirects "/" to "/dashboard" to avoid race condition', async () => {
+  it('redirects "/" to "/profile" to avoid race condition', async () => {
     mockLogin.mockResolvedValue({ user: { id: '1', email: 'test@example.com' } });
     mockSearchParams.set('redirect', '/');
 
@@ -124,7 +124,7 @@ describe('SignInForm', () => {
     fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/dashboard');
+      expect(mockPush).toHaveBeenCalledWith('/profile');
     });
   });
 
@@ -143,7 +143,7 @@ describe('SignInForm', () => {
     fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/dashboard');
+      expect(mockPush).toHaveBeenCalledWith('/profile');
     });
   });
 
@@ -162,7 +162,7 @@ describe('SignInForm', () => {
     fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/dashboard');
+      expect(mockPush).toHaveBeenCalledWith('/profile');
     });
   });
 

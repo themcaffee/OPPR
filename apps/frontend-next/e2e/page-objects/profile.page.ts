@@ -1,13 +1,12 @@
 import { type Page, type Locator, expect } from '@playwright/test';
 
-export class DashboardPage {
+export class ProfilePage {
   readonly page: Page;
 
   // Header elements
   readonly heading: Locator;
   readonly headerLogo: Locator;
   readonly signOutButton: Locator;
-  readonly welcomeMessage: Locator;
 
   // Loading state
   readonly loadingText: Locator;
@@ -42,13 +41,12 @@ export class DashboardPage {
     this.page = page;
 
     // Header elements
-    this.heading = page.getByRole('heading', { name: 'Dashboard' });
+    this.heading = page.getByRole('heading', { name: 'Profile' });
     this.headerLogo = page.getByRole('link', { name: 'OPPRS' });
     this.signOutButton = page.getByRole('button', { name: /sign out|logout/i });
-    this.welcomeMessage = page.getByText(/Welcome,/);
 
     // Loading state
-    this.loadingText = page.getByText('Loading dashboard...');
+    this.loadingText = page.getByText('Loading profile...');
 
     // No player profile state
     this.noPlayerProfileCard = page.getByText('No Player Profile Linked');
@@ -80,7 +78,7 @@ export class DashboardPage {
   }
 
   async goto() {
-    await this.page.goto('/dashboard');
+    await this.page.goto('/profile');
   }
 
   async expectLoaded() {
@@ -94,14 +92,6 @@ export class DashboardPage {
 
   async expectPlayerProfile() {
     await expect(this.noPlayerProfileCard).not.toBeVisible();
-  }
-
-  async expectWelcomeMessage(playerName: string) {
-    await expect(this.page.getByText(`Welcome, ${playerName}!`)).toBeVisible();
-  }
-
-  async expectNoWelcomeMessage() {
-    await expect(this.welcomeMessage).not.toBeVisible();
   }
 
   async expectLeaderboardVisible() {

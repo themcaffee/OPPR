@@ -7,6 +7,7 @@ import { RecentResultsTable } from '@/components/dashboard/RecentResultsTable';
 import { LeaderboardCard } from '@/components/dashboard/LeaderboardCard';
 import { ActivityFeed } from '@/components/dashboard/ActivityFeed';
 import { NoPlayerProfile } from '@/components/dashboard/NoPlayerProfile';
+import { LogoutButton } from '@/components/auth/LogoutButton';
 import type {
   AuthUser,
   PlayerStats,
@@ -15,7 +16,7 @@ import type {
   Tournament,
 } from '@opprs/rest-api-client';
 
-interface DashboardData {
+interface ProfileData {
   user: AuthUser | null;
   stats: PlayerStats | null;
   results: PlayerResult[];
@@ -24,8 +25,8 @@ interface DashboardData {
   recentTournaments: Tournament[];
 }
 
-export default function DashboardPage() {
-  const [data, setData] = useState<DashboardData>({
+export default function ProfilePage() {
+  const [data, setData] = useState<ProfileData>({
     user: null,
     stats: null,
     results: [],
@@ -37,7 +38,7 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchDashboardData() {
+    async function fetchProfileData() {
       try {
         // Cast to AuthUser since we're using cookie-based auth
         const user = (await apiClient.getMe()) as AuthUser;
@@ -71,14 +72,14 @@ export default function DashboardPage() {
           recentTournaments,
         });
       } catch (err) {
-        console.error('Dashboard data fetch error:', err);
-        setError('Failed to load dashboard data. Please try refreshing the page.');
+        console.error('Profile data fetch error:', err);
+        setError('Failed to load profile data. Please try refreshing the page.');
       } finally {
         setIsLoading(false);
       }
     }
 
-    fetchDashboardData();
+    fetchProfileData();
   }, []);
 
   if (isLoading) {
@@ -86,7 +87,7 @@ export default function DashboardPage() {
       <main className="p-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center py-12">
-            <p className="text-gray-500">Loading dashboard...</p>
+            <p className="text-gray-500">Loading profile...</p>
           </div>
         </div>
       </main>
@@ -117,7 +118,10 @@ export default function DashboardPage() {
   return (
     <main className="p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
+          <LogoutButton />
+        </div>
 
           {!hasPlayerProfile ? (
             <NoPlayerProfile />

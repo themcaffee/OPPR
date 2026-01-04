@@ -94,14 +94,14 @@ test.describe('User Login', () => {
     await signInPage.submitButton.click();
 
     // Wait for navigation to complete
-    await expect(page).toHaveURL('/dashboard', { timeout: 10000 });
+    await expect(page).toHaveURL('/profile', { timeout: 10000 });
 
     // Verify auth cookies were set
     const cookies = await context.cookies();
     const accessCookie = cookies.find((c) => c.name === 'opprs_access');
     expect(accessCookie).toBeDefined();
 
-    // Should be on dashboard (not redirected to sign-in)
+    // Should be on profile (not redirected to sign-in)
     await expect(page).not.toHaveURL(/sign-in/);
   });
 
