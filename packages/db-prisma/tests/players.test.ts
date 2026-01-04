@@ -3,7 +3,6 @@ import {
   createPlayer,
   findPlayerById,
   findPlayerByExternalId,
-  findPlayerByPlayerNumber,
   findPlayerByUserEmail,
   findPlayers,
   getRatedPlayers,
@@ -62,26 +61,6 @@ describe('players', () => {
       expect(player.isRated).toBe(true);
       expect(player.eventCount).toBe(5);
     });
-
-    it('should auto-generate playerNumber when not provided', async () => {
-      const player = await createPlayer({ name: 'Test' });
-
-      expect(player.playerNumber).toBeDefined();
-      expect(player.playerNumber).toBeGreaterThanOrEqual(10000);
-      expect(player.playerNumber).toBeLessThanOrEqual(99999);
-    });
-
-    it('should use provided playerNumber', async () => {
-      const player = await createPlayer(createPlayerInput({ playerNumber: 12345 }));
-
-      expect(player.playerNumber).toBe(12345);
-    });
-
-    it('should reject duplicate playerNumber', async () => {
-      await createPlayer(createPlayerInput({ playerNumber: 11111 }));
-
-      await expect(createPlayer(createPlayerInput({ playerNumber: 11111 }))).rejects.toThrow();
-    });
   });
 
   describe('findPlayerById', () => {
@@ -138,37 +117,6 @@ describe('players', () => {
 
       expect(found).not.toBeNull();
       expect(found!.tournamentResults).toBeDefined();
-    });
-  });
-
-  describe('findPlayerByPlayerNumber', () => {
-    it('should find a player by player number', async () => {
-      const input = createPlayerInput({ playerNumber: 54321 });
-      const created = await createPlayer(input);
-
-      const found = await findPlayerByPlayerNumber(54321);
-
-      expect(found).not.toBeNull();
-      expect(found!.id).toBe(created.id);
-      expect(found!.playerNumber).toBe(54321);
-    });
-
-    it('should return null for non-existent player number', async () => {
-      const found = await findPlayerByPlayerNumber(99998);
-
-      expect(found).toBeNull();
-    });
-
-    it('should support include option', async () => {
-      const player = await createPlayer(createPlayerInput());
-      const tournament = await createTournament(createTournamentInput());
-      await createResult(createResultInput(player.id, tournament.id));
-
-      const found = await findPlayerByPlayerNumber(player.playerNumber, { tournamentResults: true });
-
-      expect(found).not.toBeNull();
-      expect(found!.tournamentResults).toBeDefined();
-      expect(found!.tournamentResults).toHaveLength(1);
     });
   });
 

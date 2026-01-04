@@ -1,8 +1,6 @@
 import { randomUUID } from 'crypto';
 import type { CreatePlayerInput } from '../../src/players.js';
 
-let playerNumberCounter = 10000;
-
 /**
  * Creates a player input object with default values
  */
@@ -10,7 +8,6 @@ export function createPlayerInput(overrides: Partial<CreatePlayerInput> = {}): C
   const id = randomUUID().slice(0, 8);
   return {
     externalId: `ext-player-${id}`,
-    playerNumber: playerNumberCounter++,
     name: `Test Player ${id}`,
     rating: 1500,
     ratingDeviation: 200,
@@ -35,8 +32,8 @@ export function createRatedPlayerInput(overrides: Partial<CreatePlayerInput> = {
 }
 
 /**
- * Resets the player number counter for test isolation
+ * Resets the player counter (no longer needed with UUID-based IDs)
  */
 export function resetPlayerCounter(): void {
-  playerNumberCounter = 10000;
+  // No-op for backward compatibility
 }
