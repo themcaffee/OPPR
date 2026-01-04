@@ -1,5 +1,13 @@
 # frontend-next
 
+## 2.2.1
+
+### Patch Changes
+
+- Updated dependencies [57ba139]
+  - @opprs/core@2.2.1
+  - @opprs/rest-api-client@2.2.1
+
 ## 2.2.0
 
 ### Minor Changes

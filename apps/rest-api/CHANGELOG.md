@@ -1,5 +1,14 @@
 # rest-api
 
+## 2.2.1
+
+### Patch Changes
+
+- Updated dependencies [57ba139]
+  - @opprs/core@2.2.1
+  - @opprs/db-prisma@2.2.1
+  - @opprs/matchplay-api@2.2.1
+
 ## 2.2.0
 
 ### Minor Changes

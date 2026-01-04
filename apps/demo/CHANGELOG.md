@@ -1,5 +1,12 @@
 # demo
 
+## 2.2.1
+
+### Patch Changes
+
+- Updated dependencies [57ba139]
+  - @opprs/core@2.2.1
+
 ## 1.1.4
 
 ### Patch Changes
