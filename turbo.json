@@ -7,6 +7,12 @@
       "inputs": ["src/**", "tsconfig.json", "package.json"],
       "outputs": ["dist/**", ".next/**", ".vite/**"]
     },
+    "@opprs/db-prisma#build": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "prisma/**", "tsconfig.json", "package.json"],
+      "outputs": ["dist/**"],
+      "cache": false
+    },
     "test": {
       "dependsOn": ["build"],
       "inputs": ["src/**", "tests/**", "vitest.config.ts", "tsconfig.json"],
