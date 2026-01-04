@@ -15,6 +15,7 @@ import {
   countPlayers,
   getPlayerWithResults,
   searchPlayers,
+  formatPlayerName,
 } from '../src/players.js';
 import { createTournament } from '../src/tournaments.js';
 import { createResult } from '../src/results.js';
@@ -640,6 +641,18 @@ describe('players', () => {
       expect(results).toHaveLength(2);
     });
 
+    it('should search multiple terms across name parts', async () => {
+      await createPlayer(createPlayerInput({ firstName: 'John', lastName: 'Doe' }));
+      await createPlayer(createPlayerInput({ firstName: 'Jane', lastName: 'Smith' }));
+      await createPlayer(createPlayerInput({ firstName: 'Johnny', lastName: 'Appleseed' }));
+
+      const results = await searchPlayers('John Doe');
+
+      expect(results).toHaveLength(1);
+      expect(results[0].firstName).toBe('John');
+      expect(results[0].lastName).toBe('Doe');
+    });
+
     it('should use default limit of 20', async () => {
       for (let i = 0; i < 25; i++) {
         await createPlayer(createPlayerInput({ firstName: `Player`, lastName: `${i}` }));
@@ -666,6 +679,57 @@ describe('players', () => {
       const results = await searchPlayers('xyz');
 
       expect(results).toHaveLength(0);
+    });
+  });
+
+  describe('formatPlayerName', () => {
+    it('should format name without middle initial', () => {
+      const result = formatPlayerName({
+        firstName: 'John',
+        lastName: 'Doe',
+      });
+
+      expect(result).toBe('John Doe');
+    });
+
+    it('should format name with middle initial', () => {
+      const result = formatPlayerName({
+        firstName: 'John',
+        middleInitial: 'A',
+        lastName: 'Doe',
+      });
+
+      expect(result).toBe('John A. Doe');
+    });
+
+    it('should not add extra period if middle initial already has one', () => {
+      const result = formatPlayerName({
+        firstName: 'John',
+        middleInitial: 'A.',
+        lastName: 'Doe',
+      });
+
+      expect(result).toBe('John A. Doe');
+    });
+
+    it('should handle null middle initial', () => {
+      const result = formatPlayerName({
+        firstName: 'John',
+        middleInitial: null,
+        lastName: 'Doe',
+      });
+
+      expect(result).toBe('John Doe');
+    });
+
+    it('should handle empty string middle initial', () => {
+      const result = formatPlayerName({
+        firstName: 'John',
+        middleInitial: '',
+        lastName: 'Doe',
+      });
+
+      expect(result).toBe('John Doe');
     });
   });
 });
