@@ -37,8 +37,8 @@ export function ActivityFeed({ recentTournaments }: ActivityFeedProps) {
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-900">{tournament.name}</p>
-                    {tournament.location && (
-                      <p className="text-xs text-gray-500">{tournament.location}</p>
+                    {tournament.location?.name && (
+                      <p className="text-xs text-gray-500">{tournament.location.name}</p>
                     )}
                     {boosterLabel && (
                       <span className="inline-block mt-1 text-xs text-blue-600">

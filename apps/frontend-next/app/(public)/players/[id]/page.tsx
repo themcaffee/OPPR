@@ -238,8 +238,8 @@ export default function PlayerProfilePage() {
                               </span>
                             )}
                           </div>
-                          {result.tournament.location && (
-                            <div className="text-xs text-gray-400">{result.tournament.location}</div>
+                          {result.tournament.location?.name && (
+                            <div className="text-xs text-gray-400">{result.tournament.location.name}</div>
                           )}
                         </td>
                         <td className="py-3 px-4 text-right text-sm font-medium text-gray-900">

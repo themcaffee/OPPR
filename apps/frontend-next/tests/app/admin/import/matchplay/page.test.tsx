@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ImportMatchplayPage from '@/app/(admin)/admin/import/matchplay/page';
 import type { ImportTournamentResponse } from '@opprs/rest-api-client';
+import { createMockTournament } from '@tests/mocks/data-factories';
 
 const mockPush = vi.fn();
 const mockBack = vi.fn();
@@ -51,25 +52,13 @@ describe('ImportMatchplayPage', () => {
 
   it('calls API with correct parameters on submit', async () => {
     const mockResponse: ImportTournamentResponse = {
-      tournament: {
+      tournament: createMockTournament({
         id: 'tour-123',
         externalId: 'mp-12345',
-        name: 'Test Tournament',
-        date: '2024-01-15T00:00:00.000Z',
-        location: 'Test Location',
-        eventBooster: 'NONE',
-        tgpConfig: null,
-        allowsOptOut: false,
         firstPlaceValue: 100.5,
         baseValue: 50,
         tgp: 100,
-        tvaRating: 10,
-        tvaRanking: 15,
-        totalTVA: 25,
-        eventBoosterMultiplier: 1.0,
-        createdAt: '2024-01-15T00:00:00.000Z',
-        updatedAt: '2024-01-15T00:00:00.000Z',
-      },
+      }),
       playersCreated: 5,
       playersUpdated: 10,
       resultsCount: 15,
@@ -94,25 +83,13 @@ describe('ImportMatchplayPage', () => {
 
   it('passes event booster when selected', async () => {
     const mockResponse: ImportTournamentResponse = {
-      tournament: {
+      tournament: createMockTournament({
         id: 'tour-123',
         externalId: 'mp-12345',
-        name: 'Test Tournament',
-        date: '2024-01-15T00:00:00.000Z',
-        location: null,
         eventBooster: 'MAJOR',
-        tgpConfig: null,
-        allowsOptOut: false,
         firstPlaceValue: 200,
-        baseValue: 50,
-        tgp: 100,
-        tvaRating: 10,
-        tvaRanking: 15,
-        totalTVA: 25,
         eventBoosterMultiplier: 2.0,
-        createdAt: '2024-01-15T00:00:00.000Z',
-        updatedAt: '2024-01-15T00:00:00.000Z',
-      },
+      }),
       playersCreated: 3,
       playersUpdated: 7,
       resultsCount: 10,
@@ -140,25 +117,17 @@ describe('ImportMatchplayPage', () => {
 
   it('passes API token when provided', async () => {
     const mockResponse: ImportTournamentResponse = {
-      tournament: {
+      tournament: createMockTournament({
         id: 'tour-123',
         externalId: 'mp-12345',
         name: 'Private Tournament',
-        date: '2024-01-15T00:00:00.000Z',
-        location: null,
-        eventBooster: 'NONE',
-        tgpConfig: null,
-        allowsOptOut: false,
         firstPlaceValue: 50,
         baseValue: 25,
         tgp: 50,
         tvaRating: 5,
         tvaRanking: 8,
         totalTVA: 13,
-        eventBoosterMultiplier: 1.0,
-        createdAt: '2024-01-15T00:00:00.000Z',
-        updatedAt: '2024-01-15T00:00:00.000Z',
-      },
+      }),
       playersCreated: 2,
       playersUpdated: 3,
       resultsCount: 5,
@@ -186,25 +155,13 @@ describe('ImportMatchplayPage', () => {
 
   it('displays success result after import', async () => {
     const mockResponse: ImportTournamentResponse = {
-      tournament: {
+      tournament: createMockTournament({
         id: 'tour-123',
         externalId: 'mp-12345',
-        name: 'Test Tournament',
-        date: '2024-01-15T00:00:00.000Z',
-        location: 'Test Location',
         eventBooster: 'CERTIFIED',
-        tgpConfig: null,
-        allowsOptOut: false,
         firstPlaceValue: 100.5,
-        baseValue: 50,
-        tgp: 100,
-        tvaRating: 10,
-        tvaRanking: 15,
-        totalTVA: 25,
         eventBoosterMultiplier: 1.5,
-        createdAt: '2024-01-15T00:00:00.000Z',
-        updatedAt: '2024-01-15T00:00:00.000Z',
-      },
+      }),
       playersCreated: 5,
       playersUpdated: 10,
       resultsCount: 15,
@@ -235,25 +192,17 @@ describe('ImportMatchplayPage', () => {
 
   it('shows "Tournament Updated" for non-created imports', async () => {
     const mockResponse: ImportTournamentResponse = {
-      tournament: {
+      tournament: createMockTournament({
         id: 'tour-123',
         externalId: 'mp-12345',
         name: 'Existing Tournament',
-        date: '2024-01-15T00:00:00.000Z',
-        location: null,
-        eventBooster: 'NONE',
-        tgpConfig: null,
-        allowsOptOut: false,
         firstPlaceValue: 50,
         baseValue: 25,
         tgp: 50,
         tvaRating: 5,
         tvaRanking: 8,
         totalTVA: 13,
-        eventBoosterMultiplier: 1.0,
-        createdAt: '2024-01-15T00:00:00.000Z',
-        updatedAt: '2024-01-15T00:00:00.000Z',
-      },
+      }),
       playersCreated: 0,
       playersUpdated: 5,
       resultsCount: 5,
@@ -290,25 +239,16 @@ describe('ImportMatchplayPage', () => {
 
   it('navigates to tournament on View Tournament click', async () => {
     const mockResponse: ImportTournamentResponse = {
-      tournament: {
+      tournament: createMockTournament({
         id: 'tour-123',
         externalId: 'mp-12345',
-        name: 'Test Tournament',
-        date: '2024-01-15T00:00:00.000Z',
-        location: null,
-        eventBooster: 'NONE',
-        tgpConfig: null,
-        allowsOptOut: false,
         firstPlaceValue: 50,
         baseValue: 25,
         tgp: 50,
         tvaRating: 5,
         tvaRanking: 8,
         totalTVA: 13,
-        eventBoosterMultiplier: 1.0,
-        createdAt: '2024-01-15T00:00:00.000Z',
-        updatedAt: '2024-01-15T00:00:00.000Z',
-      },
+      }),
       playersCreated: 1,
       playersUpdated: 2,
       resultsCount: 3,
@@ -334,25 +274,16 @@ describe('ImportMatchplayPage', () => {
 
   it('resets form on Import Another click', async () => {
     const mockResponse: ImportTournamentResponse = {
-      tournament: {
+      tournament: createMockTournament({
         id: 'tour-123',
         externalId: 'mp-12345',
-        name: 'Test Tournament',
-        date: '2024-01-15T00:00:00.000Z',
-        location: null,
-        eventBooster: 'NONE',
-        tgpConfig: null,
-        allowsOptOut: false,
         firstPlaceValue: 50,
         baseValue: 25,
         tgp: 50,
         tvaRating: 5,
         tvaRanking: 8,
         totalTVA: 13,
-        eventBoosterMultiplier: 1.0,
-        createdAt: '2024-01-15T00:00:00.000Z',
-        updatedAt: '2024-01-15T00:00:00.000Z',
-      },
+      }),
       playersCreated: 1,
       playersUpdated: 2,
       resultsCount: 3,

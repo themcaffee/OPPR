@@ -20,7 +20,7 @@ interface SearchOptions {
 interface CreateOptions {
   name?: string;
   date?: string;
-  location?: string;
+  locationId?: string;
   eventBooster?: string;
   externalId?: string;
 }
@@ -28,7 +28,7 @@ interface CreateOptions {
 interface UpdateOptions {
   name?: string;
   date?: string;
-  location?: string;
+  locationId?: string;
   eventBooster?: string;
 }
 
@@ -114,7 +114,7 @@ export function registerTournamentCommands(program: Command): void {
     .description('Create a new tournament')
     .option('--name <name>', 'Tournament name')
     .option('--date <date>', 'Tournament date (ISO format)')
-    .option('--location <location>', 'Tournament location')
+    .option('--location-id <id>', 'Location ID')
     .option('--event-booster <type>', 'Event booster type (NONE, CERTIFIED, CERTIFIED_PLUS, CHAMPIONSHIP_SERIES, MAJOR)')
     .option('--external-id <id>', 'External ID')
     .action(
@@ -131,7 +131,7 @@ export function registerTournamentCommands(program: Command): void {
         const tournament = await client.tournaments.create({
           name: options.name,
           date: options.date,
-          location: options.location,
+          locationId: options.locationId,
           eventBooster: options.eventBooster as EventBoosterType,
           externalId: options.externalId,
         });
@@ -147,7 +147,7 @@ export function registerTournamentCommands(program: Command): void {
     .description('Update a tournament')
     .option('--name <name>', 'Tournament name')
     .option('--date <date>', 'Tournament date (ISO format)')
-    .option('--location <location>', 'Tournament location')
+    .option('--location-id <id>', 'Location ID')
     .option('--event-booster <type>', 'Event booster type')
     .action(
       wrapCommand(async (id: string, options: UpdateOptions, cmd: Command) => {
@@ -158,7 +158,7 @@ export function registerTournamentCommands(program: Command): void {
         const tournament = await client.tournaments.update(id, {
           name: options.name,
           date: options.date,
-          location: options.location,
+          locationId: options.locationId,
           eventBooster: options.eventBooster as EventBoosterType,
         });
         spinner.stop();

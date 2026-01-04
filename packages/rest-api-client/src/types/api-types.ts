@@ -165,9 +165,51 @@ export interface PlayerResult {
     id: string;
     name: string;
     date: string;
-    location: string | null;
+    locationId: string | null;
+    location?: Location | null;
     eventBooster: EventBoosterType;
   };
+}
+
+// ==================== Locations ====================
+
+export interface Location {
+  id: string;
+  externalId: string | null;
+  name: string;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  country: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateLocationRequest {
+  externalId?: string;
+  name: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+}
+
+export interface UpdateLocationRequest {
+  name?: string;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+  country?: string | null;
+}
+
+export interface LocationListParams extends PaginationParams {
+  sortBy?: 'name' | 'city' | 'createdAt';
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface LocationSearchParams {
+  q: string;
+  limit?: number;
 }
 
 // ==================== Tournaments ====================
@@ -183,8 +225,15 @@ export interface Tournament {
   id: string;
   externalId: string | null;
   name: string;
-  location: string | null;
+  description: string | null;
   date: string;
+  locationId: string | null;
+  location?: Location | null;
+  organizerId: string | null;
+  organizer?: {
+    id: string;
+    name: string | null;
+  } | null;
   tgpConfig: Record<string, unknown> | null;
   eventBooster: EventBoosterType;
   allowsOptOut: boolean;
@@ -203,7 +252,9 @@ export interface CreateTournamentRequest {
   name: string;
   date: string;
   externalId?: string;
-  location?: string;
+  description?: string;
+  locationId?: string;
+  organizerId?: string;
   tgpConfig?: Record<string, unknown>;
   eventBooster?: EventBoosterType;
   allowsOptOut?: boolean;
@@ -219,7 +270,9 @@ export interface CreateTournamentRequest {
 export interface UpdateTournamentRequest {
   name?: string;
   date?: string;
-  location?: string;
+  description?: string | null;
+  locationId?: string | null;
+  organizerId?: string | null;
   tgpConfig?: Record<string, unknown>;
   eventBooster?: EventBoosterType;
   allowsOptOut?: boolean;
@@ -301,7 +354,8 @@ export interface ResultWithRelations extends Result {
     id: string;
     name: string;
     date: string;
-    location: string | null;
+    locationId: string | null;
+    location?: Location | null;
     eventBooster: EventBoosterType;
   };
 }

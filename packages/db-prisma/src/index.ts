@@ -84,5 +84,18 @@ export {
   linkPlayerToUser,
 } from './users.js';
 
+// Export location functions
+export {
+  createLocation,
+  findLocationById,
+  findLocationByExternalId,
+  findLocations,
+  searchLocations,
+  updateLocation,
+  deleteLocation,
+  countLocations,
+  getLocationWithTournaments,
+} from './locations.js';
+
 // Export all types
 export * from './types.js';

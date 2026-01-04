@@ -219,8 +219,8 @@ export default function LandingPage() {
                         >
                           {tournament.name}
                         </Link>
-                        {tournament.location && (
-                          <p className="text-xs text-gray-500">{tournament.location}</p>
+                        {tournament.location?.name && (
+                          <p className="text-xs text-gray-500">{tournament.location.name}</p>
                         )}
                         {boosterLabel && (
                           <span className="inline-block mt-1 px-1.5 py-0.5 text-xs bg-blue-100 text-blue-700 rounded">

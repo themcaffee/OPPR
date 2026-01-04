@@ -27,6 +27,7 @@ import { ResultsResource } from './resources/results.js';
 import { StatsResource } from './resources/stats.js';
 import { ImportResource } from './resources/import.js';
 import { UsersResource } from './resources/users.js';
+import { LocationsResource } from './resources/locations.js';
 
 const DEFAULT_BASE_URL = '/api/v1';
 const DEFAULT_TIMEOUT = 30000;
@@ -421,5 +422,12 @@ export class OpprsClient {
    */
   get users(): UsersResource {
     return new UsersResource(this.request.bind(this), this.buildQueryString.bind(this));
+  }
+
+  /**
+   * Locations resource
+   */
+  get locations(): LocationsResource {
+    return new LocationsResource(this.request.bind(this), this.buildQueryString.bind(this));
   }
 }
