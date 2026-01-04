@@ -13,28 +13,22 @@ describe('AdminSidebar', () => {
     mockPathname = '/admin/tournaments';
   });
 
-  it('renders Players link', () => {
-    render(<AdminSidebar />);
-
-    expect(screen.getByRole('link', { name: 'Players' })).toBeInTheDocument();
-  });
-
   it('renders Tournaments link', () => {
     render(<AdminSidebar />);
 
     expect(screen.getByRole('link', { name: 'Tournaments' })).toBeInTheDocument();
   });
 
+  it('renders Players link', () => {
+    render(<AdminSidebar />);
+
+    expect(screen.getByRole('link', { name: 'Players' })).toBeInTheDocument();
+  });
+
   it('renders Users link', () => {
     render(<AdminSidebar />);
 
     expect(screen.getByRole('link', { name: 'Users' })).toBeInTheDocument();
-  });
-
-  it('has correct href for Players link', () => {
-    render(<AdminSidebar />);
-
-    expect(screen.getByRole('link', { name: 'Players' })).toHaveAttribute('href', '/admin/players');
   });
 
   it('has correct href for Tournaments link', () => {
@@ -46,10 +40,32 @@ describe('AdminSidebar', () => {
     );
   });
 
+  it('has correct href for Players link', () => {
+    render(<AdminSidebar />);
+
+    expect(screen.getByRole('link', { name: 'Players' })).toHaveAttribute('href', '/admin/players');
+  });
+
   it('has correct href for Users link', () => {
     render(<AdminSidebar />);
 
     expect(screen.getByRole('link', { name: 'Users' })).toHaveAttribute('href', '/admin/users');
+  });
+
+  it('highlights Tournaments when on /admin/tournaments', () => {
+    mockPathname = '/admin/tournaments';
+    render(<AdminSidebar />);
+
+    const tournamentsLink = screen.getByRole('link', { name: 'Tournaments' });
+    expect(tournamentsLink).toHaveClass('bg-blue-600');
+  });
+
+  it('highlights Tournaments when on /admin/tournaments/123', () => {
+    mockPathname = '/admin/tournaments/123';
+    render(<AdminSidebar />);
+
+    const tournamentsLink = screen.getByRole('link', { name: 'Tournaments' });
+    expect(tournamentsLink).toHaveClass('bg-blue-600');
   });
 
   it('highlights Players when on /admin/players', () => {
@@ -68,12 +84,12 @@ describe('AdminSidebar', () => {
     expect(playersLink).toHaveClass('bg-blue-600');
   });
 
-  it('highlights Tournaments when on /admin/tournaments', () => {
-    mockPathname = '/admin/tournaments';
+  it('highlights Users when on /admin/users', () => {
+    mockPathname = '/admin/users';
     render(<AdminSidebar />);
 
-    const tournamentsLink = screen.getByRole('link', { name: 'Tournaments' });
-    expect(tournamentsLink).toHaveClass('bg-blue-600');
+    const usersLink = screen.getByRole('link', { name: 'Users' });
+    expect(usersLink).toHaveClass('bg-blue-600');
   });
 
   it('highlights Users when on /admin/users/edit/456', () => {
