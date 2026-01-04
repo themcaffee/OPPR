@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 
-let mockPathname = '/admin';
+let mockPathname = '/admin/tournaments';
 
 vi.mock('next/navigation', () => ({
   usePathname: () => mockPathname,
@@ -10,13 +10,7 @@ vi.mock('next/navigation', () => ({
 
 describe('AdminSidebar', () => {
   beforeEach(() => {
-    mockPathname = '/admin';
-  });
-
-  it('renders Dashboard link', () => {
-    render(<AdminSidebar />);
-
-    expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();
+    mockPathname = '/admin/tournaments';
   });
 
   it('renders Players link', () => {
@@ -35,12 +29,6 @@ describe('AdminSidebar', () => {
     render(<AdminSidebar />);
 
     expect(screen.getByRole('link', { name: 'Users' })).toBeInTheDocument();
-  });
-
-  it('has correct href for Dashboard link', () => {
-    render(<AdminSidebar />);
-
-    expect(screen.getByRole('link', { name: 'Dashboard' })).toHaveAttribute('href', '/admin');
   });
 
   it('has correct href for Players link', () => {
@@ -62,14 +50,6 @@ describe('AdminSidebar', () => {
     render(<AdminSidebar />);
 
     expect(screen.getByRole('link', { name: 'Users' })).toHaveAttribute('href', '/admin/users');
-  });
-
-  it('highlights Dashboard when on /admin', () => {
-    mockPathname = '/admin';
-    render(<AdminSidebar />);
-
-    const dashboardLink = screen.getByRole('link', { name: 'Dashboard' });
-    expect(dashboardLink).toHaveClass('bg-blue-600');
   });
 
   it('highlights Players when on /admin/players', () => {
@@ -104,16 +84,8 @@ describe('AdminSidebar', () => {
     expect(usersLink).toHaveClass('bg-blue-600');
   });
 
-  it('does not highlight Dashboard for subpaths like /admin/players', () => {
-    mockPathname = '/admin/players';
-    render(<AdminSidebar />);
-
-    const dashboardLink = screen.getByRole('link', { name: 'Dashboard' });
-    expect(dashboardLink).not.toHaveClass('bg-blue-600');
-  });
-
   it('applies inactive styling to non-active links', () => {
-    mockPathname = '/admin';
+    mockPathname = '/admin/tournaments';
     render(<AdminSidebar />);
 
     const playersLink = screen.getByRole('link', { name: 'Players' });
