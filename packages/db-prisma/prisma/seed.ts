@@ -13,6 +13,7 @@ async function main() {
   const playerData = [
     {
       externalId: 'player-1',
+      playerNumber: 10001,
       name: 'Alice Champion',
       rating: 1850,
       ratingDeviation: 50,
@@ -22,6 +23,7 @@ async function main() {
     },
     {
       externalId: 'player-2',
+      playerNumber: 10002,
       name: 'Bob Wizard',
       rating: 1750,
       ratingDeviation: 60,
@@ -31,6 +33,7 @@ async function main() {
     },
     {
       externalId: 'player-3',
+      playerNumber: 10003,
       name: 'Charlie Flipper',
       rating: 1650,
       ratingDeviation: 75,
@@ -40,6 +43,7 @@ async function main() {
     },
     {
       externalId: 'player-4',
+      playerNumber: 10004,
       name: 'Diana Tilt',
       rating: 1550,
       ratingDeviation: 100,
@@ -49,6 +53,7 @@ async function main() {
     },
     {
       externalId: 'player-5',
+      playerNumber: 10005,
       name: 'Eve Plunger',
       rating: 1300,
       ratingDeviation: 150,
