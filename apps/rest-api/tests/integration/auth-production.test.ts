@@ -73,6 +73,7 @@ describe('Auth endpoints (production mode)', () => {
           email: 'newuser@example.com',
           password: 'password123',
           name: 'New User',
+          acceptPolicies: true,
         },
       });
 
@@ -101,6 +102,7 @@ describe('Auth endpoints (production mode)', () => {
           email: testUserEmail, // Already exists
           password: 'password123',
           name: 'Duplicate User',
+          acceptPolicies: true,
         },
       });
 

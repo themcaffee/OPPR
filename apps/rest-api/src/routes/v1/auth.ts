@@ -30,6 +30,7 @@ interface RegisterBody {
   email: string;
   password: string;
   name: string;
+  acceptPolicies: boolean;
 }
 
 interface RefreshPayload {
@@ -104,7 +105,12 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
       },
     },
     async (request, reply) => {
-      const { email, password, name } = request.body;
+      const { email, password, name, acceptPolicies } = request.body;
+
+      // Validate policy acceptance
+      if (!acceptPolicies) {
+        throw new BadRequestError('You must accept the Terms of Service, Privacy Policy, and Code of Conduct');
+      }
 
       // Check if email already exists
       const existingUser = await findUserByEmail(email);
@@ -115,9 +121,18 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
       // Hash password
       const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
 
+      // Set acceptance timestamps
+      const acceptedAt = new Date();
+
       // Create user with linked player
       const user = await createUserWithPlayer(
-        { email, passwordHash },
+        {
+          email,
+          passwordHash,
+          tosAcceptedAt: acceptedAt,
+          privacyPolicyAcceptedAt: acceptedAt,
+          codeOfConductAcceptedAt: acceptedAt,
+        },
         { name }
       );
 

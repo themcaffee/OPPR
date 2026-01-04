@@ -10,6 +10,9 @@ export interface CreateUserInput {
   passwordHash: string;
   playerId?: string;
   role?: 'USER' | 'ADMIN';
+  tosAcceptedAt?: Date;
+  privacyPolicyAcceptedAt?: Date;
+  codeOfConductAcceptedAt?: Date;
 }
 
 /**
@@ -32,6 +35,9 @@ export interface UserWithPlayer {
   role: 'USER' | 'ADMIN';
   createdAt: Date;
   updatedAt: Date;
+  tosAcceptedAt: Date | null;
+  privacyPolicyAcceptedAt: Date | null;
+  codeOfConductAcceptedAt: Date | null;
   player: {
     id: string;
     playerNumber: number;
