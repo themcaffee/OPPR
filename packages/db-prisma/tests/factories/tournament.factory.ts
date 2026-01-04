@@ -12,7 +12,6 @@ export function createTournamentInput(
   return {
     externalId: `ext-tournament-${id}`,
     name: `Test Tournament ${id}`,
-    location: `Test Location ${id}`,
     date: new Date(),
     eventBooster: 'NONE' as EventBoosterType,
     ...overrides,

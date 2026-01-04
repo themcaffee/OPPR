@@ -415,12 +415,10 @@ describe('tournaments', () => {
 
       const updated = await updateTournament(tournament.id, {
         name: 'Updated Name',
-        location: 'New Location',
         baseValue: 15,
       });
 
       expect(updated.name).toBe('Updated Name');
-      expect(updated.location).toBe('New Location');
       expect(updated.baseValue).toBe(15);
     });
 
@@ -560,16 +558,6 @@ describe('tournaments', () => {
 
       expect(results).toHaveLength(1);
       expect(results[0].name).toBe('Pinball Championship');
-    });
-
-    it('should find tournaments by location (case-insensitive)', async () => {
-      await createTournament(createTournamentInput({ location: 'New York' }));
-      await createTournament(createTournamentInput({ location: 'Los Angeles' }));
-
-      const results = await searchTournaments('NEW YORK');
-
-      expect(results).toHaveLength(1);
-      expect(results[0].location).toBe('New York');
     });
 
     it('should match partial strings', async () => {

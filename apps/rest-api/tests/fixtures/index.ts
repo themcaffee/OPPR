@@ -38,7 +38,6 @@ export function createTournamentFixture(overrides: Record<string, unknown> = {})
   return {
     externalId: `ext-tournament-${id}`,
     name: `Test Tournament ${id}`,
-    location: 'Test City',
     date: new Date().toISOString(),
     eventBooster: 'NONE',
     allowsOptOut: false,

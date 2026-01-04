@@ -145,8 +145,8 @@ export default function TournamentDetailPage() {
       {/* Tournament Info */}
       <Card className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">{tournament.name}</h1>
-        {tournament.location && (
-          <p className="text-gray-600 mb-4">{tournament.location}</p>
+        {tournament.location?.name && (
+          <p className="text-gray-600 mb-4">{tournament.location.name}</p>
         )}
         <div className="text-sm text-gray-500 mb-6">{formatDate(tournament.date)}</div>
 

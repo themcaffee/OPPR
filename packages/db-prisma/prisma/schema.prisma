@@ -33,8 +33,9 @@ model Player {
   lastEventDate    DateTime?
 
   // Relations
-  tournamentResults TournamentResult[]
-  user              User?
+  tournamentResults    TournamentResult[]
+  user                 User?
+  organizedTournaments Tournament[]       @relation("OrganizedTournaments")
 
   @@index([externalId])
   @@index([playerNumber])
@@ -51,8 +52,16 @@ model Tournament {
   // Tournament identification
   externalId       String?  @unique // External ID from OPPR or other systems
   name             String
-  location         String?
+  description      String?  @db.VarChar(2000)
   date             DateTime
+
+  // Location relation
+  locationId       String?
+  location         Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+
+  // Organizer relation
+  organizerId      String?
+  organizer        Player?   @relation("OrganizedTournaments", fields: [organizerId], references: [id], onDelete: SetNull)
 
   // Tournament configuration (stored as JSON)
   // Contains TGPConfig structure from OPPR
@@ -77,6 +86,8 @@ model Tournament {
   @@index([date])
   @@index([eventBooster])
   @@index([externalId])
+  @@index([locationId])
+  @@index([organizerId])
 }
 
 // Tournament Result - junction table linking players to tournaments
@@ -150,4 +161,25 @@ model User {
   refreshTokenHash String?
 
   @@index([email])
+}
+
+// Location model - represents a venue where tournaments are held
+model Location {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  externalId    String?  @unique
+  name          String
+  address       String?
+  city          String?
+  state         String?
+  country       String?
+
+  // Relations
+  tournaments   Tournament[]
+
+  @@index([externalId])
+  @@index([name])
+  @@index([city])
 }

@@ -1,19 +1,17 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ActivityFeed } from '@/components/dashboard/ActivityFeed';
+import { createMockTournament } from '@tests/mocks/data-factories';
 import type { Tournament } from '@opprs/rest-api-client';
 
 describe('ActivityFeed', () => {
   const mockTournaments: Tournament[] = [
-    {
+    createMockTournament({
       id: 't1',
-      externalId: null,
       name: 'Winter Classic',
-      location: 'Portland, OR',
+      location: { id: 'loc-1', externalId: null, name: 'Portland, OR', address: null, city: null, state: null, country: null, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
       date: '2024-12-20',
-      tgpConfig: null,
       eventBooster: 'CERTIFIED',
-      allowsOptOut: false,
       baseValue: 20,
       tvaRating: 10,
       tvaRanking: 15,
@@ -21,18 +19,12 @@ describe('ActivityFeed', () => {
       tgp: 100,
       eventBoosterMultiplier: 1.25,
       firstPlaceValue: 50,
-      createdAt: '2024-01-01',
-      updatedAt: '2024-01-01',
-    },
-    {
+    }),
+    createMockTournament({
       id: 't2',
-      externalId: null,
       name: 'Holiday Bash',
-      location: null,
       date: '2024-12-25',
-      tgpConfig: null,
       eventBooster: 'NONE',
-      allowsOptOut: false,
       baseValue: 15,
       tvaRating: 5,
       tvaRanking: 10,
@@ -40,9 +32,7 @@ describe('ActivityFeed', () => {
       tgp: 80,
       eventBoosterMultiplier: 1.0,
       firstPlaceValue: 30,
-      createdAt: '2024-01-01',
-      updatedAt: '2024-01-01',
-    },
+    }),
   ];
 
   it('renders the title', () => {
