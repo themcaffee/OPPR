@@ -12,7 +12,7 @@ permissions:
 jobs:
   canary:
     runs-on: ubuntu-latest
-    # Skip if this is a release-please commit
+    # Skip if this is a release commit (from changesets Version Packages PR)
     if: "${{ !startsWith(github.event.head_commit.message, 'chore: release') }}"
 
     steps:

@@ -348,18 +348,32 @@ Before submitting:
 
 ## Release Process
 
-Releases are automated using [release-please](https://github.com/googleapis/release-please):
+This project uses [Changesets](https://github.com/changesets/changesets) for versioning and changelog generation.
 
-1. Commits to `main` are analyzed for conventional commit messages
-2. release-please automatically creates/updates a Release PR with:
-   - Version bumps based on commit types
+### Adding a Changeset
+
+When making user-facing changes, add a changeset:
+
+```bash
+pnpm changeset
+```
+
+This launches an interactive prompt where you:
+1. Select affected packages
+2. Choose bump type (patch/minor/major)
+3. Write a summary of the changes
+
+This creates a markdown file in `.changeset/` that should be committed with your PR.
+
+### How Releases Work
+
+1. PRs with changesets merge to `main`
+2. CI automatically creates/updates a "Version Packages" PR with:
+   - Version bumps based on changesets
    - Updated CHANGELOGs
-3. When the Release PR is merged:
-   - A new git tag is created
-   - A GitHub Release is published
+3. When the "Version Packages" PR is merged:
+   - Git tags are created
    - Packages are automatically published to npm
-
-You don't need to manually update version numbers or CHANGELOGs - just write good commit messages!
 
 ## Questions?
 
