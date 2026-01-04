@@ -1,0 +1,10 @@
+{
+  "name": "frontend-minimal",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Minimal static HTML5 frontend for OPPRS",
+  "scripts": {
+    "dev": "npx serve public -l 3001",
+    "preview": "npx serve public -l 3001"
+  }
+}

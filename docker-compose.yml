@@ -68,6 +68,18 @@ services:
       - oppr-network
 
   # ==========================================================================
+  # Frontend Minimal (Static HTML5)
+  # ==========================================================================
+  frontend-minimal:
+    build:
+      context: .
+      dockerfile: apps/frontend-minimal/Dockerfile
+    container_name: oppr-frontend-minimal
+    restart: unless-stopped
+    networks:
+      - oppr-network
+
+  # ==========================================================================
   # Caddy Reverse Proxy
   # ==========================================================================
   caddy:
@@ -76,6 +88,7 @@ services:
     restart: unless-stopped
     depends_on:
       - frontend-next
+      - frontend-minimal
       - rest-api
     ports:
       - "80:80"

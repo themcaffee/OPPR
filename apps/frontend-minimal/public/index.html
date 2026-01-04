@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OPPRS - Open Pinball Player Ranking System</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>OPPRS</h1>
+    <p>Open Pinball Player Ranking System</p>
+    <nav>
+      <button id="nav-rankings" class="nav-btn active">Player Rankings</button>
+      <button id="nav-tournaments" class="nav-btn">Tournaments</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Player Rankings View -->
+    <section id="rankings-view" class="view">
+      <h2>Top Player Rankings</h2>
+      <div id="rankings-loading" class="loading">Loading...</div>
+      <div id="rankings-error" class="error hidden"></div>
+      <table id="rankings-table" class="data-table hidden">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Rating</th>
+            <th>Events</th>
+          </tr>
+        </thead>
+        <tbody id="rankings-body"></tbody>
+      </table>
+      <div id="rankings-pagination" class="pagination hidden"></div>
+    </section>
+
+    <!-- Tournaments View -->
+    <section id="tournaments-view" class="view hidden">
+      <h2>Tournaments</h2>
+      <div id="tournaments-loading" class="loading">Loading...</div>
+      <div id="tournaments-error" class="error hidden"></div>
+      <table id="tournaments-table" class="data-table hidden">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Location</th>
+            <th>Type</th>
+            <th>First Place Value</th>
+          </tr>
+        </thead>
+        <tbody id="tournaments-body"></tbody>
+      </table>
+      <div id="tournaments-pagination" class="pagination hidden"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Powered by OPPRS</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
