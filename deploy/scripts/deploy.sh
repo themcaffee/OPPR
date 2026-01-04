@@ -233,6 +233,17 @@ log_success "===================================================================
 log_success "Deployment completed successfully!"
 log_success "==================================================================="
 log_info "Services are now running with image tag: $IMAGE_TAG"
+
+# Clean up unused Docker resources to prevent disk space issues
+log_info "Cleaning up unused Docker resources..."
+remote_exec "docker image prune -af --filter 'until=24h'" || true
+remote_exec "docker container prune -f" || true
+remote_exec "docker network prune -f" || true
+
+# Show disk usage after cleanup
+log_info "Disk usage after cleanup:"
+remote_exec "df -h / | tail -1"
+
 log_info ""
 log_info "View logs:"
 log_info "  ssh -i $SSH_KEY $SSH_USER@$REMOTE_HOST 'cd $DEPLOY_DIR && docker compose logs -f'"

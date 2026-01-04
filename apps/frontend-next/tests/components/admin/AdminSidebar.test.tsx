@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 
-let mockPathname = '/admin';
+let mockPathname = '/admin/tournaments';
 
 vi.mock('next/navigation', () => ({
   usePathname: () => mockPathname,
@@ -10,7 +10,7 @@ vi.mock('next/navigation', () => ({
 
 describe('AdminSidebar', () => {
   beforeEach(() => {
-    mockPathname = '/admin';
+    mockPathname = '/admin/tournaments';
   });
 
   it('renders Tournaments link', () => {
@@ -60,6 +60,14 @@ describe('AdminSidebar', () => {
     expect(tournamentsLink).toHaveClass('bg-blue-600');
   });
 
+  it('highlights Tournaments when on /admin/tournaments/123', () => {
+    mockPathname = '/admin/tournaments/123';
+    render(<AdminSidebar />);
+
+    const tournamentsLink = screen.getByRole('link', { name: 'Tournaments' });
+    expect(tournamentsLink).toHaveClass('bg-blue-600');
+  });
+
   it('highlights Players when on /admin/players', () => {
     mockPathname = '/admin/players';
     render(<AdminSidebar />);
@@ -74,6 +82,14 @@ describe('AdminSidebar', () => {
 
     const playersLink = screen.getByRole('link', { name: 'Players' });
     expect(playersLink).toHaveClass('bg-blue-600');
+  });
+
+  it('highlights Users when on /admin/users', () => {
+    mockPathname = '/admin/users';
+    render(<AdminSidebar />);
+
+    const usersLink = screen.getByRole('link', { name: 'Users' });
+    expect(usersLink).toHaveClass('bg-blue-600');
   });
 
   it('highlights Users when on /admin/users/edit/456', () => {

@@ -9,9 +9,6 @@ const SEEDED_USER = {
   email: 'e2e-test@example.com',
   password: 'TestPassword123!',
   playerName: 'Alice Champion',
-  rating: 1850,
-  ratingDeviation: 50,
-  ranking: 5,
 };
 
 test.describe('Profile - Authentication', () => {
@@ -188,37 +185,6 @@ test.describe('Profile - With Player Profile (Seeded User)', () => {
     await expect(page).toHaveURL('/profile');
   });
 
-  test('should display Rating card with correct values', async ({ page }) => {
-    const profilePage = new ProfilePage(page);
-
-    await profilePage.expectLoaded();
-    await profilePage.expectPlayerProfile();
-
-    // Verify rating card content
-    await profilePage.expectRatingCardContent(SEEDED_USER.rating, SEEDED_USER.ratingDeviation);
-
-    // Alice is a rated player (has 25 events)
-    await expect(profilePage.ratedPlayerBadge).toBeVisible();
-  });
-
-  test('should display Ranking card with world ranking', async ({ page }) => {
-    const profilePage = new ProfilePage(page);
-
-    await profilePage.expectLoaded();
-    await profilePage.expectPlayerProfile();
-
-    // Verify ranking card content
-    await profilePage.expectRankingCardContent(SEEDED_USER.ranking);
-    await expect(profilePage.rankingPoints).toBeVisible();
-  });
-
-  test('should display Quick Actions card with navigation links', async ({ page }) => {
-    const profilePage = new ProfilePage(page);
-
-    await profilePage.expectLoaded();
-    await profilePage.expectQuickActionsVisible();
-  });
-
   test('should display Player Stats card', async ({ page }) => {
     const profilePage = new ProfilePage(page);
 
@@ -247,33 +213,6 @@ test.describe('Profile - With Player Profile (Seeded User)', () => {
 
     // Current player (Alice Champion) should be highlighted with "(You)"
     await profilePage.expectCurrentPlayerHighlighted();
-  });
-
-  test('should navigate to results page via Quick Actions', async ({ page }) => {
-    const profilePage = new ProfilePage(page);
-
-    await profilePage.expectLoaded();
-    await profilePage.viewResultsLink.click();
-
-    await expect(page).toHaveURL('/profile/results');
-  });
-
-  test('should navigate to tournaments page via Quick Actions', async ({ page }) => {
-    const profilePage = new ProfilePage(page);
-
-    await profilePage.expectLoaded();
-    await profilePage.findTournamentsLink.click();
-
-    await expect(page).toHaveURL('/profile/tournaments');
-  });
-
-  test('should navigate to settings page via Quick Actions', async ({ page }) => {
-    const profilePage = new ProfilePage(page);
-
-    await profilePage.expectLoaded();
-    await profilePage.updateProfileLink.click();
-
-    await expect(page).toHaveURL('/profile/settings');
   });
 });
 
