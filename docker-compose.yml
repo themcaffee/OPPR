@@ -45,6 +45,10 @@ services:
       LOG_LEVEL: ${LOG_LEVEL:-info}
       RUN_MIGRATIONS: ${RUN_MIGRATIONS:-true}
       SEED_DATABASE: ${SEED_DATABASE:-false}
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-}
+      SEED_TEST_EMAIL: ${SEED_TEST_EMAIL:-}
+      SEED_TEST_PASSWORD: ${SEED_TEST_PASSWORD:-}
       AUTH_DEV_MODE: ${AUTH_DEV_MODE:-false}
     networks:
       - oppr-network
@@ -119,6 +123,10 @@ services:
       DATABASE_URL: postgresql://oppr:${POSTGRES_PASSWORD:-oppr_dev_password}@postgres:5432/oppr_db?schema=public
       RUN_MIGRATIONS: "true"
       SEED_DATABASE: "true"
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-}
+      SEED_TEST_EMAIL: ${SEED_TEST_EMAIL:-}
+      SEED_TEST_PASSWORD: ${SEED_TEST_PASSWORD:-}
     command: echo "Seeding complete"
     restart: "no"
     networks:
