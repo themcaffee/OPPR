@@ -86,7 +86,7 @@ export function createMockPaginatedResponse<T>(
 ) {
   return {
     data,
-    meta: {
+    pagination: {
       page,
       limit: 20,
       total,
