@@ -1,7 +1,6 @@
 /*
   Warnings:
 
-  - You are about to drop the column `email` on the `Player` table. All the data in the column will be lost.
   - You are about to drop the `TournamentResult` table. If the table is not empty, all the data it contains will be lost.
 
 */
@@ -13,15 +12,6 @@ ALTER TABLE "TournamentResult" DROP CONSTRAINT "TournamentResult_playerId_fkey";
 
 -- DropForeignKey
 ALTER TABLE "TournamentResult" DROP CONSTRAINT "TournamentResult_tournamentId_fkey";
-
--- DropIndex
-DROP INDEX "Player_email_idx";
-
--- DropIndex
-DROP INDEX "Player_email_key";
-
--- AlterTable
-ALTER TABLE "Player" DROP COLUMN "email";
 
 -- DropTable
 DROP TABLE "TournamentResult";
