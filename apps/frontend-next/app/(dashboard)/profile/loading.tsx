@@ -26,7 +26,7 @@ function SkeletonTable() {
   );
 }
 
-export default function DashboardLoading() {
+export default function ProfileLoading() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header skeleton */}

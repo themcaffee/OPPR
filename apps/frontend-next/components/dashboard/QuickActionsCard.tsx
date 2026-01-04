@@ -7,19 +7,19 @@ export function QuickActionsCard() {
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
       <div className="space-y-2">
         <Link
-          href="/dashboard/results"
+          href="/profile/results"
           className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
         >
           View My Results
         </Link>
         <Link
-          href="/dashboard/tournaments"
+          href="/profile/tournaments"
           className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
         >
           Find Tournaments
         </Link>
         <Link
-          href="/dashboard/profile"
+          href="/profile/settings"
           className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
         >
           Update Profile

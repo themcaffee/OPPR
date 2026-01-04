@@ -14,7 +14,7 @@ describe('QuickActionsCard', () => {
 
     const link = screen.getByRole('link', { name: 'View My Results' });
     expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute('href', '/dashboard/results');
+    expect(link).toHaveAttribute('href', '/profile/results');
   });
 
   it('renders Find Tournaments link', () => {
@@ -22,7 +22,7 @@ describe('QuickActionsCard', () => {
 
     const link = screen.getByRole('link', { name: 'Find Tournaments' });
     expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute('href', '/dashboard/tournaments');
+    expect(link).toHaveAttribute('href', '/profile/tournaments');
   });
 
   it('renders Update Profile link', () => {
@@ -30,6 +30,6 @@ describe('QuickActionsCard', () => {
 
     const link = screen.getByRole('link', { name: 'Update Profile' });
     expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute('href', '/dashboard/profile');
+    expect(link).toHaveAttribute('href', '/profile/settings');
   });
 });

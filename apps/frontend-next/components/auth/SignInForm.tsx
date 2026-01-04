@@ -20,11 +20,11 @@ export function SignInForm() {
     // Security: Only allow relative paths starting with /
     // Reject protocol-relative URLs (//evil.com) and absolute URLs
     if (redirect && redirect.startsWith('/') && !redirect.startsWith('//')) {
-      // Redirect "/" to "/dashboard" directly since "/" just redirects there anyway
+      // Redirect "/" to "/profile" directly since "/" just redirects there anyway
       // This avoids a race condition with middleware cookie detection
-      return redirect === '/' ? '/dashboard' : redirect;
+      return redirect === '/' ? '/profile' : redirect;
     }
-    return '/dashboard';
+    return '/profile';
   };
 
   const {

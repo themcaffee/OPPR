@@ -27,13 +27,15 @@ test.describe('Navigation', () => {
       await expect(page.getByRole('link', { name: 'Register' })).toBeVisible();
     });
 
-    test('should not display Dashboard or Admin links when not authenticated', async ({ page }) => {
+    test('should not display profile dropdown or Admin links when not authenticated', async ({
+      page,
+    }) => {
       await page.goto('/');
 
       // Wait for the page to load and auth check to complete
       await expect(page.getByRole('link', { name: 'Sign in' })).toBeVisible();
 
-      await expect(page.getByRole('link', { name: 'Dashboard' })).not.toBeVisible();
+      await expect(page.getByRole('link', { name: 'Profile' })).not.toBeVisible();
       await expect(page.getByRole('link', { name: 'Admin' })).not.toBeVisible();
     });
 
@@ -75,14 +77,28 @@ test.describe('Navigation', () => {
       await signInPage.signIn('e2e-test@example.com', 'TestPassword123!');
     });
 
-    test('should display Dashboard link when authenticated', async ({ page }) => {
+    test('should display profile dropdown when authenticated', async ({ page }) => {
       await page.goto('/');
 
-      await expect(page.getByRole('link', { name: 'Dashboard' })).toBeVisible();
+      // Profile dropdown button should be visible (shows user name or email)
+      await expect(page.getByRole('button', { name: /e2e-test/i })).toBeVisible();
     });
 
-    test('should display Sign Out button when authenticated', async ({ page }) => {
+    test('should display Profile link in dropdown when clicked', async ({ page }) => {
       await page.goto('/');
+
+      // Click the profile dropdown button
+      await page.getByRole('button', { name: /e2e-test/i }).click();
+
+      // Profile link should be visible in dropdown
+      await expect(page.getByRole('link', { name: 'Profile' })).toBeVisible();
+    });
+
+    test('should display Sign Out button in dropdown when clicked', async ({ page }) => {
+      await page.goto('/');
+
+      // Click the profile dropdown button
+      await page.getByRole('button', { name: /e2e-test/i }).click();
 
       await expect(page.getByRole('button', { name: 'Sign Out' })).toBeVisible();
     });
@@ -90,27 +106,31 @@ test.describe('Navigation', () => {
     test('should not display Sign in and Register links when authenticated', async ({ page }) => {
       await page.goto('/');
 
-      // Wait for auth check to complete
-      await expect(page.getByRole('link', { name: 'Dashboard' })).toBeVisible();
+      // Wait for auth check to complete (profile dropdown is visible)
+      await expect(page.getByRole('button', { name: /e2e-test/i })).toBeVisible();
 
       await expect(page.getByRole('link', { name: 'Sign in' })).not.toBeVisible();
       await expect(page.getByRole('link', { name: 'Register' })).not.toBeVisible();
     });
 
-    test('should navigate to Dashboard page', async ({ page }) => {
+    test('should navigate to Profile page', async ({ page }) => {
       await page.goto('/');
 
-      await page.getByRole('link', { name: 'Dashboard' }).click();
+      // Click profile dropdown and then Profile link
+      await page.getByRole('button', { name: /e2e-test/i }).click();
+      await page.getByRole('link', { name: 'Profile' }).click();
 
-      await expect(page).toHaveURL('/dashboard');
+      await expect(page).toHaveURL('/profile');
     });
 
     test('should sign out when clicking Sign Out button', async ({ page }) => {
       await page.goto('/');
 
-      // Wait for Dashboard link to be visible (indicating auth state is loaded)
-      await expect(page.getByRole('link', { name: 'Dashboard' })).toBeVisible();
+      // Wait for profile dropdown to be visible (indicating auth state is loaded)
+      await expect(page.getByRole('button', { name: /e2e-test/i })).toBeVisible();
 
+      // Click profile dropdown and then Sign Out button
+      await page.getByRole('button', { name: /e2e-test/i }).click();
       await page.getByRole('button', { name: 'Sign Out' }).click();
 
       // Should redirect to sign-in page
@@ -121,16 +141,19 @@ test.describe('Navigation', () => {
   // Note: Admin navigation tests are skipped because there's no seeded admin user
   // To test admin functionality, add an admin user to the seed file
   test.describe('Admin Navigation', () => {
-    test.skip('should display Admin link for admin users', async ({ page }) => {
+    test.skip('should display Admin link in main navigation for admin users', async ({ page }) => {
       // This test requires a seeded admin user
       await page.goto('/');
-      await expect(page.getByRole('link', { name: 'Admin' })).toBeVisible();
+      // Admin link should appear in main navigation (next to Players)
+      const nav = page.locator('nav');
+      await expect(nav.getByRole('link', { name: 'Admin' })).toBeVisible();
     });
 
     test.skip('should navigate to Admin panel', async ({ page }) => {
       // This test requires a seeded admin user
       await page.goto('/');
-      await page.getByRole('link', { name: 'Admin' }).click();
+      const nav = page.locator('nav');
+      await nav.getByRole('link', { name: 'Admin' }).click();
       await expect(page).toHaveURL('/admin');
     });
   });
