@@ -90,27 +90,39 @@ async function main() {
 
   console.log(`✓ Created ${await prisma.player.count()} players`);
 
-  // Create test user for e2e tests (linked to Alice Champion)
-  console.log('Creating test user...');
-  const testPassword = 'TestPassword123!';
-  const passwordHash = await bcrypt.hash(testPassword, BCRYPT_SALT_ROUNDS);
+  // Seed users from environment variables (development only)
+  const seedAdminEmail = process.env.SEED_ADMIN_EMAIL;
+  const seedAdminPassword = process.env.SEED_ADMIN_PASSWORD;
+  const seedTestEmail = process.env.SEED_TEST_EMAIL;
+  const seedTestPassword = process.env.SEED_TEST_PASSWORD;
 
-  await prisma.user.upsert({
-    where: { email: 'e2e-test@example.com' },
-    update: {
-      passwordHash,
-      role: 'USER',
-      playerId: player1.id,
-    },
-    create: {
-      email: 'e2e-test@example.com',
-      passwordHash,
-      role: 'USER',
-      playerId: player1.id,
-    },
-  });
+  // Create admin user if credentials provided
+  if (seedAdminEmail && seedAdminPassword) {
+    console.log('Creating admin user...');
+    const adminPasswordHash = await bcrypt.hash(seedAdminPassword, BCRYPT_SALT_ROUNDS);
+    await prisma.user.upsert({
+      where: { email: seedAdminEmail },
+      update: { passwordHash: adminPasswordHash, role: 'ADMIN' },
+      create: { email: seedAdminEmail, passwordHash: adminPasswordHash, role: 'ADMIN' },
+    });
+    console.log(`✓ Created admin user (${seedAdminEmail})`);
+  } else {
+    console.log('⏭ Skipping admin user (SEED_ADMIN_EMAIL/SEED_ADMIN_PASSWORD not set)');
+  }
 
-  console.log(`✓ Created test user (e2e-test@example.com / ${testPassword})`);
+  // Create test user if credentials provided (linked to Alice Champion)
+  if (seedTestEmail && seedTestPassword) {
+    console.log('Creating test user...');
+    const testPasswordHash = await bcrypt.hash(seedTestPassword, BCRYPT_SALT_ROUNDS);
+    await prisma.user.upsert({
+      where: { email: seedTestEmail },
+      update: { passwordHash: testPasswordHash, role: 'USER', playerId: player1.id },
+      create: { email: seedTestEmail, passwordHash: testPasswordHash, role: 'USER', playerId: player1.id },
+    });
+    console.log(`✓ Created test user (${seedTestEmail}) linked to ${player1.name}`);
+  } else {
+    console.log('⏭ Skipping test user (SEED_TEST_EMAIL/SEED_TEST_PASSWORD not set)');
+  }
 
   // Create admin user
   console.log('Creating admin user...');
