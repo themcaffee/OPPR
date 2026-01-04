@@ -424,7 +424,7 @@ describe('PlayerProfilePage', () => {
       expect(screen.getByText('Failed to load player')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('← Back to players')).toBeInTheDocument();
+    expect(screen.getByText('← Back to rankings')).toBeInTheDocument();
   });
 
   it('displays Unknown Player for null name', async () => {
@@ -442,7 +442,7 @@ describe('PlayerProfilePage', () => {
     });
   });
 
-  it('renders back link to players list', async () => {
+  it('renders back link to rankings', async () => {
     const player: Player = createMockPlayer({ name: 'Test Player' });
     const stats = createMockPlayerStats();
 
@@ -456,8 +456,8 @@ describe('PlayerProfilePage', () => {
       expect(screen.getByText('Test Player')).toBeInTheDocument();
     });
 
-    const backLink = screen.getByRole('link', { name: '← Back to players' });
-    expect(backLink).toHaveAttribute('href', '/players');
+    const backLink = screen.getByRole('link', { name: '← Back to rankings' });
+    expect(backLink).toHaveAttribute('href', '/rankings');
   });
 
   it('renders tournament links in history', async () => {

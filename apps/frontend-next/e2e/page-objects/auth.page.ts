@@ -86,18 +86,20 @@ export class SignInPage {
 
 export class ProfilePage {
   readonly page: Page;
-  readonly welcomeHeading: Locator;
-  readonly goToDashboardLink: Locator;
+  readonly heading: Locator;
   readonly signOutButton: Locator;
+  readonly loadingText: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.welcomeHeading = page.getByRole('heading', { name: /welcome to opprs/i });
-    this.goToDashboardLink = page.getByRole('link', { name: /go to dashboard/i });
-    this.signOutButton = page.getByRole('button', { name: /sign out/i });
+    this.heading = page.getByRole('heading', { name: 'Profile' });
+    this.signOutButton = page.getByRole('button', { name: /sign out|logout/i });
+    this.loadingText = page.getByText('Loading profile...');
   }
 
   async expectVisible() {
-    await expect(this.welcomeHeading).toBeVisible();
+    // Wait for loading to complete
+    await expect(this.loadingText).toBeHidden({ timeout: 10000 });
+    await expect(this.heading).toBeVisible();
   }
 }

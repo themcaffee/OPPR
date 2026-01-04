@@ -13,10 +13,11 @@ vi.mock('next/navigation', () => ({
 
 // Mock the api-client
 const mockGetMe = vi.fn();
+const mockLogout = vi.fn().mockResolvedValue(undefined);
 vi.mock('@/lib/api-client', () => ({
   apiClient: {
     getMe: () => mockGetMe(),
-    logout: vi.fn().mockResolvedValue(undefined),
+    logout: () => mockLogout(),
   },
 }));
 
@@ -54,7 +55,6 @@ describe('AppHeader', () => {
         'href',
         '/tournaments'
       );
-      expect(screen.getByRole('link', { name: 'Players' })).toHaveAttribute('href', '/players');
     });
 
     it('renders Sign in and Register links', async () => {
@@ -68,14 +68,14 @@ describe('AppHeader', () => {
       expect(screen.getByRole('link', { name: 'Register' })).toHaveAttribute('href', '/register');
     });
 
-    it('does not render Dashboard, Admin, or Sign Out when not authenticated', async () => {
+    it('does not render profile dropdown, Admin, or Sign Out when not authenticated', async () => {
       render(<AppHeader />);
 
       await waitFor(() => {
         expect(screen.getByRole('link', { name: 'Sign in' })).toBeInTheDocument();
       });
 
-      expect(screen.queryByRole('link', { name: 'Dashboard' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('link', { name: 'Profile' })).not.toBeInTheDocument();
       expect(screen.queryByRole('link', { name: 'Admin' })).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Sign Out' })).not.toBeInTheDocument();
     });
@@ -94,29 +94,48 @@ describe('AppHeader', () => {
       });
     });
 
-    it('renders Dashboard link when authenticated', async () => {
+    it('renders profile dropdown with user name when authenticated', async () => {
       render(<AppHeader />);
 
       await waitFor(() => {
-        expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();
-      });
-
-      expect(screen.getByRole('link', { name: 'Dashboard' })).toHaveAttribute('href', '/dashboard');
-    });
-
-    it('renders Sign Out button when authenticated', async () => {
-      render(<AppHeader />);
-
-      await waitFor(() => {
-        expect(screen.getByRole('button', { name: 'Sign Out' })).toBeInTheDocument();
+        expect(screen.getByText('Test Player')).toBeInTheDocument();
       });
     });
 
-    it('displays welcome message with player name', async () => {
+    it('renders Profile link in dropdown when clicked', async () => {
       render(<AppHeader />);
 
       await waitFor(() => {
-        expect(screen.getByText('Welcome, Test Player!')).toBeInTheDocument();
+        expect(screen.getByText('Test Player')).toBeInTheDocument();
+      });
+
+      // Click the first profile dropdown button (desktop view)
+      const profileButtons = screen.getAllByText('Test Player');
+      fireEvent.click(profileButtons[0]);
+
+      await waitFor(() => {
+        // There may be multiple Profile links (desktop and mobile dropdowns)
+        const profileLinks = screen.getAllByRole('menuitem', { name: 'Profile' });
+        expect(profileLinks.length).toBeGreaterThan(0);
+        expect(profileLinks[0]).toHaveAttribute('href', '/profile');
+      });
+    });
+
+    it('renders Sign Out button in dropdown when clicked', async () => {
+      render(<AppHeader />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Test Player')).toBeInTheDocument();
+      });
+
+      // Click the first profile dropdown button (desktop view)
+      const profileButtons = screen.getAllByText('Test Player');
+      fireEvent.click(profileButtons[0]);
+
+      await waitFor(() => {
+        // There may be multiple Sign Out buttons (desktop and mobile dropdowns)
+        const signOutButtons = screen.getAllByRole('menuitem', { name: 'Sign Out' });
+        expect(signOutButtons.length).toBeGreaterThan(0);
       });
     });
 
@@ -124,21 +143,23 @@ describe('AppHeader', () => {
       render(<AppHeader />);
 
       await waitFor(() => {
-        expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();
+        expect(screen.getByText('Test Player')).toBeInTheDocument();
       });
 
       expect(screen.queryByRole('link', { name: 'Sign in' })).not.toBeInTheDocument();
       expect(screen.queryByRole('link', { name: 'Register' })).not.toBeInTheDocument();
     });
 
-    it('does not render Admin link for non-admin users', async () => {
+    it('does not render Admin link in main nav for non-admin users', async () => {
       render(<AppHeader />);
 
       await waitFor(() => {
-        expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();
+        expect(screen.getByText('Test Player')).toBeInTheDocument();
       });
 
-      expect(screen.queryByRole('link', { name: 'Admin' })).not.toBeInTheDocument();
+      // Admin link should not appear in main navigation for non-admin users
+      const nav = screen.getByRole('navigation');
+      expect(nav.querySelector('a[href="/admin"]')).not.toBeInTheDocument();
     });
   });
 
@@ -155,14 +176,18 @@ describe('AppHeader', () => {
       });
     });
 
-    it('renders Admin link for admin users', async () => {
+    it('renders Admin link in main navigation for admin users', async () => {
       render(<AppHeader />);
 
       await waitFor(() => {
-        expect(screen.getByRole('link', { name: 'Admin' })).toBeInTheDocument();
+        expect(screen.getByText('Admin Player')).toBeInTheDocument();
       });
 
-      expect(screen.getByRole('link', { name: 'Admin' })).toHaveAttribute('href', '/admin');
+      // Admin link should appear in main navigation
+      const nav = screen.getByRole('navigation');
+      const adminLink = nav.querySelector('a[href="/admin"]');
+      expect(adminLink).toBeInTheDocument();
+      expect(adminLink).toHaveTextContent('Admin');
     });
   });
 

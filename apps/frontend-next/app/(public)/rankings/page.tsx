@@ -12,20 +12,30 @@ export default function RankingsPage() {
   const [error, setError] = useState<string | null>(null);
   const [viewType, setViewType] = useState<'ranking' | 'rating'>('ranking');
   const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const limit = 50;
 
   useEffect(() => {
     async function fetchData() {
       setIsLoading(true);
       try {
-        const result = await apiClient.players.list({
-          page,
-          limit,
-          sortBy: viewType,
-          sortOrder: viewType === 'ranking' ? 'asc' : 'desc',
-          isRated: true,
-        });
-        setData(result);
+        if (searchQuery) {
+          const results = await apiClient.players.search({ q: searchQuery, limit: 50 });
+          setData({
+            data: results,
+            pagination: { page: 1, limit: 50, total: results.length, totalPages: 1 },
+          });
+        } else {
+          const result = await apiClient.players.list({
+            page,
+            limit,
+            sortBy: viewType,
+            sortOrder: viewType === 'ranking' ? 'asc' : 'desc',
+            isRated: true,
+          });
+          setData(result);
+        }
       } catch (err) {
         setError('Failed to load rankings');
         console.error(err);
@@ -34,10 +44,22 @@ export default function RankingsPage() {
       }
     }
     fetchData();
-  }, [page, viewType]);
+  }, [page, viewType, searchQuery]);
 
   const handleViewTypeChange = (type: 'ranking' | 'rating') => {
     setViewType(type);
+    setPage(1);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSearchQuery(searchInput);
+    setPage(1);
+  };
+
+  const clearSearch = () => {
+    setSearchInput('');
+    setSearchQuery('');
     setPage(1);
   };
 
@@ -51,30 +73,62 @@ export default function RankingsPage() {
       </div>
 
       <Card>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-gray-900">Leaderboard</h2>
-          <div className="flex rounded-md shadow-sm">
+        {/* Search */}
+        <form onSubmit={handleSearch} className="mb-6">
+          <div className="flex space-x-2">
+            <input
+              type="text"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="Search players..."
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
             <button
-              onClick={() => handleViewTypeChange('ranking')}
-              className={`px-4 py-2 text-sm font-medium rounded-l-md border ${
-                viewType === 'ranking'
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-              }`}
+              type="submit"
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
             >
-              Ranking
+              Search
             </button>
-            <button
-              onClick={() => handleViewTypeChange('rating')}
-              className={`px-4 py-2 text-sm font-medium rounded-r-md border-t border-b border-r ${
-                viewType === 'rating'
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-              }`}
-            >
-              Rating
-            </button>
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={clearSearch}
+                className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Clear
+              </button>
+            )}
           </div>
+        </form>
+
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-semibold text-gray-900">
+            {searchQuery ? 'Search Results' : 'Leaderboard'}
+          </h2>
+          {!searchQuery && (
+            <div className="flex rounded-md shadow-sm">
+              <button
+                onClick={() => handleViewTypeChange('ranking')}
+                className={`px-4 py-2 text-sm font-medium rounded-l-md border ${
+                  viewType === 'ranking'
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                Ranking
+              </button>
+              <button
+                onClick={() => handleViewTypeChange('rating')}
+                className={`px-4 py-2 text-sm font-medium rounded-r-md border-t border-b border-r ${
+                  viewType === 'rating'
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                Rating
+              </button>
+            </div>
+          )}
         </div>
 
         {isLoading ? (
@@ -86,7 +140,9 @@ export default function RankingsPage() {
         ) : error || !data ? (
           <p className="text-red-600 text-center py-8">{error || 'Failed to load rankings'}</p>
         ) : data.data.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">No rated players yet.</p>
+          <p className="text-gray-500 text-center py-8">
+            {searchQuery ? 'No players found matching your search.' : 'No rated players yet.'}
+          </p>
         ) : (
           <>
             <div className="overflow-x-auto">
@@ -100,7 +156,7 @@ export default function RankingsPage() {
                       Player
                     </th>
                     <th className="text-right py-3 px-4 text-sm font-medium text-gray-500">
-                      {viewType === 'ranking' ? 'Rank' : 'Rating'}
+                      {searchQuery ? 'Rating' : viewType === 'ranking' ? 'Rank' : 'Rating'}
                     </th>
                     <th className="text-right py-3 px-4 text-sm font-medium text-gray-500">
                       Events
@@ -110,8 +166,9 @@ export default function RankingsPage() {
                 <tbody>
                   {data.data.map((player, index) => {
                     const position = (page - 1) * limit + index + 1;
-                    const displayValue =
-                      viewType === 'ranking'
+                    const displayValue = searchQuery
+                      ? Math.round(player.rating)
+                      : viewType === 'ranking'
                         ? player.ranking ?? '-'
                         : Math.round(player.rating);
 
@@ -128,9 +185,14 @@ export default function RankingsPage() {
                           >
                             {player.name ?? 'Unknown Player'}
                           </Link>
+                          {searchQuery && player.isRated && (
+                            <span className="ml-2 px-1.5 py-0.5 text-xs bg-green-100 text-green-700 rounded">
+                              Rated
+                            </span>
+                          )}
                         </td>
                         <td className="py-3 px-4 text-right text-sm font-medium text-gray-700">
-                          {viewType === 'ranking' && typeof displayValue === 'number'
+                          {!searchQuery && viewType === 'ranking' && typeof displayValue === 'number'
                             ? `#${displayValue}`
                             : displayValue}
                         </td>
@@ -145,7 +207,7 @@ export default function RankingsPage() {
             </div>
 
             {/* Pagination */}
-            {data.pagination.totalPages > 1 && (
+            {!searchQuery && data.pagination.totalPages > 1 && (
               <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200">
                 <div className="text-sm text-gray-500">
                   Page {data.pagination.page} of {data.pagination.totalPages} ({data.pagination.total} players)
