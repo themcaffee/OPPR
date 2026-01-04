@@ -1,137 +1,5 @@
 import { type Page, type Locator, expect } from '@playwright/test';
 
-export class PlayersPage {
-  readonly page: Page;
-
-  // Header elements
-  readonly heading: Locator;
-  readonly description: Locator;
-
-  // Search elements
-  readonly searchInput: Locator;
-  readonly searchButton: Locator;
-  readonly clearButton: Locator;
-
-  // Table elements
-  readonly table: Locator;
-  readonly tableHeaders: Locator;
-  readonly tableRows: Locator;
-  readonly playerLinks: Locator;
-
-  // Pagination
-  readonly paginationInfo: Locator;
-  readonly previousButton: Locator;
-  readonly nextButton: Locator;
-
-  // States
-  readonly loadingState: Locator;
-  readonly emptyState: Locator;
-  readonly noSearchResults: Locator;
-  readonly errorState: Locator;
-
-  constructor(page: Page) {
-    this.page = page;
-
-    // Header elements
-    this.heading = page.getByRole('heading', { name: 'Players', level: 1 });
-    this.description = page.getByText('Browse all players and view their profiles.');
-
-    // Search elements
-    this.searchInput = page.getByPlaceholder('Search players...');
-    this.searchButton = page.getByRole('button', { name: 'Search' });
-    this.clearButton = page.getByRole('button', { name: 'Clear' });
-
-    // Table elements
-    this.table = page.locator('table');
-    this.tableHeaders = page.locator('th');
-    this.tableRows = page.locator('tbody tr');
-    this.playerLinks = page.locator('tbody tr a');
-
-    // Pagination
-    this.paginationInfo = page.getByText(/Page \d+ of \d+/);
-    this.previousButton = page.getByRole('button', { name: 'Previous' });
-    this.nextButton = page.getByRole('button', { name: 'Next' });
-
-    // States
-    this.loadingState = page.locator('.animate-pulse');
-    this.emptyState = page.getByText('No players yet.');
-    this.noSearchResults = page.getByText('No players found matching your search.');
-    this.errorState = page.getByText('Failed to load players');
-  }
-
-  async goto() {
-    await this.page.goto('/players');
-  }
-
-  async expectLoaded() {
-    await expect(this.loadingState.first()).toBeHidden({ timeout: 10000 });
-    await expect(this.heading).toBeVisible();
-    await expect(this.description).toBeVisible();
-  }
-
-  async expectTableVisible() {
-    await expect(this.table).toBeVisible();
-    await expect(this.page.getByRole('columnheader', { name: 'Player' })).toBeVisible();
-    await expect(this.page.getByRole('columnheader', { name: 'Rating' })).toBeVisible();
-    await expect(this.page.getByRole('columnheader', { name: 'Rank' })).toBeVisible();
-    await expect(this.page.getByRole('columnheader', { name: 'Events' })).toBeVisible();
-  }
-
-  async search(query: string) {
-    await this.searchInput.fill(query);
-    await this.searchButton.click();
-    // Wait for loading to complete
-    await expect(this.loadingState.first()).toBeHidden({ timeout: 5000 });
-  }
-
-  async clearSearch() {
-    await this.clearButton.click();
-    // Wait for loading to complete
-    await expect(this.loadingState.first()).toBeHidden({ timeout: 5000 });
-  }
-
-  async getPlayerCount(): Promise<number> {
-    return await this.tableRows.count();
-  }
-
-  async expectPlayerInList(playerName: string) {
-    await expect(this.page.getByRole('link', { name: playerName })).toBeVisible();
-  }
-
-  async expectPlayerNotInList(playerName: string) {
-    await expect(this.page.getByRole('link', { name: playerName })).not.toBeVisible();
-  }
-
-  async clickPlayer(playerName: string) {
-    await this.page.getByRole('link', { name: playerName }).click();
-  }
-
-  async expectPaginationVisible() {
-    await expect(this.paginationInfo).toBeVisible();
-    await expect(this.previousButton).toBeVisible();
-    await expect(this.nextButton).toBeVisible();
-  }
-
-  async expectPaginationHidden() {
-    await expect(this.paginationInfo).not.toBeVisible();
-  }
-
-  async goToNextPage() {
-    await this.nextButton.click();
-    await expect(this.loadingState.first()).toBeHidden({ timeout: 5000 });
-  }
-
-  async goToPreviousPage() {
-    await this.previousButton.click();
-    await expect(this.loadingState.first()).toBeHidden({ timeout: 5000 });
-  }
-
-  async expectRatedBadge(playerName: string) {
-    const row = this.page.locator('tr').filter({ hasText: playerName });
-    await expect(row.getByText('Rated')).toBeVisible();
-  }
-}
-
 export class PlayerProfilePage {
   readonly page: Page;
 
@@ -173,7 +41,7 @@ export class PlayerProfilePage {
     this.page = page;
 
     // Header elements
-    this.backLink = page.getByRole('link', { name: '← Back to players' });
+    this.backLink = page.getByRole('link', { name: '← Back to rankings' });
     this.playerName = page.getByRole('heading', { level: 1 });
     this.ratedBadge = page.getByText('Rated', { exact: true });
     this.eventsUntilRated = page.getByText(/more events? to rated/);
@@ -190,11 +58,22 @@ export class PlayerProfilePage {
     this.avgPositionCard = page.locator('.text-center').filter({ hasText: 'Avg Position' });
 
     // Performance stats
-    this.performanceStatsSection = page.getByRole('heading', { name: 'Performance Stats' }).locator('..');
-    this.firstPlacesValue = page.locator('div').filter({ hasText: 'First Places' }).locator('.text-xl');
-    this.topThreeValue = page.locator('div').filter({ hasText: 'Top 3 Finishes' }).locator('.text-xl');
+    this.performanceStatsSection = page
+      .getByRole('heading', { name: 'Performance Stats' })
+      .locator('..');
+    this.firstPlacesValue = page
+      .locator('div')
+      .filter({ hasText: 'First Places' })
+      .locator('.text-xl');
+    this.topThreeValue = page
+      .locator('div')
+      .filter({ hasText: 'Top 3 Finishes' })
+      .locator('.text-xl');
     this.bestFinishValue = page.locator('div').filter({ hasText: 'Best Finish' }).locator('.text-xl');
-    this.avgEfficiencyValue = page.locator('div').filter({ hasText: 'Avg Efficiency' }).locator('.text-xl');
+    this.avgEfficiencyValue = page
+      .locator('div')
+      .filter({ hasText: 'Avg Efficiency' })
+      .locator('.text-xl');
 
     // Tournament history
     this.tournamentHistorySection = page.getByText(/Tournament History/).locator('..');
@@ -218,10 +97,10 @@ export class PlayerProfilePage {
 
   async expectBackLinkVisible() {
     await expect(this.backLink).toBeVisible();
-    await expect(this.backLink).toHaveAttribute('href', '/players');
+    await expect(this.backLink).toHaveAttribute('href', '/rankings');
   }
 
-  async goBackToPlayers() {
+  async goBackToRankings() {
     await this.backLink.click();
   }
 
