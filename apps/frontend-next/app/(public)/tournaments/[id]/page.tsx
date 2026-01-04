@@ -27,6 +27,57 @@ function getEventBoosterLabel(booster: string): string {
   return labels[booster] ?? booster;
 }
 
+function getQualifyingTypeLabel(type: string): string {
+  const labels: Record<string, string> = {
+    unlimited: 'Unlimited Entry',
+    limited: 'Limited Entry',
+    hybrid: 'Hybrid',
+    none: 'None',
+  };
+  return labels[type] ?? type;
+}
+
+function getFinalsFormatLabel(formatType: string): string {
+  const labels: Record<string, string> = {
+    'single-elimination': 'Single Elimination',
+    'double-elimination': 'Double Elimination',
+    'match-play': 'Match Play',
+    'best-game': 'Best Game',
+    'card-qualifying': 'Card Qualifying',
+    'pin-golf': 'Pin Golf',
+    'flip-frenzy': 'Flip Frenzy',
+    'strike-format': 'Strike Format',
+    'target-match-play': 'Target Match Play',
+    hybrid: 'Hybrid',
+    none: 'None',
+  };
+  return labels[formatType] ?? formatType;
+}
+
+function getBallCountLabel(adjustment: number): string {
+  if (adjustment <= 0.33) return '1-Ball';
+  if (adjustment <= 0.66) return '2-Ball';
+  return '3-Ball';
+}
+
+interface TGPConfig {
+  qualifying?: {
+    type?: string;
+    meaningfulGames?: number;
+    hours?: number;
+    fourPlayerGroups?: boolean;
+    threePlayerGroups?: boolean;
+  };
+  finals?: {
+    formatType?: string;
+    meaningfulGames?: number;
+    finalistCount?: number;
+    fourPlayerGroups?: boolean;
+    threePlayerGroups?: boolean;
+  };
+  ballCountAdjustment?: number;
+}
+
 export default function TournamentDetailPage() {
   const params = useParams();
   const tournamentId = params.id as string;
@@ -99,36 +150,105 @@ export default function TournamentDetailPage() {
         )}
         <div className="text-sm text-gray-500 mb-6">{formatDate(tournament.date)}</div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-gray-50 rounded-lg p-3">
-            <div className="text-xs text-gray-500 uppercase">Event Type</div>
-            <div className="text-sm font-medium text-gray-900">
-              {getEventBoosterLabel(tournament.eventBooster)}
-            </div>
-          </div>
-          {tournament.tgp && (
-            <div className="bg-gray-50 rounded-lg p-3">
-              <div className="text-xs text-gray-500 uppercase">TGP</div>
-              <div className="text-sm font-medium text-gray-900">{tournament.tgp}%</div>
-            </div>
-          )}
-          {tournament.firstPlaceValue && (
-            <div className="bg-gray-50 rounded-lg p-3">
-              <div className="text-xs text-gray-500 uppercase">1st Place</div>
-              <div className="text-sm font-medium text-gray-900">
-                {tournament.firstPlaceValue.toFixed(2)} pts
+        {(() => {
+          const tgpConfig = tournament.tgpConfig as TGPConfig | null;
+          return (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-gray-50 rounded-lg p-3">
+                <div className="text-xs text-gray-500 uppercase">Event Type</div>
+                <div className="text-sm font-medium text-gray-900">
+                  {getEventBoosterLabel(tournament.eventBooster)}
+                </div>
               </div>
+              {tournament.tgp && (
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <div className="text-xs text-gray-500 uppercase">TGP</div>
+                  <div className="text-sm font-medium text-gray-900">{tournament.tgp}%</div>
+                </div>
+              )}
+              {tournament.firstPlaceValue && (
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <div className="text-xs text-gray-500 uppercase">1st Place</div>
+                  <div className="text-sm font-medium text-gray-900">
+                    {tournament.firstPlaceValue.toFixed(2)} pts
+                  </div>
+                </div>
+              )}
+              {tournament.baseValue && (
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <div className="text-xs text-gray-500 uppercase">Base Value</div>
+                  <div className="text-sm font-medium text-gray-900">
+                    {tournament.baseValue.toFixed(2)}
+                  </div>
+                </div>
+              )}
+              {tgpConfig?.qualifying?.type && (
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <div className="text-xs text-gray-500 uppercase">Qualifying</div>
+                  <div className="text-sm font-medium text-gray-900">
+                    {getQualifyingTypeLabel(tgpConfig.qualifying.type)}
+                  </div>
+                </div>
+              )}
+              {tgpConfig?.finals?.formatType && (
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <div className="text-xs text-gray-500 uppercase">Finals Format</div>
+                  <div className="text-sm font-medium text-gray-900">
+                    {getFinalsFormatLabel(tgpConfig.finals.formatType)}
+                  </div>
+                </div>
+              )}
+              {tgpConfig?.ballCountAdjustment !== undefined && (
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <div className="text-xs text-gray-500 uppercase">Ball Count</div>
+                  <div className="text-sm font-medium text-gray-900">
+                    {getBallCountLabel(tgpConfig.ballCountAdjustment)}
+                  </div>
+                </div>
+              )}
+              {(tgpConfig?.qualifying?.fourPlayerGroups ||
+                tgpConfig?.qualifying?.threePlayerGroups ||
+                tgpConfig?.finals?.fourPlayerGroups ||
+                tgpConfig?.finals?.threePlayerGroups) && (
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <div className="text-xs text-gray-500 uppercase">Group Size</div>
+                  <div className="text-sm font-medium text-gray-900">
+                    {tgpConfig?.qualifying?.fourPlayerGroups || tgpConfig?.finals?.fourPlayerGroups
+                      ? '4-Player'
+                      : '3-Player'}
+                  </div>
+                </div>
+              )}
+              {tgpConfig?.qualifying?.meaningfulGames !== undefined &&
+                tgpConfig.qualifying.meaningfulGames > 0 && (
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="text-xs text-gray-500 uppercase">Qualifying Games</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {tgpConfig.qualifying.meaningfulGames}
+                    </div>
+                  </div>
+                )}
+              {tgpConfig?.finals?.meaningfulGames !== undefined &&
+                tgpConfig.finals.meaningfulGames > 0 && (
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="text-xs text-gray-500 uppercase">Finals Games</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {tgpConfig.finals.meaningfulGames}
+                    </div>
+                  </div>
+                )}
+              {tgpConfig?.finals?.finalistCount !== undefined &&
+                tgpConfig.finals.finalistCount > 0 && (
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="text-xs text-gray-500 uppercase">Finalists</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {tgpConfig.finals.finalistCount}
+                    </div>
+                  </div>
+                )}
             </div>
-          )}
-          {tournament.baseValue && (
-            <div className="bg-gray-50 rounded-lg p-3">
-              <div className="text-xs text-gray-500 uppercase">Base Value</div>
-              <div className="text-sm font-medium text-gray-900">
-                {tournament.baseValue.toFixed(2)}
-              </div>
-            </div>
-          )}
-        </div>
+          );
+        })()}
       </Card>
 
       {/* Results */}
