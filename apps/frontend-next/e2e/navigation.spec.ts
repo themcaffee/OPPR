@@ -87,8 +87,10 @@ test.describe('Navigation', () => {
     test('should display Profile link in dropdown when clicked', async ({ page }) => {
       await page.goto('/');
 
-      // Click the profile dropdown button
-      await page.getByRole('button', { name: /Alice Champion/i }).click();
+      // Wait for auth state to load and click the profile dropdown button
+      const dropdownButton = page.getByRole('button', { name: /Alice Champion/i });
+      await expect(dropdownButton).toBeVisible();
+      await dropdownButton.click();
 
       // Profile link should be visible in dropdown
       await expect(page.getByRole('link', { name: 'Profile' })).toBeVisible();
@@ -97,8 +99,10 @@ test.describe('Navigation', () => {
     test('should display Sign Out button in dropdown when clicked', async ({ page }) => {
       await page.goto('/');
 
-      // Click the profile dropdown button
-      await page.getByRole('button', { name: /Alice Champion/i }).click();
+      // Wait for auth state to load and click the profile dropdown button
+      const dropdownButton = page.getByRole('button', { name: /Alice Champion/i });
+      await expect(dropdownButton).toBeVisible();
+      await dropdownButton.click();
 
       await expect(page.getByRole('button', { name: 'Sign Out' })).toBeVisible();
     });
@@ -116,8 +120,12 @@ test.describe('Navigation', () => {
     test('should navigate to Profile page', async ({ page }) => {
       await page.goto('/');
 
-      // Click profile dropdown and then Profile link
-      await page.getByRole('button', { name: /Alice Champion/i }).click();
+      // Wait for auth state to load and click profile dropdown
+      const dropdownButton = page.getByRole('button', { name: /Alice Champion/i });
+      await expect(dropdownButton).toBeVisible();
+      await dropdownButton.click();
+
+      // Click Profile link in dropdown
       await page.getByRole('link', { name: 'Profile' }).click();
 
       await expect(page).toHaveURL('/profile');
@@ -126,11 +134,12 @@ test.describe('Navigation', () => {
     test('should sign out when clicking Sign Out button', async ({ page }) => {
       await page.goto('/');
 
-      // Wait for profile dropdown to be visible (indicating auth state is loaded)
-      await expect(page.getByRole('button', { name: /Alice Champion/i })).toBeVisible();
+      // Wait for auth state to load and click profile dropdown
+      const dropdownButton = page.getByRole('button', { name: /Alice Champion/i });
+      await expect(dropdownButton).toBeVisible();
+      await dropdownButton.click();
 
-      // Click profile dropdown and then Sign Out button
-      await page.getByRole('button', { name: /Alice Champion/i }).click();
+      // Click Sign Out button in dropdown
       await page.getByRole('button', { name: 'Sign Out' }).click();
 
       // Should redirect to sign-in page
