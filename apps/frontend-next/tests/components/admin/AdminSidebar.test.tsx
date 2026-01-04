@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 
-let mockPathname = '/admin';
+let mockPathname = '/admin/tournaments';
 
 vi.mock('next/navigation', () => ({
   usePathname: () => mockPathname,
@@ -10,19 +10,7 @@ vi.mock('next/navigation', () => ({
 
 describe('AdminSidebar', () => {
   beforeEach(() => {
-    mockPathname = '/admin';
-  });
-
-  it('renders Dashboard link', () => {
-    render(<AdminSidebar />);
-
-    expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();
-  });
-
-  it('renders Players link', () => {
-    render(<AdminSidebar />);
-
-    expect(screen.getByRole('link', { name: 'Players' })).toBeInTheDocument();
+    mockPathname = '/admin/tournaments';
   });
 
   it('renders Tournaments link', () => {
@@ -31,22 +19,16 @@ describe('AdminSidebar', () => {
     expect(screen.getByRole('link', { name: 'Tournaments' })).toBeInTheDocument();
   });
 
+  it('renders Players link', () => {
+    render(<AdminSidebar />);
+
+    expect(screen.getByRole('link', { name: 'Players' })).toBeInTheDocument();
+  });
+
   it('renders Users link', () => {
     render(<AdminSidebar />);
 
     expect(screen.getByRole('link', { name: 'Users' })).toBeInTheDocument();
-  });
-
-  it('has correct href for Dashboard link', () => {
-    render(<AdminSidebar />);
-
-    expect(screen.getByRole('link', { name: 'Dashboard' })).toHaveAttribute('href', '/admin');
-  });
-
-  it('has correct href for Players link', () => {
-    render(<AdminSidebar />);
-
-    expect(screen.getByRole('link', { name: 'Players' })).toHaveAttribute('href', '/admin/players');
   });
 
   it('has correct href for Tournaments link', () => {
@@ -58,18 +40,32 @@ describe('AdminSidebar', () => {
     );
   });
 
+  it('has correct href for Players link', () => {
+    render(<AdminSidebar />);
+
+    expect(screen.getByRole('link', { name: 'Players' })).toHaveAttribute('href', '/admin/players');
+  });
+
   it('has correct href for Users link', () => {
     render(<AdminSidebar />);
 
     expect(screen.getByRole('link', { name: 'Users' })).toHaveAttribute('href', '/admin/users');
   });
 
-  it('highlights Dashboard when on /admin', () => {
-    mockPathname = '/admin';
+  it('highlights Tournaments when on /admin/tournaments', () => {
+    mockPathname = '/admin/tournaments';
     render(<AdminSidebar />);
 
-    const dashboardLink = screen.getByRole('link', { name: 'Dashboard' });
-    expect(dashboardLink).toHaveClass('bg-blue-600');
+    const tournamentsLink = screen.getByRole('link', { name: 'Tournaments' });
+    expect(tournamentsLink).toHaveClass('bg-blue-600');
+  });
+
+  it('highlights Tournaments when on /admin/tournaments/123', () => {
+    mockPathname = '/admin/tournaments/123';
+    render(<AdminSidebar />);
+
+    const tournamentsLink = screen.getByRole('link', { name: 'Tournaments' });
+    expect(tournamentsLink).toHaveClass('bg-blue-600');
   });
 
   it('highlights Players when on /admin/players', () => {
@@ -88,12 +84,12 @@ describe('AdminSidebar', () => {
     expect(playersLink).toHaveClass('bg-blue-600');
   });
 
-  it('highlights Tournaments when on /admin/tournaments', () => {
-    mockPathname = '/admin/tournaments';
+  it('highlights Users when on /admin/users', () => {
+    mockPathname = '/admin/users';
     render(<AdminSidebar />);
 
-    const tournamentsLink = screen.getByRole('link', { name: 'Tournaments' });
-    expect(tournamentsLink).toHaveClass('bg-blue-600');
+    const usersLink = screen.getByRole('link', { name: 'Users' });
+    expect(usersLink).toHaveClass('bg-blue-600');
   });
 
   it('highlights Users when on /admin/users/edit/456', () => {
@@ -104,16 +100,8 @@ describe('AdminSidebar', () => {
     expect(usersLink).toHaveClass('bg-blue-600');
   });
 
-  it('does not highlight Dashboard for subpaths like /admin/players', () => {
-    mockPathname = '/admin/players';
-    render(<AdminSidebar />);
-
-    const dashboardLink = screen.getByRole('link', { name: 'Dashboard' });
-    expect(dashboardLink).not.toHaveClass('bg-blue-600');
-  });
-
   it('applies inactive styling to non-active links', () => {
-    mockPathname = '/admin';
+    mockPathname = '/admin/tournaments';
     render(<AdminSidebar />);
 
     const playersLink = screen.getByRole('link', { name: 'Players' });
