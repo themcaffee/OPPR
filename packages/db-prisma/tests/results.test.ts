@@ -360,14 +360,15 @@ describe('results', () => {
     });
 
     it('should include player relation', async () => {
-      const player = await createPlayer(createPlayerInput({ name: 'Test Player' }));
+      const player = await createPlayer(createPlayerInput({ firstName: 'Test', lastName: 'Player' }));
       const tournament = await createTournament(createTournamentInput());
       await createResult(createResultInput(player.id, tournament.id));
 
       const results = await getTournamentResults(tournament.id);
 
       expect(results[0].player).toBeDefined();
-      expect(results[0].player.name).toBe('Test Player');
+      expect(results[0].player.firstName).toBe('Test');
+      expect(results[0].player.lastName).toBe('Player');
     });
 
     it('should order by position ascending', async () => {

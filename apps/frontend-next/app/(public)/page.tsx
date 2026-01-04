@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { apiClient } from '@/lib/api-client';
 import { Card } from '@/components/ui/Card';
 import type { Player, Tournament } from '@opprs/rest-api-client';
+import { formatPlayerName } from '@/lib/utils/player';
 
 interface LandingData {
   rankingLeaderboard: Player[];
@@ -177,7 +178,7 @@ export default function LandingPage() {
                         href={`/players/${player.id}`}
                         className="text-sm text-gray-900 hover:text-blue-600"
                       >
-                        {player.name ?? 'Unknown Player'}
+                        {formatPlayerName(player)}
                       </Link>
                     </div>
                     <span className="text-sm font-medium text-gray-700">{displayValue}</span>

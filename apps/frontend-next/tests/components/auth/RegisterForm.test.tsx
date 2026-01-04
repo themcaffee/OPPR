@@ -28,10 +28,12 @@ describe('RegisterForm', () => {
     vi.clearAllMocks();
   });
 
-  it('renders name, email, password, and confirm password fields', () => {
+  it('renders name fields, email, password, and confirm password fields', () => {
     render(<RegisterForm />);
 
-    expect(screen.getByLabelText(/^name$/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/first name/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/m\.i\./i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/last name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/confirm password/i)).toBeInTheDocument();
@@ -56,8 +58,11 @@ describe('RegisterForm', () => {
 
     render(<RegisterForm />);
 
-    fireEvent.change(screen.getByLabelText(/^name$/i), {
-      target: { value: 'Test User' },
+    fireEvent.change(screen.getByLabelText(/first name/i), {
+      target: { value: 'Test' },
+    });
+    fireEvent.change(screen.getByLabelText(/last name/i), {
+      target: { value: 'User' },
     });
     fireEvent.change(screen.getByLabelText(/email/i), {
       target: { value: 'test@example.com' },
@@ -72,7 +77,8 @@ describe('RegisterForm', () => {
 
     await waitFor(() => {
       expect(mockRegister).toHaveBeenCalledWith({
-        name: 'Test User',
+        firstName: 'Test',
+        lastName: 'User',
         email: 'test@example.com',
         password: 'Password123',
       });
@@ -84,8 +90,11 @@ describe('RegisterForm', () => {
 
     render(<RegisterForm />);
 
-    fireEvent.change(screen.getByLabelText(/^name$/i), {
-      target: { value: 'Test User' },
+    fireEvent.change(screen.getByLabelText(/first name/i), {
+      target: { value: 'Test' },
+    });
+    fireEvent.change(screen.getByLabelText(/last name/i), {
+      target: { value: 'User' },
     });
     fireEvent.change(screen.getByLabelText(/email/i), {
       target: { value: 'test@example.com' },
@@ -108,8 +117,11 @@ describe('RegisterForm', () => {
 
     render(<RegisterForm />);
 
-    fireEvent.change(screen.getByLabelText(/^name$/i), {
-      target: { value: 'Test User' },
+    fireEvent.change(screen.getByLabelText(/first name/i), {
+      target: { value: 'Test' },
+    });
+    fireEvent.change(screen.getByLabelText(/last name/i), {
+      target: { value: 'User' },
     });
     fireEvent.change(screen.getByLabelText(/email/i), {
       target: { value: 'existing@example.com' },
@@ -132,8 +144,11 @@ describe('RegisterForm', () => {
 
     render(<RegisterForm />);
 
-    fireEvent.change(screen.getByLabelText(/^name$/i), {
-      target: { value: 'Test User' },
+    fireEvent.change(screen.getByLabelText(/first name/i), {
+      target: { value: 'Test' },
+    });
+    fireEvent.change(screen.getByLabelText(/last name/i), {
+      target: { value: 'User' },
     });
     fireEvent.change(screen.getByLabelText(/email/i), {
       target: { value: 'test@example.com' },
@@ -156,8 +171,11 @@ describe('RegisterForm', () => {
 
     render(<RegisterForm />);
 
-    fireEvent.change(screen.getByLabelText(/^name$/i), {
-      target: { value: 'Test User' },
+    fireEvent.change(screen.getByLabelText(/first name/i), {
+      target: { value: 'Test' },
+    });
+    fireEvent.change(screen.getByLabelText(/last name/i), {
+      target: { value: 'User' },
     });
     fireEvent.change(screen.getByLabelText(/email/i), {
       target: { value: 'test@example.com' },
@@ -180,8 +198,11 @@ describe('RegisterForm', () => {
 
     render(<RegisterForm />);
 
-    fireEvent.change(screen.getByLabelText(/^name$/i), {
-      target: { value: 'Test User' },
+    fireEvent.change(screen.getByLabelText(/first name/i), {
+      target: { value: 'Test' },
+    });
+    fireEvent.change(screen.getByLabelText(/last name/i), {
+      target: { value: 'User' },
     });
     fireEvent.change(screen.getByLabelText(/email/i), {
       target: { value: 'test@example.com' },
@@ -209,8 +230,11 @@ describe('RegisterForm', () => {
 
     render(<RegisterForm />);
 
-    fireEvent.change(screen.getByLabelText(/^name$/i), {
-      target: { value: 'Test User' },
+    fireEvent.change(screen.getByLabelText(/first name/i), {
+      target: { value: 'Test' },
+    });
+    fireEvent.change(screen.getByLabelText(/last name/i), {
+      target: { value: 'User' },
     });
     fireEvent.change(screen.getByLabelText(/email/i), {
       target: { value: 'test@example.com' },

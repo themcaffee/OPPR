@@ -11,7 +11,8 @@ export function createPlayerInput(overrides: Partial<CreatePlayerInput> = {}): C
   return {
     externalId: `ext-player-${id}`,
     playerNumber: playerNumberCounter++,
-    name: `Test Player ${id}`,
+    firstName: 'Test',
+    lastName: `Player ${id}`,
     rating: 1500,
     ratingDeviation: 200,
     isRated: false,

@@ -8,7 +8,9 @@ describe('LeaderboardCard', () => {
     {
       id: 'p1',
       externalId: null,
-      name: 'Alice',
+      firstName: 'Alice',
+      middleInitial: null,
+      lastName: 'Smith',
       rating: 1800,
       ratingDeviation: 50,
       ranking: 1,
@@ -22,7 +24,9 @@ describe('LeaderboardCard', () => {
     {
       id: 'p2',
       externalId: null,
-      name: 'Bob',
+      firstName: 'Bob',
+      middleInitial: null,
+      lastName: 'Jones',
       rating: 1750,
       ratingDeviation: 60,
       ranking: 2,
@@ -39,7 +43,9 @@ describe('LeaderboardCard', () => {
     {
       id: 'p3',
       externalId: null,
-      name: 'Charlie',
+      firstName: 'Charlie',
+      middleInitial: null,
+      lastName: 'Brown',
       rating: 1900,
       ratingDeviation: 40,
       ranking: 3,
@@ -71,8 +77,8 @@ describe('LeaderboardCard', () => {
       />
     );
 
-    expect(screen.getByText('Alice')).toBeInTheDocument();
-    expect(screen.getByText('Bob')).toBeInTheDocument();
+    expect(screen.getByText('Alice Smith')).toBeInTheDocument();
+    expect(screen.getByText('Bob Jones')).toBeInTheDocument();
   });
 
   it('switches to rating view when clicking Rating button', () => {
@@ -85,7 +91,7 @@ describe('LeaderboardCard', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Rating' }));
 
-    expect(screen.getByText('Charlie')).toBeInTheDocument();
+    expect(screen.getByText('Charlie Brown')).toBeInTheDocument();
   });
 
   it('highlights current user in the list', () => {
@@ -133,21 +139,21 @@ describe('LeaderboardCard', () => {
     expect(screen.getByText('1900')).toBeInTheDocument();
   });
 
-  it('shows Unknown Player for null names', () => {
-    const playersWithNullName: Player[] = [
+  it('shows full name with middle initial when provided', () => {
+    const playersWithMiddleInitial: Player[] = [
       {
         ...mockRankingPlayers[0],
-        name: null,
+        middleInitial: 'A',
       },
     ];
 
     render(
       <LeaderboardCard
-        rankingPlayers={playersWithNullName}
+        rankingPlayers={playersWithMiddleInitial}
         ratingPlayers={[]}
       />
     );
 
-    expect(screen.getByText('Unknown Player')).toBeInTheDocument();
+    expect(screen.getByText('Alice A. Smith')).toBeInTheDocument();
   });
 });

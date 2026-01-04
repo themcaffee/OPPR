@@ -60,12 +60,16 @@ export interface User {
 export interface RegisterRequest {
   email: string;
   password: string;
-  name: string;
+  firstName: string;
+  middleInitial?: string;
+  lastName: string;
 }
 
 export interface PlayerProfile {
   id: string;
-  name: string | null;
+  firstName: string;
+  middleInitial: string | null;
+  lastName: string;
   rating: number;
   ratingDeviation: number;
   ranking: number | null;
@@ -90,7 +94,9 @@ export interface AuthResponse {
 export interface Player {
   id: string;
   externalId: string | null;
-  name: string | null;
+  firstName: string;
+  middleInitial: string | null;
+  lastName: string;
   rating: number;
   ratingDeviation: number;
   ranking: number | null;
@@ -104,7 +110,9 @@ export interface Player {
 
 export interface CreatePlayerRequest {
   externalId?: string;
-  name?: string;
+  firstName: string;
+  middleInitial?: string;
+  lastName: string;
   rating?: number;
   ratingDeviation?: number;
   ranking?: number;
@@ -113,7 +121,9 @@ export interface CreatePlayerRequest {
 }
 
 export interface UpdatePlayerRequest {
-  name?: string;
+  firstName?: string;
+  middleInitial?: string | null;
+  lastName?: string;
   rating?: number;
   ratingDeviation?: number;
   ranking?: number;
@@ -265,7 +275,9 @@ export interface TournamentResult {
   efficiency: number | null;
   player: {
     id: string;
-    name: string | null;
+    firstName: string;
+    middleInitial: string | null;
+    lastName: string;
     rating: number;
     ranking: number | null;
   };
@@ -293,7 +305,9 @@ export interface Result {
 export interface ResultWithRelations extends Result {
   player: {
     id: string;
-    name: string | null;
+    firstName: string;
+    middleInitial: string | null;
+    lastName: string;
     rating: number;
     ranking: number | null;
   };

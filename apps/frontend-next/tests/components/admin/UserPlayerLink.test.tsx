@@ -22,7 +22,7 @@ vi.mock('@/lib/api-client', () => ({
 }));
 
 describe('UserPlayerLink', () => {
-  const mockPlayer = createMockPlayer({ id: 'p1', name: 'Alice' });
+  const mockPlayer = createMockPlayer({ id: 'p1', firstName: 'Alice', lastName: 'Smith' });
   const mockUserWithPlayer = createMockUser({
     id: 'user-1',
     player: mockPlayer,
@@ -42,7 +42,7 @@ describe('UserPlayerLink', () => {
     const onUpdate = vi.fn();
     render(<UserPlayerLink user={mockUserWithPlayer} onUpdate={onUpdate} />);
 
-    expect(screen.getByText('Alice')).toBeInTheDocument();
+    expect(screen.getByText('Alice Smith')).toBeInTheDocument();
   });
 
   it('shows "Link Player" button when user has no linked player', () => {
@@ -125,7 +125,7 @@ describe('UserPlayerLink', () => {
 
   it('calls apiClient.users.linkPlayer when selecting a player', async () => {
     const onUpdate = vi.fn();
-    const newPlayer = createMockPlayer({ id: 'p2', name: 'Bob' });
+    const newPlayer = createMockPlayer({ id: 'p2', firstName: 'Bob', lastName: 'Jones' });
     mockPlayersList.mockResolvedValue(createMockPaginatedResponse([newPlayer]));
     mockUsersLinkPlayer.mockResolvedValue({});
 
@@ -144,10 +144,10 @@ describe('UserPlayerLink', () => {
     fireEvent.focus(input);
 
     await waitFor(() => {
-      expect(screen.getByText('Bob')).toBeInTheDocument();
+      expect(screen.getByText('Bob Jones')).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByText('Bob'));
+    fireEvent.click(screen.getByText('Bob Jones'));
 
     await waitFor(() => {
       expect(mockUsersLinkPlayer).toHaveBeenCalledWith('user-2', 'p2');
@@ -156,7 +156,7 @@ describe('UserPlayerLink', () => {
 
   it('calls onUpdate after linking player', async () => {
     const onUpdate = vi.fn();
-    const newPlayer = createMockPlayer({ id: 'p2', name: 'Bob' });
+    const newPlayer = createMockPlayer({ id: 'p2', firstName: 'Bob', lastName: 'Jones' });
     mockPlayersList.mockResolvedValue(createMockPaginatedResponse([newPlayer]));
     mockUsersLinkPlayer.mockResolvedValue({});
 
@@ -172,10 +172,10 @@ describe('UserPlayerLink', () => {
     fireEvent.focus(input);
 
     await waitFor(() => {
-      expect(screen.getByText('Bob')).toBeInTheDocument();
+      expect(screen.getByText('Bob Jones')).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByText('Bob'));
+    fireEvent.click(screen.getByText('Bob Jones'));
 
     await waitFor(() => {
       expect(onUpdate).toHaveBeenCalled();

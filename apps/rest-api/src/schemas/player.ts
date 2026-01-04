@@ -3,7 +3,9 @@ export const playerSchema = {
   properties: {
     id: { type: 'string' },
     externalId: { type: 'string', nullable: true },
-    name: { type: 'string', nullable: true },
+    firstName: { type: 'string' },
+    middleInitial: { type: 'string', nullable: true },
+    lastName: { type: 'string' },
     rating: { type: 'number' },
     ratingDeviation: { type: 'number' },
     ranking: { type: 'integer', nullable: true },
@@ -18,9 +20,12 @@ export const playerSchema = {
 
 export const createPlayerSchema = {
   type: 'object',
+  required: ['firstName', 'lastName'],
   properties: {
     externalId: { type: 'string' },
-    name: { type: 'string' },
+    firstName: { type: 'string', minLength: 1 },
+    middleInitial: { type: 'string', maxLength: 2 },
+    lastName: { type: 'string', minLength: 1 },
     rating: { type: 'number', default: 1500 },
     ratingDeviation: { type: 'number', default: 200 },
     ranking: { type: 'integer' },
@@ -32,7 +37,9 @@ export const createPlayerSchema = {
 export const updatePlayerSchema = {
   type: 'object',
   properties: {
-    name: { type: 'string' },
+    firstName: { type: 'string', minLength: 1 },
+    middleInitial: { type: 'string', maxLength: 2, nullable: true },
+    lastName: { type: 'string', minLength: 1 },
     rating: { type: 'number' },
     ratingDeviation: { type: 'number' },
     ranking: { type: 'integer' },

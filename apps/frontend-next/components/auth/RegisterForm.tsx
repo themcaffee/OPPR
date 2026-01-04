@@ -31,7 +31,9 @@ export function RegisterForm() {
 
     try {
       await apiClient.register({
-        name: data.name,
+        firstName: data.firstName,
+        middleInitial: data.middleInitial || undefined,
+        lastName: data.lastName,
         email: data.email,
         password: data.password,
       });
@@ -57,15 +59,44 @@ export function RegisterForm() {
         </div>
       )}
 
-      <FormField
-        label="Name"
-        id="name"
-        type="text"
-        placeholder="Your name"
-        autoComplete="name"
-        error={errors.name?.message}
-        {...register('name')}
-      />
+      <div className="grid grid-cols-1 sm:grid-cols-6 gap-4">
+        <div className="sm:col-span-2">
+          <FormField
+            label="First Name"
+            id="firstName"
+            type="text"
+            placeholder="First"
+            autoComplete="given-name"
+            error={errors.firstName?.message}
+            {...register('firstName')}
+          />
+        </div>
+
+        <div className="sm:col-span-1">
+          <FormField
+            label="M.I."
+            id="middleInitial"
+            type="text"
+            placeholder="M"
+            maxLength={2}
+            autoComplete="additional-name"
+            error={errors.middleInitial?.message}
+            {...register('middleInitial')}
+          />
+        </div>
+
+        <div className="sm:col-span-3">
+          <FormField
+            label="Last Name"
+            id="lastName"
+            type="text"
+            placeholder="Last"
+            autoComplete="family-name"
+            error={errors.lastName?.message}
+            {...register('lastName')}
+          />
+        </div>
+      </div>
 
       <FormField
         label="Email"

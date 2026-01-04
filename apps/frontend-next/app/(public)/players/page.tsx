@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { apiClient } from '@/lib/api-client';
 import { Card } from '@/components/ui/Card';
 import type { Player, PaginatedResponse } from '@opprs/rest-api-client';
+import { formatPlayerName } from '@/lib/utils/player';
 
 export default function PlayersPage() {
   const [data, setData] = useState<PaginatedResponse<Player> | null>(null);
@@ -135,7 +136,7 @@ export default function PlayersPage() {
                           href={`/players/${player.id}`}
                           className="text-sm font-medium text-gray-900 hover:text-blue-600"
                         >
-                          {player.name ?? 'Unknown Player'}
+                          {formatPlayerName(player)}
                         </Link>
                         {player.isRated && (
                           <span className="ml-2 px-1.5 py-0.5 text-xs bg-green-100 text-green-700 rounded">

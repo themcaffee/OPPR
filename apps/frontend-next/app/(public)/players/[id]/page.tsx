@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { apiClient } from '@/lib/api-client';
 import { Card } from '@/components/ui/Card';
 import type { Player, PlayerStats, PlayerResult } from '@opprs/rest-api-client';
+import { formatPlayerName } from '@/lib/utils/player';
 
 function formatDate(dateString: string): string {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -107,7 +108,7 @@ export default function PlayerProfilePage() {
       {/* Player Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          {player.name ?? 'Unknown Player'}
+          {formatPlayerName(player)}
         </h1>
         <div className="flex items-center space-x-4">
           {player.isRated ? (

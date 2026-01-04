@@ -29,7 +29,9 @@ interface LoginBody {
 interface RegisterBody {
   email: string;
   password: string;
-  name: string;
+  firstName: string;
+  middleInitial?: string;
+  lastName: string;
 }
 
 interface RefreshPayload {
@@ -104,7 +106,7 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
       },
     },
     async (request, reply) => {
-      const { email, password, name } = request.body;
+      const { email, password, firstName, middleInitial, lastName } = request.body;
 
       // Check if email already exists
       const existingUser = await findUserByEmail(email);
@@ -118,7 +120,7 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
       // Create user with linked player
       const user = await createUserWithPlayer(
         { email, passwordHash },
-        { name }
+        { firstName, middleInitial, lastName }
       );
 
       // Generate tokens

@@ -41,7 +41,7 @@ describe('TournamentResultsManager', () => {
       decayMultiplier: null,
       decayedPoints: 100,
       efficiency: null,
-      player: { id: 'p1', name: 'Alice', rating: 1500, ranking: 1 },
+      player: { id: 'p1', firstName: 'Alice', middleInitial: null, lastName: 'Smith', rating: 1500, ranking: 1 },
     },
     {
       id: 'result-2',
@@ -54,7 +54,7 @@ describe('TournamentResultsManager', () => {
       decayMultiplier: null,
       decayedPoints: 60,
       efficiency: null,
-      player: { id: 'p2', name: 'Bob', rating: 1400, ranking: 2 },
+      player: { id: 'p2', firstName: 'Bob', middleInitial: null, lastName: 'Jones', rating: 1400, ranking: 2 },
     },
   ];
 
@@ -111,8 +111,8 @@ describe('TournamentResultsManager', () => {
     render(<TournamentResultsManager tournamentId="tour-1" />);
 
     await waitFor(() => {
-      expect(screen.getByText('Alice')).toBeInTheDocument();
-      expect(screen.getByText('Bob')).toBeInTheDocument();
+      expect(screen.getByText('Alice Smith')).toBeInTheDocument();
+      expect(screen.getByText('Bob Jones')).toBeInTheDocument();
     });
   });
 
@@ -146,7 +146,7 @@ describe('TournamentResultsManager', () => {
     render(<TournamentResultsManager tournamentId="tour-1" />);
 
     await waitFor(() => {
-      expect(screen.getByText('Alice')).toBeInTheDocument();
+      expect(screen.getByText('Alice Smith')).toBeInTheDocument();
     });
 
     fireEvent.click(screen.getAllByText('Edit')[0]);
@@ -162,7 +162,7 @@ describe('TournamentResultsManager', () => {
     render(<TournamentResultsManager tournamentId="tour-1" />);
 
     await waitFor(() => {
-      expect(screen.getByText('Alice')).toBeInTheDocument();
+      expect(screen.getByText('Alice Smith')).toBeInTheDocument();
     });
 
     fireEvent.click(screen.getAllByText('Delete')[0]);
@@ -178,7 +178,7 @@ describe('TournamentResultsManager', () => {
     render(<TournamentResultsManager tournamentId="tour-1" />);
 
     await waitFor(() => {
-      expect(screen.getByText('Alice')).toBeInTheDocument();
+      expect(screen.getByText('Alice Smith')).toBeInTheDocument();
     });
 
     fireEvent.click(screen.getAllByText('Delete')[0]);
@@ -225,7 +225,7 @@ describe('TournamentResultsManager', () => {
     render(<TournamentResultsManager tournamentId="tour-1" />);
 
     await waitFor(() => {
-      expect(screen.getByText('Alice')).toBeInTheDocument();
+      expect(screen.getByText('Alice Smith')).toBeInTheDocument();
     });
 
     // Start editing

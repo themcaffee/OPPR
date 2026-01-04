@@ -54,7 +54,8 @@ describe('Error handlers', () => {
     it('should return results for existing player', async () => {
       // Create a player
       const playerResponse = await authenticatedRequest('POST', '/api/v1/players', {
-        name: 'Test Player',
+        firstName: 'Test',
+        lastName: 'Player',
       });
       const player = playerResponse.json();
 
@@ -67,7 +68,8 @@ describe('Error handlers', () => {
     it('should return stats for existing player (empty stats)', async () => {
       // Create a player with no results
       const playerResponse = await authenticatedRequest('POST', '/api/v1/players', {
-        name: 'Test Player',
+        firstName: 'Test',
+        lastName: 'Player',
       });
       const player = playerResponse.json();
 
@@ -81,7 +83,8 @@ describe('Error handlers', () => {
     it('should return stats for player with results', async () => {
       // Create a player
       const playerResponse = await authenticatedRequest('POST', '/api/v1/players', {
-        name: 'Test Player',
+        firstName: 'Test',
+        lastName: 'Player',
       });
       const player = playerResponse.json();
 

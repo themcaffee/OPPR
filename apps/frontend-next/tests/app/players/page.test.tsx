@@ -40,9 +40,9 @@ describe('PlayersPage', () => {
 
   it('renders player list after loading', async () => {
     const players: Player[] = [
-      createMockPlayer({ id: 'p1', name: 'Alice Champion', rating: 1850, ranking: 1, isRated: true, eventCount: 25 }),
-      createMockPlayer({ id: 'p2', name: 'Bob Wizard', rating: 1750, ranking: 2, isRated: true, eventCount: 20 }),
-      createMockPlayer({ id: 'p3', name: 'Charlie Newbie', rating: 1500, ranking: null, isRated: false, eventCount: 3 }),
+      createMockPlayer({ id: 'p1', firstName: 'Alice', lastName: 'Champion', rating: 1850, ranking: 1, isRated: true, eventCount: 25 }),
+      createMockPlayer({ id: 'p2', firstName: 'Bob', lastName: 'Wizard', rating: 1750, ranking: 2, isRated: true, eventCount: 20 }),
+      createMockPlayer({ id: 'p3', firstName: 'Charlie', lastName: 'Newbie', rating: 1500, ranking: null, isRated: false, eventCount: 3 }),
     ];
     mockPlayersList.mockResolvedValue(createMockPaginatedResponse(players, 1, 1, 3));
 
@@ -58,8 +58,8 @@ describe('PlayersPage', () => {
 
   it('displays rated badge for rated players', async () => {
     const players: Player[] = [
-      createMockPlayer({ id: 'p1', name: 'Rated Player', isRated: true }),
-      createMockPlayer({ id: 'p2', name: 'Unrated Player', isRated: false }),
+      createMockPlayer({ id: 'p1', firstName: 'Rated', lastName: 'Player', isRated: true }),
+      createMockPlayer({ id: 'p2', firstName: 'Unrated', lastName: 'Player', isRated: false }),
     ];
     mockPlayersList.mockResolvedValue(createMockPaginatedResponse(players, 1, 1, 2));
 
@@ -76,7 +76,7 @@ describe('PlayersPage', () => {
 
   it('displays rating and ranking values', async () => {
     const players: Player[] = [
-      createMockPlayer({ id: 'p1', name: 'Test Player', rating: 1850, ranking: 5, eventCount: 15 }),
+      createMockPlayer({ id: 'p1', firstName: 'Test', lastName: 'Player', rating: 1850, ranking: 5, eventCount: 15 }),
     ];
     mockPlayersList.mockResolvedValue(createMockPaginatedResponse(players, 1, 1, 1));
 
@@ -93,7 +93,7 @@ describe('PlayersPage', () => {
 
   it('displays dash for null ranking', async () => {
     const players: Player[] = [
-      createMockPlayer({ id: 'p1', name: 'Unranked Player', ranking: null }),
+      createMockPlayer({ id: 'p1', firstName: 'Unranked', lastName: 'Player', ranking: null }),
     ];
     mockPlayersList.mockResolvedValue(createMockPaginatedResponse(players, 1, 1, 1));
 
@@ -129,11 +129,11 @@ describe('PlayersPage', () => {
 
   it('handles search form submission', async () => {
     const allPlayers: Player[] = [
-      createMockPlayer({ id: 'p1', name: 'Alice Champion' }),
-      createMockPlayer({ id: 'p2', name: 'Bob Wizard' }),
+      createMockPlayer({ id: 'p1', firstName: 'Alice', lastName: 'Champion' }),
+      createMockPlayer({ id: 'p2', firstName: 'Bob', lastName: 'Wizard' }),
     ];
     const searchResults: Player[] = [
-      createMockPlayer({ id: 'p1', name: 'Alice Champion' }),
+      createMockPlayer({ id: 'p1', firstName: 'Alice', lastName: 'Champion' }),
     ];
 
     mockPlayersList.mockResolvedValue(createMockPaginatedResponse(allPlayers, 1, 1, 2));
@@ -158,10 +158,10 @@ describe('PlayersPage', () => {
 
   it('shows clear button when search is active', async () => {
     const allPlayers: Player[] = [
-      createMockPlayer({ id: 'p1', name: 'Alice Champion' }),
+      createMockPlayer({ id: 'p1', firstName: 'Alice', lastName: 'Champion' }),
     ];
     const searchResults: Player[] = [
-      createMockPlayer({ id: 'p1', name: 'Alice Champion' }),
+      createMockPlayer({ id: 'p1', firstName: 'Alice', lastName: 'Champion' }),
     ];
 
     mockPlayersList.mockResolvedValue(createMockPaginatedResponse(allPlayers, 1, 1, 1));
@@ -188,11 +188,11 @@ describe('PlayersPage', () => {
 
   it('clears search when clear button clicked', async () => {
     const allPlayers: Player[] = [
-      createMockPlayer({ id: 'p1', name: 'Alice Champion' }),
-      createMockPlayer({ id: 'p2', name: 'Bob Wizard' }),
+      createMockPlayer({ id: 'p1', firstName: 'Alice', lastName: 'Champion' }),
+      createMockPlayer({ id: 'p2', firstName: 'Bob', lastName: 'Wizard' }),
     ];
     const searchResults: Player[] = [
-      createMockPlayer({ id: 'p1', name: 'Alice Champion' }),
+      createMockPlayer({ id: 'p1', firstName: 'Alice', lastName: 'Champion' }),
     ];
 
     mockPlayersList.mockResolvedValue(createMockPaginatedResponse(allPlayers, 1, 1, 2));
@@ -224,7 +224,7 @@ describe('PlayersPage', () => {
 
   it('displays empty search results message', async () => {
     const allPlayers: Player[] = [
-      createMockPlayer({ id: 'p1', name: 'Alice Champion' }),
+      createMockPlayer({ id: 'p1', firstName: 'Alice', lastName: 'Champion' }),
     ];
     mockPlayersList.mockResolvedValue(createMockPaginatedResponse(allPlayers, 1, 1, 1));
     mockPlayersSearch.mockResolvedValue([]);
@@ -247,7 +247,7 @@ describe('PlayersPage', () => {
 
   it('displays pagination controls for multiple pages', async () => {
     const players: Player[] = [
-      createMockPlayer({ id: 'p1', name: 'Test Player' }),
+      createMockPlayer({ id: 'p1', firstName: 'Test', lastName: 'Player' }),
     ];
     mockPlayersList.mockResolvedValue(createMockPaginatedResponse(players, 1, 3, 60));
 
@@ -264,7 +264,7 @@ describe('PlayersPage', () => {
 
   it('handles pagination next button click', async () => {
     const players: Player[] = [
-      createMockPlayer({ id: 'p1', name: 'Page 1 Player' }),
+      createMockPlayer({ id: 'p1', firstName: 'Page 1', lastName: 'Player' }),
     ];
     mockPlayersList.mockResolvedValue(createMockPaginatedResponse(players, 1, 3, 60));
 
@@ -288,7 +288,7 @@ describe('PlayersPage', () => {
 
   it('handles pagination previous button click', async () => {
     const players: Player[] = [
-      createMockPlayer({ id: 'p1', name: 'Page 2 Player' }),
+      createMockPlayer({ id: 'p1', firstName: 'Page 2', lastName: 'Player' }),
     ];
     // Start on page 2
     mockPlayersList
@@ -324,7 +324,7 @@ describe('PlayersPage', () => {
 
   it('hides pagination when only one page', async () => {
     const players: Player[] = [
-      createMockPlayer({ id: 'p1', name: 'Only Player' }),
+      createMockPlayer({ id: 'p1', firstName: 'Only', lastName: 'Player' }),
     ];
     mockPlayersList.mockResolvedValue(createMockPaginatedResponse(players, 1, 1, 1));
 
@@ -340,7 +340,7 @@ describe('PlayersPage', () => {
 
   it('hides pagination during search', async () => {
     const allPlayers: Player[] = [
-      createMockPlayer({ id: 'p1', name: 'Alice Champion' }),
+      createMockPlayer({ id: 'p1', firstName: 'Alice', lastName: 'Champion' }),
     ];
     mockPlayersList.mockResolvedValue(createMockPaginatedResponse(allPlayers, 1, 3, 60));
     mockPlayersSearch.mockResolvedValue(allPlayers);
@@ -365,22 +365,22 @@ describe('PlayersPage', () => {
     expect(screen.queryByRole('button', { name: 'Next' })).not.toBeInTheDocument();
   });
 
-  it('displays Unknown Player for null names', async () => {
+  it('displays player name properly', async () => {
     const players: Player[] = [
-      createMockPlayer({ id: 'p1', name: null }),
+      createMockPlayer({ id: 'p1', firstName: 'John', middleInitial: 'A', lastName: 'Doe' }),
     ];
     mockPlayersList.mockResolvedValue(createMockPaginatedResponse(players, 1, 1, 1));
 
     render(<PlayersPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Unknown Player')).toBeInTheDocument();
+      expect(screen.getByText('John A. Doe')).toBeInTheDocument();
     });
   });
 
   it('renders player links with correct href', async () => {
     const players: Player[] = [
-      createMockPlayer({ id: 'player-abc-123', name: 'Linked Player' }),
+      createMockPlayer({ id: 'player-abc-123', firstName: 'Linked', lastName: 'Player' }),
     ];
     mockPlayersList.mockResolvedValue(createMockPaginatedResponse(players, 1, 1, 1));
 
@@ -396,7 +396,7 @@ describe('PlayersPage', () => {
 
   it('renders table headers correctly', async () => {
     const players: Player[] = [
-      createMockPlayer({ id: 'p1', name: 'Test Player' }),
+      createMockPlayer({ id: 'p1', firstName: 'Test', lastName: 'Player' }),
     ];
     mockPlayersList.mockResolvedValue(createMockPaginatedResponse(players, 1, 1, 1));
 

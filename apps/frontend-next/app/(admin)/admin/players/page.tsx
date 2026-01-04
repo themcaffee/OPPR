@@ -9,6 +9,7 @@ import { SearchInput } from '@/components/admin/SearchInput';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import type { Player, PaginatedResponse } from '@opprs/rest-api-client';
+import { formatPlayerName } from '@/lib/utils/player';
 
 export default function AdminPlayersPage() {
   const router = useRouter();
@@ -40,7 +41,7 @@ export default function AdminPlayersPage() {
   }, [fetchPlayers]);
 
   const columns = [
-    { key: 'name', header: 'Name', render: (p: Player) => p.name ?? '-' },
+    { key: 'name', header: 'Name', render: (p: Player) => formatPlayerName(p) },
     { key: 'rating', header: 'Rating', render: (p: Player) => p.rating.toFixed(0) },
     { key: 'ranking', header: 'Ranking', render: (p: Player) => p.ranking ?? '-' },
     { key: 'eventCount', header: 'Events' },

@@ -90,7 +90,9 @@ describe('AppHeader', () => {
         role: 'user',
         player: {
           id: 'player-1',
-          name: 'Test Player',
+          firstName: 'Test',
+          middleInitial: null,
+          lastName: 'Player',
         },
       });
     });
@@ -172,7 +174,9 @@ describe('AppHeader', () => {
         role: 'admin',
         player: {
           id: 'player-1',
-          name: 'Admin Player',
+          firstName: 'Admin',
+          middleInitial: null,
+          lastName: 'Player',
         },
       });
     });

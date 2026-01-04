@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { apiClient } from '@/lib/api-client';
 import { Card } from '@/components/ui/Card';
 import type { Player, PaginatedResponse } from '@opprs/rest-api-client';
+import { formatPlayerName } from '@/lib/utils/player';
 
 export default function RankingsPage() {
   const [data, setData] = useState<PaginatedResponse<Player> | null>(null);
@@ -126,7 +127,7 @@ export default function RankingsPage() {
                             href={`/players/${player.id}`}
                             className="text-sm font-medium text-gray-900 hover:text-blue-600"
                           >
-                            {player.name ?? 'Unknown Player'}
+                            {formatPlayerName(player)}
                           </Link>
                         </td>
                         <td className="py-3 px-4 text-right text-sm font-medium text-gray-700">

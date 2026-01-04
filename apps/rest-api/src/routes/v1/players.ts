@@ -11,6 +11,7 @@ import {
   getTopPlayersByRating,
   getTopPlayersByRanking,
   getPlayerStats,
+  type CreatePlayerInput,
 } from '@opprs/db-prisma';
 import {
   playerSchema,
@@ -228,7 +229,7 @@ export const playerRoutes: FastifyPluginAsync = async (app) => {
   );
 
   // Create player
-  app.post<{ Body: Record<string, unknown> }>(
+  app.post<{ Body: CreatePlayerInput }>(
     '/',
     {
       schema: {

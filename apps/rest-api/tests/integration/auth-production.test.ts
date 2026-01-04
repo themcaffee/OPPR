@@ -43,7 +43,7 @@ describe('Auth endpoints (production mode)', () => {
     const passwordHash = await bcrypt.hash(testUserPassword, 12);
     const playerNumber = await generateUniquePlayerNumber();
     const player = await prisma.player.create({
-      data: { name: 'Test Player', playerNumber },
+      data: { firstName: 'Test', lastName: 'Player', playerNumber },
     });
     const user = await prisma.user.create({
       data: {
@@ -68,7 +68,8 @@ describe('Auth endpoints (production mode)', () => {
         payload: {
           email: 'newuser@example.com',
           password: 'password123',
-          name: 'New User',
+          firstName: 'New',
+          lastName: 'User',
         },
       });
 
@@ -80,7 +81,8 @@ describe('Auth endpoints (production mode)', () => {
       expect(body.user).toHaveProperty('email', 'newuser@example.com');
       expect(body.user).toHaveProperty('role', 'user');
       expect(body.user).toHaveProperty('player');
-      expect(body.user.player).toHaveProperty('name', 'New User');
+      expect(body.user.player).toHaveProperty('firstName', 'New');
+      expect(body.user.player).toHaveProperty('lastName', 'User');
       expect(body).toHaveProperty('message', 'Registration successful');
 
       // Verify cookies were set
@@ -96,7 +98,8 @@ describe('Auth endpoints (production mode)', () => {
         payload: {
           email: testUserEmail, // Already exists
           password: 'password123',
-          name: 'Duplicate User',
+          firstName: 'Duplicate',
+          lastName: 'User',
         },
       });
 

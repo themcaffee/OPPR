@@ -535,13 +535,14 @@ describe('tournaments', () => {
 
     it('should include player data in results', async () => {
       const tournament = await createTournament(createTournamentInput());
-      const player = await createPlayer(createPlayerInput({ name: 'Test Player' }));
+      const player = await createPlayer(createPlayerInput({ firstName: 'Test', lastName: 'Player' }));
       await createResult(createResultInput(player.id, tournament.id));
 
       const result = await getTournamentWithResults(tournament.id);
 
       expect(result!.results[0].player).toBeDefined();
-      expect(result!.results[0].player.name).toBe('Test Player');
+      expect(result!.results[0].player.firstName).toBe('Test');
+      expect(result!.results[0].player.lastName).toBe('Player');
     });
 
     it('should return null for non-existent tournament', async () => {

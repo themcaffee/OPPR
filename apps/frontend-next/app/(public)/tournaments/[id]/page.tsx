@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { apiClient } from '@/lib/api-client';
 import { Card } from '@/components/ui/Card';
 import type { Tournament, TournamentResult } from '@opprs/rest-api-client';
+import { formatPlayerName } from '@/lib/utils/player';
 
 function formatDate(dateString: string): string {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -294,7 +295,7 @@ export default function TournamentDetailPage() {
                           href={`/players/${result.player.id}`}
                           className="text-sm text-gray-900 hover:text-blue-600"
                         >
-                          {result.player.name ?? 'Unknown Player'}
+                          {formatPlayerName(result.player)}
                         </Link>
                         {result.optedOut && (
                           <span className="ml-2 text-xs text-gray-400">(opted out)</span>

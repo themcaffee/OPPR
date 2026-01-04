@@ -31,7 +31,7 @@ beforeEach(() => {
 describe('players', () => {
   describe('createPlayer', () => {
     it('should create a player with minimal data', async () => {
-      const player = await createPlayer({});
+      const player = await createPlayer({ firstName: 'Test', lastName: 'Player' });
 
       expect(player.id).toBeDefined();
       expect(player.createdAt).toBeInstanceOf(Date);
@@ -46,7 +46,8 @@ describe('players', () => {
       const player = await createPlayer(input);
 
       expect(player.externalId).toBe(input.externalId);
-      expect(player.name).toBe(input.name);
+      expect(player.firstName).toBe(input.firstName);
+      expect(player.lastName).toBe(input.lastName);
       expect(player.rating).toBe(input.rating);
       expect(player.ratingDeviation).toBe(input.ratingDeviation);
       expect(player.ranking).toBe(10);
@@ -64,7 +65,7 @@ describe('players', () => {
     });
 
     it('should auto-generate playerNumber when not provided', async () => {
-      const player = await createPlayer({ name: 'Test' });
+      const player = await createPlayer({ firstName: 'Test', lastName: 'Player' });
 
       expect(player.playerNumber).toBeDefined();
       expect(player.playerNumber).toBeGreaterThanOrEqual(10000);
@@ -92,7 +93,8 @@ describe('players', () => {
 
       expect(found).not.toBeNull();
       expect(found!.id).toBe(created.id);
-      expect(found!.name).toBe(created.name);
+      expect(found!.firstName).toBe(created.firstName);
+      expect(found!.lastName).toBe(created.lastName);
     });
 
     it('should return null for non-existent ID', async () => {
@@ -397,11 +399,12 @@ describe('players', () => {
 
   describe('updatePlayer', () => {
     it('should update a single field', async () => {
-      const player = await createPlayer(createPlayerInput({ name: 'Original Name' }));
+      const player = await createPlayer(createPlayerInput({ firstName: 'Original', lastName: 'Name' }));
 
-      const updated = await updatePlayer(player.id, { name: 'New Name' });
+      const updated = await updatePlayer(player.id, { firstName: 'New', lastName: 'Name' });
 
-      expect(updated.name).toBe('New Name');
+      expect(updated.firstName).toBe('New');
+      expect(updated.lastName).toBe('Name');
       expect(updated.externalId).toBe(player.externalId);
     });
 
@@ -409,12 +412,14 @@ describe('players', () => {
       const player = await createPlayer(createPlayerInput());
 
       const updated = await updatePlayer(player.id, {
-        name: 'Updated Name',
+        firstName: 'Updated',
+        lastName: 'Name',
         rating: 1800,
         ratingDeviation: 150,
       });
 
-      expect(updated.name).toBe('Updated Name');
+      expect(updated.firstName).toBe('Updated');
+      expect(updated.lastName).toBe('Name');
       expect(updated.rating).toBe(1800);
       expect(updated.ratingDeviation).toBe(150);
     });
@@ -426,7 +431,7 @@ describe('players', () => {
       // Small delay to ensure timestamp difference
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const updated = await updatePlayer(player.id, { name: 'New Name' });
+      const updated = await updatePlayer(player.id, { firstName: 'New' });
 
       expect(updated.updatedAt.getTime()).toBeGreaterThanOrEqual(originalUpdatedAt.getTime());
     });
@@ -616,18 +621,19 @@ describe('players', () => {
 
   describe('searchPlayers', () => {
     it('should find players by name (case-insensitive)', async () => {
-      await createPlayer(createPlayerInput({ name: 'John Doe' }));
-      await createPlayer(createPlayerInput({ name: 'Jane Smith' }));
+      await createPlayer(createPlayerInput({ firstName: 'John', lastName: 'Doe' }));
+      await createPlayer(createPlayerInput({ firstName: 'Jane', lastName: 'Smith' }));
 
       const results = await searchPlayers('john');
 
       expect(results).toHaveLength(1);
-      expect(results[0].name).toBe('John Doe');
+      expect(results[0].firstName).toBe('John');
+      expect(results[0].lastName).toBe('Doe');
     });
 
     it('should match partial strings', async () => {
-      await createPlayer(createPlayerInput({ name: 'John Doe' }));
-      await createPlayer(createPlayerInput({ name: 'Johnny Appleseed' }));
+      await createPlayer(createPlayerInput({ firstName: 'John', lastName: 'Doe' }));
+      await createPlayer(createPlayerInput({ firstName: 'Johnny', lastName: 'Appleseed' }));
 
       const results = await searchPlayers('john');
 
@@ -636,7 +642,7 @@ describe('players', () => {
 
     it('should use default limit of 20', async () => {
       for (let i = 0; i < 25; i++) {
-        await createPlayer(createPlayerInput({ name: `Player ${i}` }));
+        await createPlayer(createPlayerInput({ firstName: `Player`, lastName: `${i}` }));
       }
 
       const results = await searchPlayers('Player');
@@ -646,7 +652,7 @@ describe('players', () => {
 
     it('should respect custom limit', async () => {
       for (let i = 0; i < 10; i++) {
-        await createPlayer(createPlayerInput({ name: `Player ${i}` }));
+        await createPlayer(createPlayerInput({ firstName: `Player`, lastName: `${i}` }));
       }
 
       const results = await searchPlayers('Player', 5);
@@ -655,7 +661,7 @@ describe('players', () => {
     });
 
     it('should return empty array for no matches', async () => {
-      await createPlayer(createPlayerInput({ name: 'John Doe' }));
+      await createPlayer(createPlayerInput({ firstName: 'John', lastName: 'Doe' }));
 
       const results = await searchPlayers('xyz');
 

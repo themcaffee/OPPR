@@ -192,9 +192,10 @@ export class MatchplayClient {
   }
 
   /**
-   * Get raw standings from API (internal helper)
+   * Get raw standings from API
+   * Returns the original Matchplay standings data including player names
    */
-  private async getRawStandings(id: number): Promise<MatchplayStanding[]> {
+  async getRawStandings(id: number): Promise<MatchplayStanding[]> {
     const response = await this.request<MatchplayListResponse<MatchplayStanding>>(
       `/tournaments/${id}/standings`
     );

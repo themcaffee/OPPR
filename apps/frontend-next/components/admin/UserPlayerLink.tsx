@@ -5,6 +5,7 @@ import { apiClient } from '@/lib/api-client';
 import { PlayerSelector } from '@/components/admin/PlayerSelector';
 import { Button } from '@/components/ui/Button';
 import type { UserWithPlayer, Player } from '@opprs/rest-api-client';
+import { formatPlayerName } from '@/lib/utils/player';
 
 interface UserPlayerLinkProps {
   user: UserWithPlayer;
@@ -93,7 +94,7 @@ export function UserPlayerLink({ user, onUpdate }: UserPlayerLinkProps) {
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <span className="font-medium text-gray-900">{user.player.name || user.player.id}</span>
+            <span className="font-medium text-gray-900">{formatPlayerName(user.player)}</span>
             <button
               type="button"
               onClick={handleEditClick}

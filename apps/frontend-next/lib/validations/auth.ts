@@ -14,7 +14,9 @@ export const signInSchema = z.object({
 
 export const registerSchema = z
   .object({
-    name: z.string().min(1, 'Name is required'),
+    firstName: z.string().min(1, 'First name is required'),
+    middleInitial: z.string().max(2, 'Middle initial must be 1-2 characters').optional(),
+    lastName: z.string().min(1, 'Last name is required'),
     email: z.string().min(1, 'Email is required').email('Please enter a valid email address'),
     password: passwordSchema,
     confirmPassword: z.string().min(1, 'Please confirm your password'),

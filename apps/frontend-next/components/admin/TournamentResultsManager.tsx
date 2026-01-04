@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/Card';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 import { PlayerSelector } from '@/components/admin/PlayerSelector';
 import type { TournamentResult, Player } from '@opprs/rest-api-client';
+import { formatPlayerName } from '@/lib/utils/player';
 
 interface TournamentResultsManagerProps {
   tournamentId: string;
@@ -128,7 +129,7 @@ export function TournamentResultsManager({
   const existingPlayerIds = results.map((r) => r.player.id);
 
   const getPlayerDisplayName = (result: TournamentResult) => {
-    return result.player.name || result.player.id;
+    return formatPlayerName(result.player);
   };
 
   if (isLoading) {

@@ -4,6 +4,7 @@ import {
   MatchplayApiError,
   MatchplayNetworkError,
 } from '@opprs/matchplay-api';
+import type { MatchplayStanding } from '@opprs/matchplay-api';
 import type {
   Tournament as CoreTournament,
   PlayerResult,
@@ -74,6 +75,37 @@ function mapEventBoosterToCore(dbType: EventBoosterType): CoreEventBoosterType {
 }
 
 /**
+ * Parse a full name into firstName, middleInitial, and lastName
+ */
+function parsePlayerName(fullName: string | null | undefined): {
+  firstName: string;
+  middleInitial?: string;
+  lastName: string;
+} {
+  if (!fullName || fullName.trim() === '') {
+    return { firstName: 'Unknown', lastName: 'Player' };
+  }
+
+  const parts = fullName.trim().split(/\s+/);
+
+  if (parts.length === 1) {
+    return { firstName: parts[0]!, lastName: 'Player' };
+  }
+
+  if (parts.length === 2) {
+    return { firstName: parts[0]!, lastName: parts[1]! };
+  }
+
+  // Handle middle name/initial
+  const firstName = parts[0]!;
+  const lastName = parts[parts.length - 1]!;
+  // Take first character of middle name(s) as middle initial
+  const middleInitial = parts[1]!.charAt(0).toUpperCase();
+
+  return { firstName, middleInitial, lastName };
+}
+
+/**
  * Import a tournament from Matchplay API
  */
 export async function importTournament(
@@ -85,11 +117,13 @@ export async function importTournament(
 
   let matchplayTournament: CoreTournament;
   let matchplayResults: PlayerResult[];
+  let rawStandings: MatchplayStanding[];
 
   try {
-    [matchplayTournament, matchplayResults] = await Promise.all([
+    [matchplayTournament, matchplayResults, rawStandings] = await Promise.all([
       client.getTournament(matchplayId),
       client.getTournamentResults(matchplayId),
+      client.getRawStandings(matchplayId),
     ]);
   } catch (error: unknown) {
     if (error instanceof MatchplayNotFoundError) {
@@ -99,6 +133,12 @@ export async function importTournament(
       throw new ExternalServiceError('Matchplay API', error.message);
     }
     throw error;
+  }
+
+  // Create a map from player ID to name from raw standings
+  const playerNameMap = new Map<string, string>();
+  for (const standing of rawStandings) {
+    playerNameMap.set(String(standing.playerId), standing.name);
   }
 
   const externalId = `matchplay:${matchplayId}`;
@@ -128,8 +168,15 @@ export async function importTournament(
     const playerExternalId = `matchplay:${player.id}`;
     let dbPlayer = await findPlayerByExternalId(playerExternalId);
 
+    // Get the player's name from the raw standings
+    const playerFullName = playerNameMap.get(player.id);
+    const parsedName = parsePlayerName(playerFullName);
+
     if (dbPlayer) {
       dbPlayer = await updatePlayer(dbPlayer.id, {
+        firstName: parsedName.firstName,
+        middleInitial: parsedName.middleInitial,
+        lastName: parsedName.lastName,
         rating: player.rating,
         ratingDeviation: player.ratingDeviation,
         ranking: player.ranking,
@@ -140,6 +187,9 @@ export async function importTournament(
     } else {
       dbPlayer = await createPlayer({
         externalId: playerExternalId,
+        firstName: parsedName.firstName,
+        middleInitial: parsedName.middleInitial,
+        lastName: parsedName.lastName,
         rating: player.rating,
         ratingDeviation: player.ratingDeviation,
         ranking: player.ranking,

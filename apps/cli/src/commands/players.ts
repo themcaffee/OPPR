@@ -121,9 +121,17 @@ export function registerPlayerCommands(program: Command): void {
           process.exit(1);
         }
 
+        // Parse name into firstName and lastName
+        const nameParts = options.name.trim().split(/\s+/);
+        const firstName = nameParts[0] ?? 'Unknown';
+        const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1]! : 'Player';
+        const middleInitial = nameParts.length > 2 ? nameParts[1]!.charAt(0).toUpperCase() : undefined;
+
         const spinner = ora('Creating player...').start();
         const player = await client.players.create({
-          name: options.name,
+          firstName,
+          middleInitial,
+          lastName,
           externalId: options.externalId,
           rating: options.rating ? parseFloat(options.rating) : undefined,
         });
@@ -145,9 +153,23 @@ export function registerPlayerCommands(program: Command): void {
         const globalOpts = cmd.optsWithGlobals<GlobalOptions>();
         const client = createClient(getApiUrl(globalOpts));
 
+        // Parse name into firstName and lastName if provided
+        let firstName: string | undefined;
+        let middleInitial: string | undefined;
+        let lastName: string | undefined;
+
+        if (options.name) {
+          const nameParts = options.name.trim().split(/\s+/);
+          firstName = nameParts[0];
+          lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1]! : undefined;
+          middleInitial = nameParts.length > 2 ? nameParts[1]!.charAt(0).toUpperCase() : undefined;
+        }
+
         const spinner = ora('Updating player...').start();
         const player = await client.players.update(id, {
-          name: options.name,
+          firstName,
+          middleInitial,
+          lastName,
           rating: options.rating ? parseFloat(options.rating) : undefined,
           ranking: options.ranking ? parseInt(options.ranking) : undefined,
         });

@@ -26,6 +26,7 @@ export {
   countPlayers,
   getPlayerWithResults,
   searchPlayers,
+  formatPlayerName,
 } from './players.js';
 
 // Export player number utilities

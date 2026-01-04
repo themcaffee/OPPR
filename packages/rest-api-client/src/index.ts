@@ -1,6 +1,9 @@
 // Main client
 export { OpprsClient } from './client.js';
 
+// Utility functions
+export { formatPlayerName } from './utils.js';
+
 // Error classes
 export {
   OpprsApiError,

@@ -4,7 +4,9 @@ export function createMockPlayer(overrides: Partial<Player> = {}): Player {
   return {
     id: 'player-1',
     externalId: null,
-    name: 'Test Player',
+    firstName: 'Test',
+    middleInitial: null,
+    lastName: 'Player',
     rating: 1500,
     ratingDeviation: 200,
     ranking: null,
@@ -57,7 +59,9 @@ export function createMockTournamentResult(
     efficiency: null,
     player: {
       id: 'player-1',
-      name: 'Test Player',
+      firstName: 'Test',
+      middleInitial: null,
+      lastName: 'Player',
       rating: 1500,
       ranking: null,
     },

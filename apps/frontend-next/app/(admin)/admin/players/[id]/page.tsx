@@ -10,6 +10,15 @@ import { Button } from '@/components/ui/Button';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 import type { UpdatePlayerRequest } from '@opprs/rest-api-client';
 
+interface PlayerFormData {
+  firstName: string;
+  middleInitial?: string;
+  lastName: string;
+  rating: number;
+  ratingDeviation: number;
+  ranking?: number;
+}
+
 export default function AdminPlayerEditPage() {
   const router = useRouter();
   const params = useParams();
@@ -25,10 +34,12 @@ export default function AdminPlayerEditPage() {
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<UpdatePlayerRequest>({
+  } = useForm<PlayerFormData>({
     defaultValues: isNew
       ? {
-          name: '',
+          firstName: '',
+          middleInitial: '',
+          lastName: '',
           rating: 1500,
           ratingDeviation: 200,
           ranking: undefined,
@@ -40,7 +51,9 @@ export default function AdminPlayerEditPage() {
     if (!isNew) {
       apiClient.players.get(id).then((p) => {
         reset({
-          name: p.name ?? '',
+          firstName: p.firstName,
+          middleInitial: p.middleInitial ?? '',
+          lastName: p.lastName,
           rating: p.rating,
           ratingDeviation: p.ratingDeviation,
           ranking: p.ranking ?? undefined,
@@ -50,11 +63,26 @@ export default function AdminPlayerEditPage() {
     }
   }, [id, isNew, reset]);
 
-  const onSubmit = async (data: UpdatePlayerRequest) => {
+  const onSubmit = async (data: PlayerFormData) => {
     if (isNew) {
-      await apiClient.players.create(data);
+      await apiClient.players.create({
+        firstName: data.firstName,
+        middleInitial: data.middleInitial || undefined,
+        lastName: data.lastName,
+        rating: data.rating,
+        ratingDeviation: data.ratingDeviation,
+        ranking: data.ranking,
+      });
     } else {
-      await apiClient.players.update(id, data);
+      const updateData: UpdatePlayerRequest = {
+        firstName: data.firstName,
+        middleInitial: data.middleInitial || undefined,
+        lastName: data.lastName,
+        rating: data.rating,
+        ratingDeviation: data.ratingDeviation,
+        ranking: data.ranking,
+      };
+      await apiClient.players.update(id, updateData);
     }
     router.push('/admin/players');
   };
@@ -77,7 +105,33 @@ export default function AdminPlayerEditPage() {
 
       <Card>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <FormField label="Name" id="name" {...register('name')} error={errors.name?.message} />
+          <div className="grid grid-cols-1 sm:grid-cols-6 gap-4">
+            <div className="sm:col-span-2">
+              <FormField
+                label="First Name"
+                id="firstName"
+                {...register('firstName', { required: 'First name is required' })}
+                error={errors.firstName?.message}
+              />
+            </div>
+            <div className="sm:col-span-1">
+              <FormField
+                label="M.I."
+                id="middleInitial"
+                maxLength={2}
+                {...register('middleInitial')}
+                error={errors.middleInitial?.message}
+              />
+            </div>
+            <div className="sm:col-span-3">
+              <FormField
+                label="Last Name"
+                id="lastName"
+                {...register('lastName', { required: 'Last name is required' })}
+                error={errors.lastName?.message}
+              />
+            </div>
+          </div>
           <FormField
             label="Rating"
             id="rating"

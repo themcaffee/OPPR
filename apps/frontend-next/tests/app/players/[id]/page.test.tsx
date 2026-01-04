@@ -88,7 +88,8 @@ describe('PlayerProfilePage', () => {
   it('renders player profile after loading', async () => {
     const player: Player = createMockPlayer({
       id: mockPlayerId,
-      name: 'Alice Champion',
+      firstName: 'Alice',
+      lastName: 'Champion',
       rating: 1850,
       ratingDeviation: 50,
       ranking: 5,
@@ -111,7 +112,8 @@ describe('PlayerProfilePage', () => {
 
   it('displays rated badge for rated players', async () => {
     const player: Player = createMockPlayer({
-      name: 'Rated Player',
+      firstName: 'Rated',
+      lastName: 'Player',
       isRated: true,
       eventCount: 10,
     });
@@ -132,7 +134,8 @@ describe('PlayerProfilePage', () => {
 
   it('displays events needed for unrated players', async () => {
     const player: Player = createMockPlayer({
-      name: 'New Player',
+      firstName: 'New',
+      lastName: 'Player',
       isRated: false,
       eventCount: 3,
     });
@@ -153,7 +156,8 @@ describe('PlayerProfilePage', () => {
 
   it('displays rating card with correct values', async () => {
     const player: Player = createMockPlayer({
-      name: 'Test Player',
+      firstName: 'Test',
+      lastName: 'Player',
       rating: 1850,
       ratingDeviation: 75,
     });
@@ -175,7 +179,8 @@ describe('PlayerProfilePage', () => {
 
   it('displays ranking card with position', async () => {
     const player: Player = createMockPlayer({
-      name: 'Ranked Player',
+      firstName: 'Ranked',
+      lastName: 'Player',
       ranking: 10,
     });
     const stats = createMockPlayerStats({ totalDecayedPoints: 350.5 });
@@ -196,7 +201,8 @@ describe('PlayerProfilePage', () => {
 
   it('displays dash for null ranking', async () => {
     const player: Player = createMockPlayer({
-      name: 'Unranked Player',
+      firstName: 'Unranked',
+      lastName: 'Player',
       ranking: null,
     });
     const stats = createMockPlayerStats();
@@ -218,7 +224,8 @@ describe('PlayerProfilePage', () => {
 
   it('displays event count', async () => {
     const player: Player = createMockPlayer({
-      name: 'Active Player',
+      firstName: 'Active',
+      lastName: 'Player',
       eventCount: 42,
     });
     const stats = createMockPlayerStats({ totalEvents: 42 });
@@ -238,7 +245,7 @@ describe('PlayerProfilePage', () => {
   });
 
   it('displays performance stats', async () => {
-    const player: Player = createMockPlayer({ name: 'Pro Player', eventCount: 20 });
+    const player: Player = createMockPlayer({ firstName: 'Pro', lastName: 'Player', eventCount: 20 });
     const stats = createMockPlayerStats({
       totalEvents: 20,
       firstPlaceFinishes: 7,
@@ -268,7 +275,7 @@ describe('PlayerProfilePage', () => {
   });
 
   it('displays tournament history table', async () => {
-    const player: Player = createMockPlayer({ name: 'Tournament Player' });
+    const player: Player = createMockPlayer({ firstName: 'Tournament', lastName: 'Player' });
     const stats = createMockPlayerStats();
     const results: PlayerResult[] = [
       createMockPlayerResult({
@@ -318,7 +325,7 @@ describe('PlayerProfilePage', () => {
   });
 
   it('displays event booster badges in tournament history', async () => {
-    const player: Player = createMockPlayer({ name: 'Test Player' });
+    const player: Player = createMockPlayer({ firstName: 'Test', lastName: 'Player' });
     const stats = createMockPlayerStats();
     const results: PlayerResult[] = [
       createMockPlayerResult({
@@ -357,7 +364,7 @@ describe('PlayerProfilePage', () => {
   });
 
   it('displays decay multiplier in tournament history', async () => {
-    const player: Player = createMockPlayer({ name: 'Test Player' });
+    const player: Player = createMockPlayer({ firstName: 'Test', lastName: 'Player' });
     const stats = createMockPlayerStats();
     const results: PlayerResult[] = [
       createMockPlayerResult({
@@ -390,7 +397,7 @@ describe('PlayerProfilePage', () => {
   });
 
   it('displays empty tournament history message', async () => {
-    const player: Player = createMockPlayer({ name: 'New Player' });
+    const player: Player = createMockPlayer({ firstName: 'New', lastName: 'Player' });
     const stats = createMockPlayerStats({ totalEvents: 0 });
 
     mockPlayersGet.mockResolvedValue(player);
@@ -421,8 +428,8 @@ describe('PlayerProfilePage', () => {
     expect(screen.getByText('← Back to players')).toBeInTheDocument();
   });
 
-  it('displays Unknown Player for null name', async () => {
-    const player: Player = createMockPlayer({ name: null });
+  it('displays full name with middle initial', async () => {
+    const player: Player = createMockPlayer({ firstName: 'John', middleInitial: 'A', lastName: 'Doe' });
     const stats = createMockPlayerStats();
 
     mockPlayersGet.mockResolvedValue(player);
@@ -432,12 +439,12 @@ describe('PlayerProfilePage', () => {
     render(<PlayerProfilePage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Unknown Player')).toBeInTheDocument();
+      expect(screen.getByText('John A. Doe')).toBeInTheDocument();
     });
   });
 
   it('renders back link to players list', async () => {
-    const player: Player = createMockPlayer({ name: 'Test Player' });
+    const player: Player = createMockPlayer({ firstName: 'Test', lastName: 'Player' });
     const stats = createMockPlayerStats();
 
     mockPlayersGet.mockResolvedValue(player);
@@ -455,7 +462,7 @@ describe('PlayerProfilePage', () => {
   });
 
   it('renders tournament links in history', async () => {
-    const player: Player = createMockPlayer({ name: 'Test Player' });
+    const player: Player = createMockPlayer({ firstName: 'Test', lastName: 'Player' });
     const stats = createMockPlayerStats();
     const results: PlayerResult[] = [
       createMockPlayerResult({
@@ -484,7 +491,7 @@ describe('PlayerProfilePage', () => {
   });
 
   it('hides performance stats section when no events', async () => {
-    const player: Player = createMockPlayer({ name: 'No Events Player' });
+    const player: Player = createMockPlayer({ firstName: 'No Events', lastName: 'Player' });
     const stats = createMockPlayerStats({ totalEvents: 0 });
 
     mockPlayersGet.mockResolvedValue(player);
@@ -501,7 +508,7 @@ describe('PlayerProfilePage', () => {
   });
 
   it('calls API with correct player ID', async () => {
-    const player: Player = createMockPlayer({ name: 'Test Player' });
+    const player: Player = createMockPlayer({ firstName: 'Test', lastName: 'Player' });
     const stats = createMockPlayerStats();
 
     mockPlayersGet.mockResolvedValue(player);

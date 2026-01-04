@@ -7,7 +7,8 @@ export function createPlayerFixture(overrides: Record<string, unknown> = {}) {
   const id = randomUUID().slice(0, 8);
   return {
     externalId: `ext-player-${id}`,
-    name: `Test Player ${id}`,
+    firstName: 'Test',
+    lastName: `Player ${id}`,
     rating: 1500,
     ratingDeviation: 200,
     isRated: false,

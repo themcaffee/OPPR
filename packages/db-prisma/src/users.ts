@@ -35,7 +35,9 @@ export interface UserWithPlayer {
   player: {
     id: string;
     playerNumber: number;
-    name: string | null;
+    firstName: string;
+    middleInitial: string | null;
+    lastName: string;
     rating: number;
     ratingDeviation: number;
     ranking: number | null;
@@ -58,7 +60,7 @@ export async function createUser(data: CreateUserInput): Promise<User> {
  */
 export async function createUserWithPlayer(
   userData: Omit<CreateUserInput, 'playerId'>,
-  playerData: { name?: string },
+  playerData: { firstName: string; middleInitial?: string; lastName: string },
 ): Promise<UserWithPlayer> {
   return prisma.$transaction(async (tx) => {
     // Generate a unique player number
@@ -67,7 +69,9 @@ export async function createUserWithPlayer(
     // Create the player first
     const player = await tx.player.create({
       data: {
-        name: playerData.name,
+        firstName: playerData.firstName,
+        middleInitial: playerData.middleInitial,
+        lastName: playerData.lastName,
         playerNumber,
       },
     });
@@ -83,7 +87,9 @@ export async function createUserWithPlayer(
           select: {
             id: true,
             playerNumber: true,
-            name: true,
+            firstName: true,
+            middleInitial: true,
+            lastName: true,
             rating: true,
             ratingDeviation: true,
             ranking: true,
@@ -132,7 +138,9 @@ export async function getUserWithPlayer(id: string): Promise<UserWithPlayer | nu
         select: {
           id: true,
           playerNumber: true,
-          name: true,
+          firstName: true,
+          middleInitial: true,
+          lastName: true,
           rating: true,
           ratingDeviation: true,
           ranking: true,
@@ -161,7 +169,9 @@ export async function getUserByEmailWithPlayer(email: string): Promise<UserWithP
         select: {
           id: true,
           playerNumber: true,
-          name: true,
+          firstName: true,
+          middleInitial: true,
+          lastName: true,
           rating: true,
           ratingDeviation: true,
           ranking: true,
@@ -237,7 +247,9 @@ export async function findUsers(params: {
         select: {
           id: true,
           playerNumber: true,
-          name: true,
+          firstName: true,
+          middleInitial: true,
+          lastName: true,
           rating: true,
           ratingDeviation: true,
           ranking: true,
@@ -288,7 +300,9 @@ export async function linkPlayerToUser(
           select: {
             id: true,
             playerNumber: true,
-            name: true,
+            firstName: true,
+            middleInitial: true,
+            lastName: true,
             rating: true,
             ratingDeviation: true,
             ranking: true,

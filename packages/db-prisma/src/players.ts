@@ -8,7 +8,9 @@ import { generateUniquePlayerNumber } from './player-number.js';
 export interface CreatePlayerInput {
   externalId?: string;
   playerNumber?: number;
-  name?: string;
+  firstName: string;
+  middleInitial?: string;
+  lastName: string;
   rating?: number;
   ratingDeviation?: number;
   ranking?: number;
@@ -20,7 +22,9 @@ export interface CreatePlayerInput {
  * Input for updating a player
  */
 export interface UpdatePlayerInput {
-  name?: string;
+  firstName?: string;
+  middleInitial?: string | null;
+  lastName?: string;
   rating?: number;
   ratingDeviation?: number;
   ranking?: number;
@@ -240,13 +244,50 @@ export async function getPlayerWithResults(id: string) {
 }
 
 /**
- * Searches players by name
+ * Searches players by name (searches across firstName and lastName)
  */
 export async function searchPlayers(query: string, limit: number = 20): Promise<Player[]> {
+  const terms = query.trim().split(/\s+/);
+
+  // If single term, search firstName or lastName
+  if (terms.length === 1) {
+    return findPlayers({
+      take: limit,
+      where: {
+        OR: [
+          { firstName: { contains: query, mode: 'insensitive' } },
+          { lastName: { contains: query, mode: 'insensitive' } },
+        ],
+      },
+    });
+  }
+
+  // If multiple terms, search for matches across name parts
   return findPlayers({
     take: limit,
     where: {
-      name: { contains: query, mode: 'insensitive' },
+      AND: terms.map((term) => ({
+        OR: [
+          { firstName: { contains: term, mode: 'insensitive' } },
+          { lastName: { contains: term, mode: 'insensitive' } },
+        ],
+      })),
     },
   });
+}
+
+/**
+ * Constructs full display name from name parts
+ */
+export function formatPlayerName(player: {
+  firstName: string;
+  middleInitial?: string | null;
+  lastName: string;
+}): string {
+  const parts = [player.firstName];
+  if (player.middleInitial) {
+    parts.push(player.middleInitial.endsWith('.') ? player.middleInitial : `${player.middleInitial}.`);
+  }
+  parts.push(player.lastName);
+  return parts.join(' ');
 }

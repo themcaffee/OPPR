@@ -19,7 +19,11 @@ model Player {
   // Player identification
   externalId       String?  @unique // External ID from OPPR or other systems
   playerNumber     Int      @unique // 5-digit unique identifier (10000-99999)
-  name             String?
+
+  // Name fields
+  firstName        String
+  middleInitial    String?  // Optional, max 2 characters
+  lastName         String
 
   // OPPR Rating fields
   rating           Float    @default(1500) // Glicko rating

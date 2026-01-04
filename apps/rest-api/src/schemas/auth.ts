@@ -9,11 +9,13 @@ export const loginRequestSchema = {
 
 export const registerRequestSchema = {
   type: 'object',
-  required: ['email', 'password', 'name'],
+  required: ['email', 'password', 'firstName', 'lastName'],
   properties: {
     email: { type: 'string', format: 'email' },
     password: { type: 'string', minLength: 8 },
-    name: { type: 'string', minLength: 1 },
+    firstName: { type: 'string', minLength: 1 },
+    middleInitial: { type: 'string', maxLength: 2 },
+    lastName: { type: 'string', minLength: 1 },
   },
 } as const;
 
@@ -66,7 +68,9 @@ export const playerProfileSchema = {
   nullable: true,
   properties: {
     id: { type: 'string' },
-    name: { type: 'string', nullable: true },
+    firstName: { type: 'string' },
+    middleInitial: { type: 'string', nullable: true },
+    lastName: { type: 'string' },
     rating: { type: 'number' },
     ratingDeviation: { type: 'number' },
     ranking: { type: 'integer', nullable: true },

@@ -187,10 +187,16 @@ export function registerAuthCommands(program: Command): void {
           process.exit(1);
         }
 
+        // Parse name into firstName and lastName
+        const nameParts = name.trim().split(/\s+/);
+        const firstName = nameParts[0] ?? 'Unknown';
+        const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1]! : 'Player';
+        const middleInitial = nameParts.length > 2 ? nameParts[1]!.charAt(0).toUpperCase() : undefined;
+
         const spinner = ora('Registering...').start();
 
         const client = createClient(apiUrl);
-        await client.register({ email, password, name });
+        await client.register({ email, password, firstName, middleInitial, lastName });
 
         spinner.stop();
         success(`Account created for ${email}`);

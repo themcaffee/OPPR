@@ -19,9 +19,9 @@ vi.mock('@/lib/api-client', () => ({
 
 describe('PlayerSelector', () => {
   const mockPlayers = [
-    createMockPlayer({ id: 'p1', name: 'Alice', rating: 1800, ranking: 1 }),
-    createMockPlayer({ id: 'p2', name: 'Bob', rating: 1750, ranking: 2 }),
-    createMockPlayer({ id: 'p3', name: 'Charlie', rating: 1700, ranking: 3 }),
+    createMockPlayer({ id: 'p1', firstName: 'Alice', lastName: 'Smith', rating: 1800, ranking: 1 }),
+    createMockPlayer({ id: 'p2', firstName: 'Bob', lastName: 'Jones', rating: 1750, ranking: 2 }),
+    createMockPlayer({ id: 'p3', firstName: 'Charlie', lastName: 'Brown', rating: 1700, ranking: 3 }),
   ];
 
   beforeEach(() => {
@@ -59,13 +59,13 @@ describe('PlayerSelector', () => {
 
   it('shows selected player name when value is set', async () => {
     const onChange = vi.fn();
-    const selectedPlayer = createMockPlayer({ id: 'p1', name: 'Alice' });
+    const selectedPlayer = createMockPlayer({ id: 'p1', firstName: 'Alice', lastName: 'Smith' });
     mockPlayersGet.mockResolvedValue(selectedPlayer);
 
     render(<PlayerSelector value="p1" onChange={onChange} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Alice')).toBeInTheDocument();
+      expect(screen.getByText('Alice Smith')).toBeInTheDocument();
     });
   });
 
@@ -98,9 +98,9 @@ describe('PlayerSelector', () => {
     fireEvent.focus(input);
 
     // Only Bob should be visible
-    expect(screen.getByText('Bob')).toBeInTheDocument();
-    expect(screen.queryByText('Alice')).not.toBeInTheDocument();
-    expect(screen.queryByText('Charlie')).not.toBeInTheDocument();
+    expect(screen.getByText('Bob Jones')).toBeInTheDocument();
+    expect(screen.queryByText('Alice Smith')).not.toBeInTheDocument();
+    expect(screen.queryByText('Charlie Brown')).not.toBeInTheDocument();
   });
 
   it('calls onChange with playerId and player when selecting', async () => {
@@ -115,25 +115,25 @@ describe('PlayerSelector', () => {
     const input = screen.getByPlaceholderText(/search for a player/i);
     fireEvent.focus(input);
 
-    fireEvent.click(screen.getByText('Bob'));
+    fireEvent.click(screen.getByText('Bob Jones'));
 
-    expect(onChange).toHaveBeenCalledWith('p2', expect.objectContaining({ id: 'p2', name: 'Bob' }));
+    expect(onChange).toHaveBeenCalledWith('p2', expect.objectContaining({ id: 'p2', firstName: 'Bob', lastName: 'Jones' }));
   });
 
   it('clears selection when clear button clicked', async () => {
     const onChange = vi.fn();
-    const selectedPlayer = createMockPlayer({ id: 'p1', name: 'Alice' });
+    const selectedPlayer = createMockPlayer({ id: 'p1', firstName: 'Alice', lastName: 'Smith' });
     mockPlayersGet.mockResolvedValue(selectedPlayer);
 
     render(<PlayerSelector value="p1" onChange={onChange} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Alice')).toBeInTheDocument();
+      expect(screen.getByText('Alice Smith')).toBeInTheDocument();
     });
 
     // Find and click the clear button (the X icon button)
     // The button has type="button" but no name, find it within the component
-    const container = screen.getByText('Alice').closest('div')?.parentElement;
+    const container = screen.getByText('Alice Smith').closest('div')?.parentElement;
     const clearButton = container?.querySelector('button');
     expect(clearButton).toBeTruthy();
     fireEvent.click(clearButton!);

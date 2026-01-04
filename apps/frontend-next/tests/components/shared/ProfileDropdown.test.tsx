@@ -27,7 +27,9 @@ describe('ProfileDropdown', () => {
     role: 'user',
     player: {
       id: 'player-1',
-      name: 'Test Player',
+      firstName: 'Test',
+      middleInitial: null,
+      lastName: 'Player',
       rating: 1500,
       ratingDeviation: 350,
       ranking: 1,

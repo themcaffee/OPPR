@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { apiClient } from '@/lib/api-client';
 import type { Player } from '@opprs/rest-api-client';
+import { formatPlayerName } from '@/lib/utils/player';
 
 interface PlayerSelectorProps {
   value: string | null;
@@ -124,7 +125,7 @@ export function PlayerSelector({
   const filteredPlayers = displayPlayers.filter((p) => !excludePlayerIds.includes(p.id));
 
   const getPlayerDisplayName = (player: Player) => {
-    return player.name || player.id;
+    return formatPlayerName(player);
   };
 
   return (

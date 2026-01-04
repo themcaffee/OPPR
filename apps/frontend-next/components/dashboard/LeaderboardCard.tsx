@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import type { Player } from '@opprs/rest-api-client';
+import { formatPlayerName } from '@/lib/utils/player';
 
 interface LeaderboardCardProps {
   rankingPlayers: Player[];
@@ -70,7 +71,7 @@ export function LeaderboardCard({
                     {index + 1}.
                   </span>
                   <span className={`text-sm ${isCurrentUser ? 'font-semibold text-blue-700' : 'text-gray-900'}`}>
-                    {player.name ?? 'Unknown Player'}
+                    {formatPlayerName(player)}
                     {isCurrentUser && (
                       <span className="ml-2 text-xs text-blue-600">(You)</span>
                     )}

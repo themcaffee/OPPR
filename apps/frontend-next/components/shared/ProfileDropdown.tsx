@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api-client';
 import type { AuthUser } from '@opprs/rest-api-client';
+import { formatPlayerName } from '@/lib/utils/player';
 
 interface ProfileDropdownProps {
   user: AuthUser;
@@ -17,7 +18,7 @@ export function ProfileDropdown({ user, onSignOut }: ProfileDropdownProps) {
   const [isLoading, setIsLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const displayName = user.player?.name || user.email;
+  const displayName = user.player ? formatPlayerName(user.player) : user.email;
 
   // Close dropdown when clicking outside
   useEffect(() => {

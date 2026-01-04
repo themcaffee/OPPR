@@ -78,19 +78,22 @@ describe('Players endpoints', () => {
 
       const body = response.json();
       expect(body).toHaveProperty('id');
-      expect(body.name).toBe(playerData.name);
+      expect(body.firstName).toBe(playerData.firstName);
+      expect(body.lastName).toBe(playerData.lastName);
       expect(body.rating).toBe(playerData.rating);
     });
 
     it('should create a player with minimal data', async () => {
       const response = await authenticatedRequest('POST', '/api/v1/players', {
-        name: 'Minimal Player',
+        firstName: 'Minimal',
+        lastName: 'Player',
       });
 
       expect(response.statusCode).toBe(201);
 
       const body = response.json();
-      expect(body.name).toBe('Minimal Player');
+      expect(body.firstName).toBe('Minimal');
+      expect(body.lastName).toBe('Player');
       expect(body.rating).toBe(1500); // default
       expect(body.ratingDeviation).toBe(200); // default
     });
@@ -130,20 +133,22 @@ describe('Players endpoints', () => {
       const { id } = createResponse.json();
 
       const response = await authenticatedRequest('PATCH', `/api/v1/players/${id}`, {
-        name: 'Updated Name',
+        firstName: 'Updated',
+        lastName: 'Name',
         rating: 1700,
       });
 
       expect(response.statusCode).toBe(200);
 
       const body = response.json();
-      expect(body.name).toBe('Updated Name');
+      expect(body.firstName).toBe('Updated');
+      expect(body.lastName).toBe('Name');
       expect(body.rating).toBe(1700);
     });
 
     it('should return 404 when updating non-existent player', async () => {
       const response = await authenticatedRequest('PATCH', '/api/v1/players/non-existent-id', {
-        name: 'Test',
+        firstName: 'Test',
       });
 
       expect(response.statusCode).toBe(404);
@@ -175,8 +180,8 @@ describe('Players endpoints', () => {
 
   describe('GET /api/v1/players/search', () => {
     it('should search players by name', async () => {
-      await authenticatedRequest('POST', '/api/v1/players', createPlayerFixture({ name: 'John Doe' }));
-      await authenticatedRequest('POST', '/api/v1/players', createPlayerFixture({ name: 'Jane Smith' }));
+      await authenticatedRequest('POST', '/api/v1/players', createPlayerFixture({ firstName: 'John', lastName: 'Doe' }));
+      await authenticatedRequest('POST', '/api/v1/players', createPlayerFixture({ firstName: 'Jane', lastName: 'Smith' }));
 
       const response = await authenticatedRequest('GET', '/api/v1/players/search?q=John');
 
@@ -184,7 +189,8 @@ describe('Players endpoints', () => {
 
       const body = response.json();
       expect(body).toHaveLength(1);
-      expect(body[0].name).toBe('John Doe');
+      expect(body[0].firstName).toBe('John');
+      expect(body[0].lastName).toBe('Doe');
     });
 
   });
