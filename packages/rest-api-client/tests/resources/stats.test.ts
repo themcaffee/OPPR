@@ -49,8 +49,9 @@ describe('StatsResource', () => {
       const players: Player[] = [
         {
           id: '1',
-          name: 'Player 1',
-          email: 'player1@example.com',
+          firstName: 'Player',
+          middleInitial: null,
+          lastName: 'One',
           rating: 2000,
           ratingDeviation: 150,
           ranking: 1,
@@ -64,8 +65,9 @@ describe('StatsResource', () => {
         },
         {
           id: '2',
-          name: 'Player 2',
-          email: 'player2@example.com',
+          firstName: 'Player',
+          middleInitial: null,
+          lastName: 'Two',
           rating: 1900,
           ratingDeviation: 160,
           ranking: 2,
@@ -91,8 +93,9 @@ describe('StatsResource', () => {
       const players: Player[] = [
         {
           id: '1',
-          name: 'Player 1',
-          email: 'player1@example.com',
+          firstName: 'Player',
+          middleInitial: null,
+          lastName: 'One',
           rating: 2000,
           ratingDeviation: 150,
           ranking: 1,

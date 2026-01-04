@@ -163,8 +163,8 @@ describe('TournamentsResource', () => {
           efficiency: 1.5,
           player: {
             id: 'player-1',
-            name: 'Test Player',
-            email: 'test@example.com',
+            firstName: 'Test',
+            lastName: 'Player',
             rating: 1500,
             ranking: 1,
           },

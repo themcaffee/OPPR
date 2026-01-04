@@ -25,7 +25,9 @@ describe('PlayersResource', () => {
   const mockPlayer: Player = {
     id: '1',
     externalId: null,
-    name: 'Test Player',
+    firstName: 'Test',
+    middleInitial: null,
+    lastName: 'Player',
     rating: 1500,
     ratingDeviation: 200,
     ranking: null,
@@ -171,7 +173,7 @@ describe('PlayersResource', () => {
 
   describe('create', () => {
     it('should create player', async () => {
-      const createData = { name: 'New Player' };
+      const createData = { firstName: 'New', lastName: 'Player' };
       mockRequest.mockResolvedValue(mockPlayer);
 
       const result = await resource.create(createData);
@@ -186,12 +188,12 @@ describe('PlayersResource', () => {
 
   describe('update', () => {
     it('should update player', async () => {
-      const updateData = { name: 'Updated Name' };
-      mockRequest.mockResolvedValue({ ...mockPlayer, name: 'Updated Name' });
+      const updateData = { lastName: 'Updated' };
+      mockRequest.mockResolvedValue({ ...mockPlayer, lastName: 'Updated' });
 
       const result = await resource.update('1', updateData);
 
-      expect(result.name).toBe('Updated Name');
+      expect(result.lastName).toBe('Updated');
       expect(mockRequest).toHaveBeenCalledWith('/players/1', {
         method: 'PATCH',
         body: JSON.stringify(updateData),

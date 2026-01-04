@@ -214,8 +214,9 @@ describe('OpprsClient', () => {
         data: [
           {
             id: '1',
-            name: 'Test Player',
-            email: 'test@example.com',
+            firstName: 'Test',
+            middleInitial: null,
+            lastName: 'Player',
             rating: 1500,
             ratingDeviation: 200,
             ranking: null,
@@ -259,8 +260,9 @@ describe('OpprsClient', () => {
     it('should get single player by id', async () => {
       const player: Player = {
         id: '1',
-        name: 'Test Player',
-        email: 'test@example.com',
+        firstName: 'Test',
+        middleInitial: null,
+        lastName: 'Player',
         rating: 1500,
         ratingDeviation: 200,
         ranking: null,
@@ -318,7 +320,8 @@ describe('OpprsClient', () => {
           role: 'user',
           player: {
             id: 'player-1',
-            name: 'New User',
+            firstName: 'New',
+            lastName: 'User',
           },
         },
         message: 'Registration successful',
@@ -398,7 +401,7 @@ describe('OpprsClient', () => {
         id: 'user-1',
         email: 'test@example.com',
         role: 'user',
-        player: { id: 'player-1', name: 'Test Player' },
+        player: { id: 'player-1', firstName: 'Test', lastName: 'Player' },
       };
 
       mockFetch.mockResolvedValueOnce(createMockResponse(authUser));

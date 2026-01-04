@@ -57,7 +57,8 @@ describe('ResultsResource', () => {
         updatedAt: '2025-01-01T00:00:00Z',
         player: {
           id: 'player-1',
-          name: 'Test Player',
+          firstName: 'Test',
+          lastName: 'Player',
         },
         tournament: {
           id: 'tournament-1',
