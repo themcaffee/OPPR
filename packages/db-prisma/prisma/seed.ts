@@ -149,13 +149,71 @@ async function main() {
 
   console.log(`✓ Created admin user (admin@example.com / ${adminPassword})`);
 
+  // Create sample locations (using upsert for idempotency)
+  console.log('Creating locations...');
+
+  const location1 = await prisma.location.upsert({
+    where: { externalId: 'location-1' },
+    update: {
+      name: 'Las Vegas Convention Center',
+      city: 'Las Vegas',
+      state: 'NV',
+      country: 'USA',
+    },
+    create: {
+      externalId: 'location-1',
+      name: 'Las Vegas Convention Center',
+      city: 'Las Vegas',
+      state: 'NV',
+      country: 'USA',
+    },
+  });
+
+  const location2 = await prisma.location.upsert({
+    where: { externalId: 'location-2' },
+    update: {
+      name: 'Ground Kontrol',
+      address: '115 NW 5th Ave',
+      city: 'Portland',
+      state: 'OR',
+      country: 'USA',
+    },
+    create: {
+      externalId: 'location-2',
+      name: 'Ground Kontrol',
+      address: '115 NW 5th Ave',
+      city: 'Portland',
+      state: 'OR',
+      country: 'USA',
+    },
+  });
+
+  const location3 = await prisma.location.upsert({
+    where: { externalId: 'location-3' },
+    update: {
+      name: 'Add-a-Ball Amusements',
+      city: 'Seattle',
+      state: 'WA',
+      country: 'USA',
+    },
+    create: {
+      externalId: 'location-3',
+      name: 'Add-a-Ball Amusements',
+      city: 'Seattle',
+      state: 'WA',
+      country: 'USA',
+    },
+  });
+
+  console.log(`✓ Created ${await prisma.location.count()} locations`);
+
   // Create sample tournaments (using upsert for idempotency)
   console.log('Creating tournaments...');
 
   const tournament1Data = {
     externalId: 'tournament-1',
     name: 'World Pinball Championship 2024',
-    location: 'Las Vegas, NV',
+    locationId: location1.id,
     date: new Date('2024-03-15'),
     eventBooster: EventBoosterType.MAJOR,
     allowsOptOut: false,
@@ -191,7 +249,7 @@ async function main() {
   const tournament2Data = {
     externalId: 'tournament-2',
     name: 'Spring Classics 2024',
-    location: 'Portland, OR',
+    locationId: location2.id,
     date: new Date('2024-04-20'),
     eventBooster: EventBoosterType.CERTIFIED,
     allowsOptOut: true,
@@ -225,7 +283,7 @@ async function main() {
   const tournament3Data = {
     externalId: 'tournament-3',
     name: 'Monthly League Finals',
-    location: 'Seattle, WA',
+    locationId: location3.id,
     date: new Date('2024-05-10'),
     eventBooster: EventBoosterType.NONE,
     allowsOptOut: false,
@@ -428,6 +486,7 @@ async function main() {
   console.log('Summary:');
   console.log(`  - ${await prisma.player.count()} players`);
   console.log(`  - ${await prisma.user.count()} users`);
+  console.log(`  - ${await prisma.location.count()} locations`);
   console.log(`  - ${await prisma.tournament.count()} tournaments`);
   console.log(`  - ${await prisma.tournamentResult.count()} tournament results`);
 }

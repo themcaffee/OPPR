@@ -6,6 +6,7 @@ export type {
   Tournament,
   TournamentResult,
   User,
+  Location,
   EventBoosterType,
   Role,
   Prisma,
@@ -25,6 +26,12 @@ export type {
 export type { CreateResultInput, UpdateResultInput, FindResultsOptions } from './results.js';
 
 export type { CreateUserInput, UpdateUserInput, UserWithPlayer } from './users.js';
+
+export type {
+  CreateLocationInput,
+  UpdateLocationInput,
+  FindLocationsOptions,
+} from './locations.js';
 
 /**
  * Player with full tournament results

@@ -138,8 +138,8 @@ export default function TournamentsPage() {
                         <h3 className="text-lg font-medium text-gray-900">
                           {tournament.name}
                         </h3>
-                        {tournament.location && (
-                          <p className="text-sm text-gray-500">{tournament.location}</p>
+                        {tournament.location?.name && (
+                          <p className="text-sm text-gray-500">{tournament.location.name}</p>
                         )}
                         <div className="flex items-center space-x-3 mt-2">
                           {boosterLabel && (

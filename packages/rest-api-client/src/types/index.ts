@@ -28,6 +28,12 @@ export type {
   TopPlayersParams,
   PlayerStats,
   PlayerResult,
+  // Locations
+  Location,
+  CreateLocationRequest,
+  UpdateLocationRequest,
+  LocationListParams,
+  LocationSearchParams,
   // Tournaments
   EventBoosterType,
   Tournament,
