@@ -13,6 +13,11 @@
       "outputs": ["dist/**"],
       "cache": false
     },
+    "@opprs/db-prisma#typecheck": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "prisma/**", "tsconfig.json", "package.json"],
+      "cache": false
+    },
     "test": {
       "dependsOn": ["build"],
       "inputs": ["src/**", "tests/**", "vitest.config.ts", "tsconfig.json"],
