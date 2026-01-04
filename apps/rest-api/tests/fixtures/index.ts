@@ -49,9 +49,9 @@ export function createTournamentFixture(overrides: Record<string, unknown> = {})
 }
 
 /**
- * Creates a result fixture for testing
+ * Creates a standing fixture for testing
  */
-export function createResultFixture(
+export function createStandingFixture(
   playerId: string,
   tournamentId: string,
   overrides: Record<string, unknown> = {}
@@ -60,6 +60,7 @@ export function createResultFixture(
     playerId,
     tournamentId,
     position: 1,
+    isFinals: false,
     optedOut: false,
     linearPoints: 10,
     dynamicPoints: 90,
@@ -70,3 +71,8 @@ export function createResultFixture(
     ...overrides,
   };
 }
+
+/**
+ * @deprecated Use createStandingFixture instead
+ */
+export const createResultFixture = createStandingFixture;

@@ -1,10 +1,11 @@
-export const resultSchema = {
+export const standingSchema = {
   type: 'object',
   properties: {
     id: { type: 'string' },
     playerId: { type: 'string' },
     tournamentId: { type: 'string' },
     position: { type: 'integer' },
+    isFinals: { type: 'boolean' },
     optedOut: { type: 'boolean' },
     linearPoints: { type: 'number', nullable: true },
     dynamicPoints: { type: 'number', nullable: true },
@@ -18,13 +19,14 @@ export const resultSchema = {
   },
 } as const;
 
-export const resultWithRelationsSchema = {
+export const standingWithRelationsSchema = {
   type: 'object',
   properties: {
     id: { type: 'string' },
     playerId: { type: 'string' },
     tournamentId: { type: 'string' },
     position: { type: 'integer' },
+    isFinals: { type: 'boolean' },
     optedOut: { type: 'boolean' },
     linearPoints: { type: 'number', nullable: true },
     dynamicPoints: { type: 'number', nullable: true },
@@ -57,13 +59,14 @@ export const resultWithRelationsSchema = {
   },
 } as const;
 
-export const createResultSchema = {
+export const createStandingSchema = {
   type: 'object',
   required: ['playerId', 'tournamentId', 'position'],
   properties: {
     playerId: { type: 'string' },
     tournamentId: { type: 'string' },
     position: { type: 'integer', minimum: 1 },
+    isFinals: { type: 'boolean', default: false },
     optedOut: { type: 'boolean', default: false },
     linearPoints: { type: 'number' },
     dynamicPoints: { type: 'number' },
@@ -75,13 +78,13 @@ export const createResultSchema = {
   },
 } as const;
 
-export const createManyResultsSchema = {
+export const createManyStandingsSchema = {
   type: 'array',
-  items: createResultSchema,
+  items: createStandingSchema,
   minItems: 1,
 } as const;
 
-export const updateResultSchema = {
+export const updateStandingSchema = {
   type: 'object',
   properties: {
     position: { type: 'integer', minimum: 1 },
@@ -96,19 +99,20 @@ export const updateResultSchema = {
   },
 } as const;
 
-export const resultListQuerySchema = {
+export const standingListQuerySchema = {
   type: 'object',
   properties: {
     page: { type: 'integer', minimum: 1, default: 1 },
     limit: { type: 'integer', minimum: 1, maximum: 100, default: 20 },
     playerId: { type: 'string' },
     tournamentId: { type: 'string' },
+    isFinals: { type: 'boolean' },
     sortBy: { type: 'string', enum: ['position', 'totalPoints', 'decayedPoints', 'createdAt'] },
     sortOrder: { type: 'string', enum: ['asc', 'desc'], default: 'asc' },
   },
 } as const;
 
-export const batchResultResponseSchema = {
+export const batchStandingResponseSchema = {
   type: 'object',
   properties: {
     count: { type: 'integer' },

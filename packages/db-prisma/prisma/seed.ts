@@ -316,11 +316,11 @@ async function main() {
 
   console.log(`✓ Created ${await prisma.tournament.count()} tournaments`);
 
-  // Create tournament results (delete existing first for idempotency)
-  console.log('Creating tournament results...');
+  // Create tournament standings (delete existing first for idempotency)
+  console.log('Creating tournament standings...');
 
-  // Delete existing results for seeded tournaments
-  await prisma.tournamentResult.deleteMany({
+  // Delete existing standings for seeded tournaments
+  await prisma.standing.deleteMany({
     where: {
       tournamentId: {
         in: [tournament1.id, tournament2.id, tournament3.id],
@@ -328,13 +328,14 @@ async function main() {
     },
   });
 
-  // World Championship results
-  await prisma.tournamentResult.createMany({
+  // World Championship standings
+  await prisma.standing.createMany({
     data: [
       {
         playerId: player1.id,
         tournamentId: tournament1.id,
         position: 1,
+        isFinals: true,
         totalPoints: 411.84,
         linearPoints: 41.18,
         dynamicPoints: 370.66,
@@ -347,6 +348,7 @@ async function main() {
         playerId: player2.id,
         tournamentId: tournament1.id,
         position: 2,
+        isFinals: true,
         totalPoints: 298.45,
         linearPoints: 41.18,
         dynamicPoints: 257.27,
@@ -359,6 +361,7 @@ async function main() {
         playerId: player3.id,
         tournamentId: tournament1.id,
         position: 3,
+        isFinals: true,
         totalPoints: 215.32,
         linearPoints: 41.18,
         dynamicPoints: 174.14,
@@ -371,6 +374,7 @@ async function main() {
         playerId: player4.id,
         tournamentId: tournament1.id,
         position: 5,
+        isFinals: true,
         totalPoints: 125.18,
         linearPoints: 41.18,
         dynamicPoints: 84.00,
@@ -382,13 +386,14 @@ async function main() {
     ],
   });
 
-  // Spring Classics results
-  await prisma.tournamentResult.createMany({
+  // Spring Classics standings
+  await prisma.standing.createMany({
     data: [
       {
         playerId: player2.id,
         tournamentId: tournament2.id,
         position: 1,
+        isFinals: true,
         totalPoints: 87.28,
         linearPoints: 8.73,
         dynamicPoints: 78.55,
@@ -401,6 +406,7 @@ async function main() {
         playerId: player1.id,
         tournamentId: tournament2.id,
         position: 2,
+        isFinals: true,
         totalPoints: 63.25,
         linearPoints: 8.73,
         dynamicPoints: 54.52,
@@ -413,6 +419,7 @@ async function main() {
         playerId: player4.id,
         tournamentId: tournament2.id,
         position: 3,
+        isFinals: true,
         totalPoints: 45.67,
         linearPoints: 8.73,
         dynamicPoints: 36.94,
@@ -425,6 +432,7 @@ async function main() {
         playerId: player5.id,
         tournamentId: tournament2.id,
         position: 6,
+        isFinals: true,
         totalPoints: 18.52,
         linearPoints: 8.73,
         dynamicPoints: 9.79,
@@ -436,13 +444,14 @@ async function main() {
     ],
   });
 
-  // Monthly League results
-  await prisma.tournamentResult.createMany({
+  // Monthly League standings
+  await prisma.standing.createMany({
     data: [
       {
         playerId: player3.id,
         tournamentId: tournament3.id,
         position: 1,
+        isFinals: true,
         totalPoints: 28.4,
         linearPoints: 2.84,
         dynamicPoints: 25.56,
@@ -455,6 +464,7 @@ async function main() {
         playerId: player4.id,
         tournamentId: tournament3.id,
         position: 2,
+        isFinals: true,
         totalPoints: 20.58,
         linearPoints: 2.84,
         dynamicPoints: 17.74,
@@ -467,6 +477,7 @@ async function main() {
         playerId: player5.id,
         tournamentId: tournament3.id,
         position: 3,
+        isFinals: true,
         totalPoints: 14.85,
         linearPoints: 2.84,
         dynamicPoints: 12.01,
@@ -478,7 +489,7 @@ async function main() {
     ],
   });
 
-  console.log(`✓ Created ${await prisma.tournamentResult.count()} tournament results`);
+  console.log(`✓ Created ${await prisma.standing.count()} tournament standings`);
 
   console.log('');
   console.log('✅ Database seeded successfully!');
@@ -488,7 +499,7 @@ async function main() {
   console.log(`  - ${await prisma.user.count()} users`);
   console.log(`  - ${await prisma.location.count()} locations`);
   console.log(`  - ${await prisma.tournament.count()} tournaments`);
-  console.log(`  - ${await prisma.tournamentResult.count()} tournament results`);
+  console.log(`  - ${await prisma.standing.count()} standings`);
 }
 
 main()

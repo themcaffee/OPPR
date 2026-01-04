@@ -23,7 +23,7 @@ import {
 } from './errors.js';
 import { PlayersResource } from './resources/players.js';
 import { TournamentsResource } from './resources/tournaments.js';
-import { ResultsResource } from './resources/results.js';
+import { StandingsResource } from './resources/results.js';
 import { StatsResource } from './resources/stats.js';
 import { ImportResource } from './resources/import.js';
 import { UsersResource } from './resources/users.js';
@@ -397,10 +397,10 @@ export class OpprsClient {
   }
 
   /**
-   * Results resource
+   * Standings resource
    */
-  get results(): ResultsResource {
-    return new ResultsResource(this.request.bind(this), this.buildQueryString.bind(this));
+  get standings(): StandingsResource {
+    return new StandingsResource(this.request.bind(this), this.buildQueryString.bind(this));
   }
 
   /**

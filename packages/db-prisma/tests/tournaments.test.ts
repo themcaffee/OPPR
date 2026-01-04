@@ -12,11 +12,15 @@ import {
   deleteTournament,
   countTournaments,
   getTournamentWithResults,
+  getTournamentWithMatches,
   searchTournaments,
   getTournamentStats,
 } from '../src/tournaments.js';
 import { createPlayer } from '../src/players.js';
-import { createResult, countResults } from '../src/results.js';
+import { createStanding, countStandings } from '../src/standings.js';
+import { createRound } from '../src/rounds.js';
+import { createMatch } from '../src/matches.js';
+import { createEntry } from '../src/entries.js';
 import {
   createTournamentInput,
   createMajorTournamentInput,
@@ -24,7 +28,7 @@ import {
   resetTournamentCounter,
 } from './factories/tournament.factory.js';
 import { createPlayerInput, resetPlayerCounter } from './factories/player.factory.js';
-import { createResultInput } from './factories/result.factory.js';
+import { createStandingInput } from './factories/result.factory.js';
 
 beforeEach(() => {
   resetTournamentCounter();
@@ -63,7 +67,6 @@ describe('tournaments', () => {
 
       expect(tournament.externalId).toBe(input.externalId);
       expect(tournament.name).toBe(input.name);
-      expect(tournament.location).toBe(input.location);
       expect(tournament.baseValue).toBe(10);
       expect(tournament.tvaRating).toBe(100);
       expect(tournament.tvaRanking).toBe(50);
@@ -125,13 +128,13 @@ describe('tournaments', () => {
     it('should support include option for relations', async () => {
       const tournament = await createTournament(createTournamentInput());
       const player = await createPlayer(createPlayerInput());
-      await createResult(createResultInput(player.id, tournament.id));
+      await createStanding(createStandingInput(player.id, tournament.id));
 
-      const found = await findTournamentById(tournament.id, { results: true });
+      const found = await findTournamentById(tournament.id, { standings: true });
 
       expect(found).not.toBeNull();
-      expect(found!.results).toBeDefined();
-      expect(found!.results).toHaveLength(1);
+      expect(found!.standings).toBeDefined();
+      expect(found!.standings).toHaveLength(1);
     });
   });
 
@@ -155,10 +158,10 @@ describe('tournaments', () => {
     it('should support include option', async () => {
       const tournament = await createTournament(createTournamentInput());
 
-      const found = await findTournamentByExternalId(tournament.externalId!, { results: true });
+      const found = await findTournamentByExternalId(tournament.externalId!, { standings: true });
 
       expect(found).not.toBeNull();
-      expect(found!.results).toBeDefined();
+      expect(found!.standings).toBeDefined();
     });
   });
 
@@ -210,11 +213,11 @@ describe('tournaments', () => {
     it('should support include option', async () => {
       const tournament = await createTournament(createTournamentInput());
       const player = await createPlayer(createPlayerInput());
-      await createResult(createResultInput(player.id, tournament.id));
+      await createStanding(createStandingInput(player.id, tournament.id));
 
-      const tournaments = await findTournaments({ include: { results: true } });
+      const tournaments = await findTournaments({ include: { standings: true } });
 
-      expect(tournaments[0].results).toBeDefined();
+      expect(tournaments[0].standings).toBeDefined();
     });
   });
 
@@ -254,11 +257,11 @@ describe('tournaments', () => {
     it('should support include option', async () => {
       const tournament = await createTournament(createTournamentInput());
       const player = await createPlayer(createPlayerInput());
-      await createResult(createResultInput(player.id, tournament.id));
+      await createStanding(createStandingInput(player.id, tournament.id));
 
-      const tournaments = await getRecentTournaments(10, { results: true });
+      const tournaments = await getRecentTournaments(10, { standings: true });
 
-      expect(tournaments[0].results).toBeDefined();
+      expect(tournaments[0].standings).toBeDefined();
     });
   });
 
@@ -407,7 +410,6 @@ describe('tournaments', () => {
       const updated = await updateTournament(tournament.id, { name: 'New Name' });
 
       expect(updated.name).toBe('New Name');
-      expect(updated.location).toBe(tournament.location);
     });
 
     it('should update multiple fields', async () => {
@@ -454,17 +456,17 @@ describe('tournaments', () => {
       expect(found).toBeNull();
     });
 
-    it('should cascade delete tournament results', async () => {
+    it('should cascade delete tournament standings', async () => {
       const tournament = await createTournament(createTournamentInput());
       const player = await createPlayer(createPlayerInput());
-      await createResult(createResultInput(player.id, tournament.id));
+      await createStanding(createStandingInput(player.id, tournament.id));
 
-      const countBefore = await countResults({ tournamentId: tournament.id });
+      const countBefore = await countStandings({ tournamentId: tournament.id });
       expect(countBefore).toBe(1);
 
       await deleteTournament(tournament.id);
 
-      const countAfter = await countResults({ tournamentId: tournament.id });
+      const countAfter = await countStandings({ tournamentId: tournament.id });
       expect(countAfter).toBe(0);
     });
   });
@@ -504,15 +506,15 @@ describe('tournaments', () => {
       const tournament = await createTournament(createTournamentInput());
       const player1 = await createPlayer(createPlayerInput());
       const player2 = await createPlayer(createPlayerInput());
-      await createResult(createResultInput(player1.id, tournament.id, { position: 1 }));
-      await createResult(createResultInput(player2.id, tournament.id, { position: 2 }));
+      await createStanding(createStandingInput(player1.id, tournament.id, { position: 1 }));
+      await createStanding(createStandingInput(player2.id, tournament.id, { position: 2 }));
 
       const result = await getTournamentWithResults(tournament.id);
 
       expect(result).not.toBeNull();
       expect(result!.id).toBe(tournament.id);
-      expect(result!.results).toBeDefined();
-      expect(result!.results).toHaveLength(2);
+      expect(result!.standings).toBeDefined();
+      expect(result!.standings).toHaveLength(2);
     });
 
     it('should order results by position ascending', async () => {
@@ -520,30 +522,69 @@ describe('tournaments', () => {
       const player1 = await createPlayer(createPlayerInput());
       const player2 = await createPlayer(createPlayerInput());
       const player3 = await createPlayer(createPlayerInput());
-      await createResult(createResultInput(player1.id, tournament.id, { position: 3 }));
-      await createResult(createResultInput(player2.id, tournament.id, { position: 1 }));
-      await createResult(createResultInput(player3.id, tournament.id, { position: 2 }));
+      await createStanding(createStandingInput(player1.id, tournament.id, { position: 3 }));
+      await createStanding(createStandingInput(player2.id, tournament.id, { position: 1 }));
+      await createStanding(createStandingInput(player3.id, tournament.id, { position: 2 }));
 
       const result = await getTournamentWithResults(tournament.id);
 
-      expect(result!.results[0].position).toBe(1);
-      expect(result!.results[1].position).toBe(2);
-      expect(result!.results[2].position).toBe(3);
+      expect(result!.standings[0].position).toBe(1);
+      expect(result!.standings[1].position).toBe(2);
+      expect(result!.standings[2].position).toBe(3);
     });
 
     it('should include player data in results', async () => {
       const tournament = await createTournament(createTournamentInput());
       const player = await createPlayer(createPlayerInput({ name: 'Test Player' }));
-      await createResult(createResultInput(player.id, tournament.id));
+      await createStanding(createStandingInput(player.id, tournament.id));
 
       const result = await getTournamentWithResults(tournament.id);
 
-      expect(result!.results[0].player).toBeDefined();
-      expect(result!.results[0].player.name).toBe('Test Player');
+      expect(result!.standings[0].player).toBeDefined();
+      expect(result!.standings[0].player.name).toBe('Test Player');
     });
 
     it('should return null for non-existent tournament', async () => {
       const result = await getTournamentWithResults('non-existent-id');
+
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('getTournamentWithMatches', () => {
+    it('should return tournament with rounds, matches, and entries', async () => {
+      const tournament = await createTournament(createTournamentInput());
+      const player = await createPlayer(createPlayerInput({ name: 'Test Player' }));
+      const round = await createRound({
+        tournamentId: tournament.id,
+        number: 1,
+        name: 'Round 1',
+      });
+      const match = await createMatch({
+        tournamentId: tournament.id,
+        roundId: round.id,
+        number: 1,
+        machineName: 'Test Machine',
+      });
+      await createEntry({
+        matchId: match.id,
+        playerId: player.id,
+        result: 'WIN',
+        position: 1,
+      });
+
+      const result = await getTournamentWithMatches(tournament.id);
+
+      expect(result).not.toBeNull();
+      expect(result!.rounds).toBeDefined();
+      expect(result!.rounds).toHaveLength(1);
+      expect(result!.rounds[0].matches).toHaveLength(1);
+      expect(result!.rounds[0].matches[0].entries).toHaveLength(1);
+      expect(result!.rounds[0].matches[0].entries[0].player.name).toBe('Test Player');
+    });
+
+    it('should return null for non-existent tournament', async () => {
+      const result = await getTournamentWithMatches('non-existent-id');
 
       expect(result).toBeNull();
     });
@@ -633,12 +674,12 @@ describe('tournaments', () => {
       const player1 = await createPlayer(createPlayerInput());
       const player2 = await createPlayer(createPlayerInput());
 
-      await createResult(createResultInput(player1.id, tournament.id, {
+      await createStanding(createStandingInput(player1.id, tournament.id, {
         position: 1,
         totalPoints: 100,
         efficiency: 0.9,
       }));
-      await createResult(createResultInput(player2.id, tournament.id, {
+      await createStanding(createStandingInput(player2.id, tournament.id, {
         position: 2,
         totalPoints: 50,
         efficiency: 0.7,
@@ -666,7 +707,7 @@ describe('tournaments', () => {
       const tournament = await createTournament(createTournamentInput());
       const player = await createPlayer(createPlayerInput());
 
-      await createResult({
+      await createStanding({
         playerId: player.id,
         tournamentId: tournament.id,
         position: 1,
@@ -684,7 +725,7 @@ describe('tournaments', () => {
       const tournament = await createTournament(createTournamentInput());
       const player = await createPlayer(createPlayerInput());
 
-      await createResult(createResultInput(player.id, tournament.id, {
+      await createStanding(createStandingInput(player.id, tournament.id, {
         totalPoints: 100,
         efficiency: 0.95,
       }));

@@ -1,17 +1,18 @@
-import type { CreateResultInput } from '../../src/results.js';
+import type { CreateStandingInput } from '../../src/standings.js';
 
 /**
- * Creates a result input object with default values
+ * Creates a standing input object with default values
  */
-export function createResultInput(
+export function createStandingInput(
   playerId: string,
   tournamentId: string,
-  overrides: Partial<Omit<CreateResultInput, 'playerId' | 'tournamentId'>> = {},
-): CreateResultInput {
+  overrides: Partial<Omit<CreateStandingInput, 'playerId' | 'tournamentId'>> = {},
+): CreateStandingInput {
   return {
     playerId,
     tournamentId,
     position: 1,
+    isFinals: false,
     optedOut: false,
     linearPoints: 50,
     dynamicPoints: 50,
@@ -22,16 +23,16 @@ export function createResultInput(
 }
 
 /**
- * Creates multiple result inputs for batch operations
+ * Creates multiple standing inputs for batch operations
  */
-export function createManyResultInputs(
+export function createManyStandingInputs(
   players: { id: string }[],
   tournamentId: string,
-  overridesFn?: (index: number, playerId: string) => Partial<Omit<CreateResultInput, 'playerId' | 'tournamentId'>>,
-): CreateResultInput[] {
+  overridesFn?: (index: number, playerId: string) => Partial<Omit<CreateStandingInput, 'playerId' | 'tournamentId'>>,
+): CreateStandingInput[] {
   return players.map((player, index) => {
     const overrides = overridesFn ? overridesFn(index, player.id) : {};
-    return createResultInput(player.id, tournamentId, {
+    return createStandingInput(player.id, tournamentId, {
       position: index + 1,
       totalPoints: 100 - index * 10,
       linearPoints: 50 - index * 5,

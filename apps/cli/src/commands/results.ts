@@ -1,6 +1,6 @@
 import type { Command } from 'commander';
 import ora from 'ora';
-import type { CreateResultRequest } from '@opprs/rest-api-client';
+import type { CreateStandingRequest } from '@opprs/rest-api-client';
 import { createClient, getApiUrl, type GlobalOptions } from '../client.js';
 import { output, success, info } from '../utils/index.js';
 import { wrapCommand } from '../utils/index.js';
@@ -10,6 +10,7 @@ interface ListOptions {
   limit?: string;
   playerId?: string;
   tournamentId?: string;
+  isFinals?: boolean;
   sortBy?: string;
   sortOrder?: string;
 }
@@ -18,6 +19,7 @@ interface CreateOptions {
   playerId?: string;
   tournamentId?: string;
   position?: string;
+  isFinals?: boolean;
   optedOut?: boolean;
 }
 
@@ -27,15 +29,16 @@ interface UpdateOptions {
 }
 
 export function registerResultCommands(program: Command): void {
-  const results = program.command('results').description('Manage tournament results');
+  const standings = program.command('standings').description('Manage tournament standings');
 
-  results
+  standings
     .command('list')
-    .description('List results with pagination')
+    .description('List standings with pagination')
     .option('--page <number>', 'Page number', '1')
     .option('--limit <number>', 'Items per page', '20')
     .option('--player-id <id>', 'Filter by player ID')
     .option('--tournament-id <id>', 'Filter by tournament ID')
+    .option('--is-finals', 'Filter by finals standings only')
     .option('--sort-by <field>', 'Sort by field (position, totalPoints, decayedPoints, createdAt)')
     .option('--sort-order <order>', 'Sort order (asc, desc)')
     .action(
@@ -43,12 +46,13 @@ export function registerResultCommands(program: Command): void {
         const globalOpts = cmd.optsWithGlobals<GlobalOptions>();
         const client = createClient(getApiUrl(globalOpts));
 
-        const spinner = ora('Fetching results...').start();
-        const result = await client.results.list({
+        const spinner = ora('Fetching standings...').start();
+        const result = await client.standings.list({
           page: parseInt(options.page ?? '1'),
           limit: parseInt(options.limit ?? '20'),
           playerId: options.playerId,
           tournamentId: options.tournamentId,
+          isFinals: options.isFinals,
           sortBy: options.sortBy as 'position' | 'totalPoints' | 'decayedPoints' | 'createdAt',
           sortOrder: options.sortOrder as 'asc' | 'desc',
         });
@@ -65,28 +69,29 @@ export function registerResultCommands(program: Command): void {
       })
     );
 
-  results
+  standings
     .command('get <id>')
-    .description('Get result by ID')
+    .description('Get standing by ID')
     .action(
       wrapCommand(async (id: string, _options: object, cmd: Command) => {
         const globalOpts = cmd.optsWithGlobals<GlobalOptions>();
         const client = createClient(getApiUrl(globalOpts));
 
-        const spinner = ora('Fetching result...').start();
-        const resultData = await client.results.get(id);
+        const spinner = ora('Fetching standing...').start();
+        const standingData = await client.standings.get(id);
         spinner.stop();
 
-        output(resultData, { json: globalOpts.json });
+        output(standingData, { json: globalOpts.json });
       })
     );
 
-  results
+  standings
     .command('create')
-    .description('Create a new result')
+    .description('Create a new standing')
     .option('--player-id <id>', 'Player ID')
     .option('--tournament-id <id>', 'Tournament ID')
     .option('--position <number>', 'Position')
+    .option('--is-finals', 'Finals standing')
     .option('--opted-out', 'Player opted out')
     .action(
       wrapCommand(async (options: CreateOptions, cmd: Command) => {
@@ -98,23 +103,24 @@ export function registerResultCommands(program: Command): void {
           process.exit(1);
         }
 
-        const spinner = ora('Creating result...').start();
-        const resultData = await client.results.create({
+        const spinner = ora('Creating standing...').start();
+        const standingData = await client.standings.create({
           playerId: options.playerId,
           tournamentId: options.tournamentId,
           position: parseInt(options.position),
+          isFinals: options.isFinals ?? false,
           optedOut: options.optedOut ?? false,
         });
         spinner.stop();
 
-        success(`Result created with ID: ${resultData.id}`);
-        output(resultData, { json: globalOpts.json });
+        success(`Standing created with ID: ${standingData.id}`);
+        output(standingData, { json: globalOpts.json });
       })
     );
 
-  results
+  standings
     .command('batch-create')
-    .description('Create multiple results from JSON (reads from stdin)')
+    .description('Create multiple standings from JSON (reads from stdin)')
     .action(
       wrapCommand(async (_options: object, cmd: Command) => {
         const globalOpts = cmd.optsWithGlobals<GlobalOptions>();
@@ -128,31 +134,31 @@ export function registerResultCommands(program: Command): void {
         }
         const input = Buffer.concat(chunks).toString('utf-8');
 
-        let resultsData: CreateResultRequest[];
+        let standingsData: CreateStandingRequest[];
         try {
-          resultsData = JSON.parse(input) as CreateResultRequest[];
+          standingsData = JSON.parse(input) as CreateStandingRequest[];
         } catch {
           console.error('Invalid JSON input');
           process.exit(1);
         }
 
-        if (!Array.isArray(resultsData)) {
+        if (!Array.isArray(standingsData)) {
           console.error('Input must be a JSON array');
           process.exit(1);
         }
 
-        const spinner = ora(`Creating ${resultsData.length} results...`).start();
-        const response = await client.results.createBatch(resultsData);
+        const spinner = ora(`Creating ${standingsData.length} standings...`).start();
+        const response = await client.standings.createBatch(standingsData);
         spinner.stop();
 
-        success(`Created ${response.count} results`);
+        success(`Created ${response.count} standings`);
         output(response, { json: globalOpts.json });
       })
     );
 
-  results
+  standings
     .command('update <id>')
-    .description('Update a result')
+    .description('Update a standing')
     .option('--position <number>', 'Position')
     .option('--opted-out', 'Player opted out')
     .action(
@@ -160,48 +166,48 @@ export function registerResultCommands(program: Command): void {
         const globalOpts = cmd.optsWithGlobals<GlobalOptions>();
         const client = createClient(getApiUrl(globalOpts));
 
-        const spinner = ora('Updating result...').start();
-        const resultData = await client.results.update(id, {
+        const spinner = ora('Updating standing...').start();
+        const standingData = await client.standings.update(id, {
           position: options.position ? parseInt(options.position) : undefined,
           optedOut: options.optedOut,
         });
         spinner.stop();
 
-        success('Result updated');
-        output(resultData, { json: globalOpts.json });
+        success('Standing updated');
+        output(standingData, { json: globalOpts.json });
       })
     );
 
-  results
+  standings
     .command('delete <id>')
-    .description('Delete a result')
+    .description('Delete a standing')
     .action(
       wrapCommand(async (id: string, _options: object, cmd: Command) => {
         const globalOpts = cmd.optsWithGlobals<GlobalOptions>();
         const client = createClient(getApiUrl(globalOpts));
 
-        const spinner = ora('Deleting result...').start();
-        await client.results.delete(id);
+        const spinner = ora('Deleting standing...').start();
+        await client.standings.delete(id);
         spinner.stop();
 
-        success(`Result ${id} deleted`);
+        success(`Standing ${id} deleted`);
       })
     );
 
-  results
+  standings
     .command('recalculate-decay')
-    .description('Recalculate time decay for all results')
+    .description('Recalculate time decay for all standings')
     .action(
       wrapCommand(async (_options: object, cmd: Command) => {
         const globalOpts = cmd.optsWithGlobals<GlobalOptions>();
         const client = createClient(getApiUrl(globalOpts));
 
         const spinner = ora('Recalculating decay...').start();
-        const response = await client.results.recalculateDecay();
+        const response = await client.standings.recalculateDecay();
         spinner.stop();
 
         success(response.message);
-        info(`Updated ${response.count} results`);
+        info(`Updated ${response.count} standings`);
       })
     );
 }

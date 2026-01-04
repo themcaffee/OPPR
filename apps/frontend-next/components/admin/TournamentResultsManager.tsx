@@ -68,7 +68,7 @@ export function TournamentResultsManager({
 
     setIsSaving(true);
     try {
-      await apiClient.results.create({
+      await apiClient.standings.create({
         tournamentId,
         playerId: addForm.playerId,
         position: addForm.position,
@@ -88,7 +88,7 @@ export function TournamentResultsManager({
   const handleEditResult = async (resultId: string) => {
     setIsSaving(true);
     try {
-      await apiClient.results.update(resultId, {
+      await apiClient.standings.update(resultId, {
         position: editForm.position,
         optedOut: editForm.optedOut,
       });
@@ -107,7 +107,7 @@ export function TournamentResultsManager({
 
     setIsDeleting(true);
     try {
-      await apiClient.results.delete(deleteResultId);
+      await apiClient.standings.delete(deleteResultId);
       await loadResults();
       setDeleteResultId(null);
     } catch (error) {

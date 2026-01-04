@@ -43,13 +43,13 @@ export type {
   TournamentSearchParams,
   TournamentStats,
   TournamentResult,
-  // Results
-  Result,
-  ResultWithRelations,
-  CreateResultRequest,
-  UpdateResultRequest,
-  ResultListParams,
-  BatchCreateResultsResponse,
+  // Standings
+  Standing,
+  StandingWithRelations,
+  CreateStandingRequest,
+  UpdateStandingRequest,
+  StandingListParams,
+  BatchCreateStandingsResponse,
   RecalculateDecayResponse,
   // Stats
   OverviewStats,
