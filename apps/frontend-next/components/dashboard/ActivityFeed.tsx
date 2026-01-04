@@ -41,8 +41,8 @@ export function ActivityFeed({ recentTournaments }: ActivityFeedProps) {
                 >
                   <div>
                     <p className="text-sm font-medium text-gray-900 hover:text-blue-600">{tournament.name}</p>
-                    {tournament.location && (
-                      <p className="text-xs text-gray-500">{tournament.location}</p>
+                    {tournament.location?.name && (
+                      <p className="text-xs text-gray-500">{tournament.location.name}</p>
                     )}
                     {boosterLabel && (
                       <span className="inline-block mt-1 text-xs text-blue-600">

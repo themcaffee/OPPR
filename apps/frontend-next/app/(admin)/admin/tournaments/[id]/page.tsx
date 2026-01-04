@@ -23,7 +23,6 @@ type TabType = 'details' | 'results';
 interface FormData {
   name: string;
   date: string;
-  location: string;
 }
 
 export default function AdminTournamentEditPage() {
@@ -56,7 +55,6 @@ export default function AdminTournamentEditPage() {
         reset({
           name: t.name,
           date: t.date.split('T')[0],
-          location: t.location ?? '',
         });
         setEventBooster(t.eventBooster as EventBoosterType);
         // Load TGP config if available
@@ -75,14 +73,17 @@ export default function AdminTournamentEditPage() {
     const payload: UpdateTournamentRequest = {
       name: data.name,
       date: new Date(data.date).toISOString(),
-      location: data.location || undefined,
       eventBooster,
       tgpConfig: tgpConfig as unknown as Record<string, unknown>,
     };
     if (isNew) {
-      const created = await apiClient.tournaments.create(
-        payload as Required<UpdateTournamentRequest>
-      );
+      const createPayload = {
+        name: data.name,
+        date: new Date(data.date).toISOString(),
+        eventBooster,
+        tgpConfig: tgpConfig as unknown as Record<string, unknown>,
+      };
+      const created = await apiClient.tournaments.create(createPayload);
       // Navigate to the newly created tournament to allow adding results
       router.push(`/admin/tournaments/${created.id}`);
     } else {
@@ -189,7 +190,7 @@ export default function AdminTournamentEditPage() {
                 />
               </div>
 
-              <FormField label="Location" id="location" {...register('location')} />
+              {/* Location management moved to separate Location entity */}
 
               <div className="flex justify-end pt-4 border-t">
                 <div className="flex space-x-3">

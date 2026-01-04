@@ -7,8 +7,10 @@ import type { Tournament, EventBoosterType, Prisma } from '@prisma/client';
 export interface CreateTournamentInput {
   externalId?: string;
   name: string;
-  location?: string;
+  description?: string;
   date: Date;
+  locationId?: string;
+  organizerId?: string;
   tgpConfig?: Prisma.InputJsonValue; // TGPConfig from OPPR
   eventBooster?: EventBoosterType;
   allowsOptOut?: boolean;
@@ -26,8 +28,10 @@ export interface CreateTournamentInput {
  */
 export interface UpdateTournamentInput {
   name?: string;
-  location?: string;
+  description?: string | null;
   date?: Date;
+  locationId?: string | null;
+  organizerId?: string | null;
   tgpConfig?: Prisma.InputJsonValue;
   eventBooster?: EventBoosterType;
   allowsOptOut?: boolean;
@@ -208,7 +212,7 @@ export async function getTournamentWithResults(id: string) {
 }
 
 /**
- * Searches tournaments by name or location
+ * Searches tournaments by name or location name
  */
 export async function searchTournaments(query: string, limit: number = 20): Promise<Tournament[]> {
   return findTournaments({
@@ -216,7 +220,7 @@ export async function searchTournaments(query: string, limit: number = 20): Prom
     where: {
       OR: [
         { name: { contains: query, mode: 'insensitive' } },
-        { location: { contains: query, mode: 'insensitive' } },
+        { location: { name: { contains: query, mode: 'insensitive' } } },
       ],
     },
     orderBy: { date: 'desc' },

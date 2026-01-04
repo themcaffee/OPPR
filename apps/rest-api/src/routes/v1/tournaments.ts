@@ -56,7 +56,9 @@ interface CreateTournamentBody {
   name: string;
   date: string;
   externalId?: string;
-  location?: string;
+  description?: string;
+  locationId?: string;
+  organizerId?: string;
   tgpConfig?: Prisma.InputJsonValue;
   eventBooster?: EventBoosterType;
   allowsOptOut?: boolean;
@@ -72,7 +74,9 @@ interface CreateTournamentBody {
 interface UpdateTournamentBody {
   name?: string;
   date?: string;
-  location?: string;
+  description?: string | null;
+  locationId?: string | null;
+  organizerId?: string | null;
   tgpConfig?: Prisma.InputJsonValue;
   eventBooster?: EventBoosterType;
   allowsOptOut?: boolean;
@@ -107,7 +111,13 @@ export const tournamentRoutes: FastifyPluginAsync = async (app) => {
       const orderBy = sortBy ? { [sortBy]: sortOrder ?? 'desc' } : { date: 'desc' as const };
 
       const [tournaments, total] = await Promise.all([
-        findTournaments({ take, skip, where, orderBy }),
+        findTournaments({
+          take,
+          skip,
+          where,
+          orderBy,
+          include: { location: true, organizer: { select: { id: true, name: true } } },
+        }),
         countTournaments(where),
       ]);
 
@@ -190,7 +200,10 @@ export const tournamentRoutes: FastifyPluginAsync = async (app) => {
       },
     },
     async (request, reply) => {
-      const tournament = await findTournamentById(request.params.id);
+      const tournament = await findTournamentById(request.params.id, {
+        location: true,
+        organizer: { select: { id: true, name: true } },
+      });
       if (!tournament) {
         throw new NotFoundError('Tournament', request.params.id);
       }

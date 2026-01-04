@@ -79,7 +79,6 @@ describe('Tournaments endpoints', () => {
       const body = response.json();
       expect(body).toHaveProperty('id');
       expect(body.name).toBe(tournamentData.name);
-      expect(body.location).toBe(tournamentData.location);
     });
 
     it('should create a tournament with minimal data', async () => {
@@ -97,7 +96,7 @@ describe('Tournaments endpoints', () => {
 
     it('should return 400 for missing required fields', async () => {
       const response = await authenticatedRequest('POST', '/api/v1/tournaments', {
-        location: 'Test City',
+        eventBooster: 'NONE',
       });
 
       expect(response.statusCode).toBe(400);
@@ -139,14 +138,12 @@ describe('Tournaments endpoints', () => {
 
       const response = await authenticatedRequest('PATCH', `/api/v1/tournaments/${id}`, {
         name: 'Updated Tournament Name',
-        location: 'New City',
       });
 
       expect(response.statusCode).toBe(200);
 
       const body = response.json();
       expect(body.name).toBe('Updated Tournament Name');
-      expect(body.location).toBe('New City');
     });
 
     it('should return 404 when updating non-existent tournament', async () => {
@@ -193,19 +190,6 @@ describe('Tournaments endpoints', () => {
       const body = response.json();
       expect(body).toHaveLength(1);
       expect(body[0].name).toBe('Spring Championship');
-    });
-
-    it('should search tournaments by location', async () => {
-      await authenticatedRequest('POST', '/api/v1/tournaments', createTournamentFixture({ location: 'Chicago' }));
-      await authenticatedRequest('POST', '/api/v1/tournaments', createTournamentFixture({ location: 'New York' }));
-
-      const response = await authenticatedRequest('GET', '/api/v1/tournaments/search?q=Chicago');
-
-      expect(response.statusCode).toBe(200);
-
-      const body = response.json();
-      expect(body).toHaveLength(1);
-      expect(body[0].location).toBe('Chicago');
     });
   });
 

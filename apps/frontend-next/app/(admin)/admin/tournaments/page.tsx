@@ -46,7 +46,7 @@ export default function AdminTournamentsPage() {
       header: 'Date',
       render: (t: Tournament) => new Date(t.date).toLocaleDateString(),
     },
-    { key: 'location', header: 'Location', render: (t: Tournament) => t.location ?? '-' },
+    { key: 'location', header: 'Location', render: (t: Tournament) => t.location?.name ?? '-' },
     { key: 'eventBooster', header: 'Booster' },
     {
       key: 'firstPlaceValue',
