@@ -34,7 +34,7 @@ import { NotFoundError } from '../../utils/errors.js';
 interface PlayerListQuery {
   page?: number;
   limit?: number;
-  sortBy?: 'rating' | 'ranking' | 'name' | 'eventCount' | 'createdAt';
+  sortBy?: 'rating' | 'ranking' | 'lastName' | 'eventCount' | 'createdAt';
   sortOrder?: 'asc' | 'desc';
   isRated?: boolean;
 }

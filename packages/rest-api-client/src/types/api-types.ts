@@ -132,7 +132,7 @@ export interface UpdatePlayerRequest {
 }
 
 export interface PlayerListParams extends PaginationParams {
-  sortBy?: 'rating' | 'ranking' | 'name' | 'eventCount' | 'createdAt';
+  sortBy?: 'rating' | 'ranking' | 'lastName' | 'eventCount' | 'createdAt';
   sortOrder?: 'asc' | 'desc';
   isRated?: boolean;
 }

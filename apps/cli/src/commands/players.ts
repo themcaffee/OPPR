@@ -40,7 +40,7 @@ export function registerPlayerCommands(program: Command): void {
     .description('List players with pagination')
     .option('--page <number>', 'Page number', '1')
     .option('--limit <number>', 'Items per page', '20')
-    .option('--sort-by <field>', 'Sort by field (rating, ranking, name, eventCount, createdAt)')
+    .option('--sort-by <field>', 'Sort by field (rating, ranking, lastName, eventCount, createdAt)')
     .option('--sort-order <order>', 'Sort order (asc, desc)')
     .option('--rated', 'Only show rated players')
     .action(
@@ -52,7 +52,7 @@ export function registerPlayerCommands(program: Command): void {
         const result = await client.players.list({
           page: parseInt(options.page ?? '1'),
           limit: parseInt(options.limit ?? '20'),
-          sortBy: options.sortBy as 'rating' | 'ranking' | 'name' | 'eventCount' | 'createdAt',
+          sortBy: options.sortBy as 'rating' | 'ranking' | 'lastName' | 'eventCount' | 'createdAt',
           sortOrder: options.sortOrder as 'asc' | 'desc',
           isRated: options.rated ? true : undefined,
         });

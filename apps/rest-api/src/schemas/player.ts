@@ -53,7 +53,7 @@ export const playerListQuerySchema = {
   properties: {
     page: { type: 'integer', minimum: 1, default: 1 },
     limit: { type: 'integer', minimum: 1, maximum: 100, default: 20 },
-    sortBy: { type: 'string', enum: ['rating', 'ranking', 'name', 'eventCount', 'createdAt'] },
+    sortBy: { type: 'string', enum: ['rating', 'ranking', 'lastName', 'eventCount', 'createdAt'] },
     sortOrder: { type: 'string', enum: ['asc', 'desc'], default: 'asc' },
     isRated: { type: 'boolean' },
   },
