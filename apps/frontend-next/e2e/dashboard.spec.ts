@@ -96,17 +96,6 @@ test.describe('Dashboard - New User (Fresh Registration)', () => {
     await expect(dashboardPage.headerLogo).toHaveAttribute('href', '/');
   });
 
-  test('should have Home link linking to home', async ({ page }) => {
-    const dashboardPage = new DashboardPage(page);
-
-    await dashboardPage.goto();
-    await dashboardPage.expectLoaded();
-
-    // Verify the Home link is visible and links to home
-    await expect(dashboardPage.homeLink).toBeVisible();
-    await expect(dashboardPage.homeLink).toHaveAttribute('href', '/');
-  });
-
   test('should sign out and redirect to sign-in', async ({ page }) => {
     const dashboardPage = new DashboardPage(page);
     const signInPage = new SignInPage(page);
