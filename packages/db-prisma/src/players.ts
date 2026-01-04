@@ -1,11 +1,13 @@
 import { prisma } from './client.js';
 import type { Player, Prisma } from '@prisma/client';
+import { generateUniquePlayerNumber } from './player-number.js';
 
 /**
  * Input for creating a new player
  */
 export interface CreatePlayerInput {
   externalId?: string;
+  playerNumber?: number;
   name?: string;
   rating?: number;
   ratingDeviation?: number;
@@ -40,11 +42,16 @@ export interface FindPlayersOptions {
 }
 
 /**
- * Creates a new player
+ * Creates a new player with auto-generated playerNumber
  */
 export async function createPlayer(data: CreatePlayerInput): Promise<Player> {
+  const playerNumber = data.playerNumber ?? (await generateUniquePlayerNumber());
+
   return prisma.player.create({
-    data,
+    data: {
+      ...data,
+      playerNumber,
+    },
   });
 }
 
@@ -70,6 +77,19 @@ export async function findPlayerByExternalId(
 ): Promise<Player | null> {
   return prisma.player.findUnique({
     where: { externalId },
+    include,
+  });
+}
+
+/**
+ * Finds a player by player number
+ */
+export async function findPlayerByPlayerNumber(
+  playerNumber: number,
+  include?: Prisma.PlayerInclude,
+): Promise<Player | null> {
+  return prisma.player.findUnique({
+    where: { playerNumber },
     include,
   });
 }
