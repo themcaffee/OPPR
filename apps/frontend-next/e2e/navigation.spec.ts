@@ -17,7 +17,6 @@ test.describe('Navigation', () => {
       const header = page.locator('header');
       await expect(header.getByRole('link', { name: 'Rankings' })).toBeVisible();
       await expect(header.getByRole('link', { name: 'Tournaments' })).toBeVisible();
-      await expect(header.getByRole('link', { name: 'Players' })).toBeVisible();
     });
 
     test('should display Sign in and Register links when not authenticated', async ({ page }) => {
@@ -57,15 +56,6 @@ test.describe('Navigation', () => {
       await header.getByRole('link', { name: 'Tournaments' }).click();
 
       await expect(page).toHaveURL('/tournaments');
-    });
-
-    test('should navigate to Players page', async ({ page }) => {
-      await page.goto('/');
-
-      const header = page.locator('header');
-      await header.getByRole('link', { name: 'Players' }).click();
-
-      await expect(page).toHaveURL('/players');
     });
   });
 
@@ -186,9 +176,7 @@ test.describe('Footer', () => {
     await expect(githubLink).toHaveAttribute('target', '_blank');
   });
 
-  test('should not display Rankings, Tournaments, or Players links in footer', async ({
-    page,
-  }) => {
+  test('should not display Rankings or Tournaments links in footer', async ({ page }) => {
     await page.goto('/');
 
     // The footer should not have duplicate navigation links
@@ -196,6 +184,5 @@ test.describe('Footer', () => {
     const footer = page.locator('footer');
     await expect(footer.getByRole('link', { name: 'Rankings' })).not.toBeVisible();
     await expect(footer.getByRole('link', { name: 'Tournaments' })).not.toBeVisible();
-    await expect(footer.getByRole('link', { name: 'Players' })).not.toBeVisible();
   });
 });

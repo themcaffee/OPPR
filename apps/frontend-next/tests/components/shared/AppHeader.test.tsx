@@ -55,7 +55,6 @@ describe('AppHeader', () => {
         'href',
         '/tournaments'
       );
-      expect(screen.getByRole('link', { name: 'Players' })).toHaveAttribute('href', '/players');
     });
 
     it('renders Sign in and Register links', async () => {
