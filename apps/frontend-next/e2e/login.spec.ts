@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { SignInPage } from './page-objects/auth.page';
-import { DashboardPage } from './page-objects/dashboard.page';
+import { ProfilePage } from './page-objects/profile.page';
 
 // Seeded test user credentials (from packages/db-prisma/prisma/seed.ts)
 const SEEDED_USER = {
@@ -9,24 +9,24 @@ const SEEDED_USER = {
 };
 
 test.describe('Login Redirect Functionality', () => {
-  test('should redirect to dashboard after login when accessing protected route', async ({
+  test('should redirect to profile after login when accessing protected route', async ({
     page,
   }) => {
     const signInPage = new SignInPage(page);
-    const dashboardPage = new DashboardPage(page);
+    const profilePage = new ProfilePage(page);
 
-    // Access protected dashboard route
-    await page.goto('/dashboard');
+    // Access protected profile route
+    await page.goto('/profile');
 
     // Should be redirected to sign-in with redirect param
-    await expect(page).toHaveURL(/\/sign-in\?redirect=%2Fdashboard/);
+    await expect(page).toHaveURL(/\/sign-in\?redirect=%2Fprofile/);
 
     // Login with seeded test user
     await signInPage.signIn(SEEDED_USER.email, SEEDED_USER.password);
 
-    // Should redirect to dashboard
-    await expect(page).toHaveURL('/dashboard');
-    await dashboardPage.expectLoaded();
+    // Should redirect to profile
+    await expect(page).toHaveURL('/profile');
+    await profilePage.expectLoaded();
   });
 
   test('should display public landing page when accessing root without auth', async ({ page }) => {
@@ -42,22 +42,22 @@ test.describe('Login Redirect Functionality', () => {
 
   test('should handle URL-encoded redirect parameter', async ({ page }) => {
     const signInPage = new SignInPage(page);
-    const dashboardPage = new DashboardPage(page);
+    const profilePage = new ProfilePage(page);
 
     // Navigate with pre-encoded redirect param
-    await signInPage.gotoWithRedirect('/dashboard');
+    await signInPage.gotoWithRedirect('/profile');
 
     // Login with seeded test user
     await signInPage.signIn(SEEDED_USER.email, SEEDED_USER.password);
 
     // Should decode and redirect properly
-    await expect(page).toHaveURL('/dashboard');
-    await dashboardPage.expectLoaded();
+    await expect(page).toHaveURL('/profile');
+    await profilePage.expectLoaded();
   });
 
-  test('should redirect to dashboard when no redirect param', async ({ page }) => {
+  test('should redirect to profile when no redirect param', async ({ page }) => {
     const signInPage = new SignInPage(page);
-    const dashboardPage = new DashboardPage(page);
+    const profilePage = new ProfilePage(page);
 
     // Navigate directly to sign-in (no redirect param)
     await signInPage.goto();
@@ -66,9 +66,9 @@ test.describe('Login Redirect Functionality', () => {
     // Login with seeded test user
     await signInPage.signIn(SEEDED_USER.email, SEEDED_USER.password);
 
-    // Should redirect to default dashboard
-    await expect(page).toHaveURL('/dashboard');
-    await dashboardPage.expectLoaded();
+    // Should redirect to default profile
+    await expect(page).toHaveURL('/profile');
+    await profilePage.expectLoaded();
   });
 });
 
@@ -100,14 +100,14 @@ test.describe('Login Validation', () => {
 test.describe('Session Management', () => {
   test('should persist session across page reloads', async ({ page, context }) => {
     const signInPage = new SignInPage(page);
-    const dashboardPage = new DashboardPage(page);
+    const profilePage = new ProfilePage(page);
 
     await signInPage.goto();
     await signInPage.signIn(SEEDED_USER.email, SEEDED_USER.password);
 
-    // Wait for dashboard to load
-    await expect(page).toHaveURL('/dashboard');
-    await dashboardPage.expectLoaded();
+    // Wait for profile to load
+    await expect(page).toHaveURL('/profile');
+    await profilePage.expectLoaded();
 
     // Verify cookie exists
     const cookies = await context.cookies();
@@ -117,23 +117,23 @@ test.describe('Session Management', () => {
     // Reload page
     await page.reload();
 
-    // Should still be on dashboard (not redirected to sign-in)
-    await expect(page).toHaveURL('/dashboard');
-    await dashboardPage.expectLoaded();
+    // Should still be on profile (not redirected to sign-in)
+    await expect(page).toHaveURL('/profile');
+    await profilePage.expectLoaded();
   });
 
   test('should logout and redirect to sign-in', async ({ page }) => {
     const signInPage = new SignInPage(page);
-    const dashboardPage = new DashboardPage(page);
+    const profilePage = new ProfilePage(page);
 
     // Login first
     await signInPage.goto();
     await signInPage.signIn(SEEDED_USER.email, SEEDED_USER.password);
-    await expect(page).toHaveURL('/dashboard');
-    await dashboardPage.expectLoaded();
+    await expect(page).toHaveURL('/profile');
+    await profilePage.expectLoaded();
 
     // Logout - wait for navigation to sign-in
-    await Promise.all([page.waitForURL('/sign-in'), dashboardPage.signOut()]);
+    await Promise.all([page.waitForURL('/sign-in'), profilePage.signOut()]);
 
     // Should be on sign-in page
     await expect(page).toHaveURL('/sign-in');
@@ -142,57 +142,57 @@ test.describe('Session Management', () => {
 
   test('should access protected routes after login', async ({ page }) => {
     const signInPage = new SignInPage(page);
-    const dashboardPage = new DashboardPage(page);
+    const profilePage = new ProfilePage(page);
 
     await signInPage.goto();
     await signInPage.signIn(SEEDED_USER.email, SEEDED_USER.password);
-    await expect(page).toHaveURL('/dashboard');
-    await dashboardPage.expectLoaded();
+    await expect(page).toHaveURL('/profile');
+    await profilePage.expectLoaded();
 
-    // Navigate to dashboard explicitly - should still work
-    await page.goto('/dashboard');
-    await expect(page).toHaveURL('/dashboard');
-    await dashboardPage.expectLoaded();
+    // Navigate to profile explicitly - should still work
+    await page.goto('/profile');
+    await expect(page).toHaveURL('/profile');
+    await profilePage.expectLoaded();
   });
 });
 
 test.describe('Login Security', () => {
   test('should not redirect to external URLs', async ({ page }) => {
     const signInPage = new SignInPage(page);
-    const dashboardPage = new DashboardPage(page);
+    const profilePage = new ProfilePage(page);
 
     // Attempt to inject external URL
     await page.goto('/sign-in?redirect=https://evil.com');
     await signInPage.signIn(SEEDED_USER.email, SEEDED_USER.password);
 
-    // Should redirect to default dashboard, not external site
-    await expect(page).toHaveURL('/dashboard');
-    await dashboardPage.expectLoaded();
+    // Should redirect to default profile, not external site
+    await expect(page).toHaveURL('/profile');
+    await profilePage.expectLoaded();
   });
 
   test('should not redirect with protocol-relative URL', async ({ page }) => {
     const signInPage = new SignInPage(page);
-    const dashboardPage = new DashboardPage(page);
+    const profilePage = new ProfilePage(page);
 
     // Attempt protocol-relative URL injection
     await page.goto('/sign-in?redirect=//evil.com');
     await signInPage.signIn(SEEDED_USER.email, SEEDED_USER.password);
 
-    // Should redirect to default dashboard, not external site
-    await expect(page).toHaveURL('/dashboard');
-    await dashboardPage.expectLoaded();
+    // Should redirect to default profile, not external site
+    await expect(page).toHaveURL('/profile');
+    await profilePage.expectLoaded();
   });
 
   test('should not redirect with javascript URL', async ({ page }) => {
     const signInPage = new SignInPage(page);
-    const dashboardPage = new DashboardPage(page);
+    const profilePage = new ProfilePage(page);
 
     // Attempt javascript URL injection
     await page.goto('/sign-in?redirect=javascript:alert(1)');
     await signInPage.signIn(SEEDED_USER.email, SEEDED_USER.password);
 
-    // Should redirect to default dashboard, not execute javascript
-    await expect(page).toHaveURL('/dashboard');
-    await dashboardPage.expectLoaded();
+    // Should redirect to default profile, not execute javascript
+    await expect(page).toHaveURL('/profile');
+    await profilePage.expectLoaded();
   });
 });

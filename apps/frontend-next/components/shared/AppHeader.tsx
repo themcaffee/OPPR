@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api-client';
-import { LogoutButton } from '@/components/auth/LogoutButton';
+import { ProfileDropdown } from '@/components/shared/ProfileDropdown';
 import type { AuthUser } from '@opprs/rest-api-client';
 
 const navLinks = [
@@ -36,7 +36,6 @@ export function AppHeader() {
 
   const isAuthenticated = user !== null;
   const isAdmin = user?.role === 'admin';
-  const playerName = user?.player?.name;
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
@@ -62,35 +61,26 @@ export function AppHeader() {
                 {link.label}
               </Link>
             ))}
+            {isAdmin && (
+              <Link
+                href="/admin"
+                className={`text-sm font-medium transition-colors ${
+                  pathname === '/admin' || pathname.startsWith('/admin/')
+                    ? 'text-blue-600'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Admin
+              </Link>
+            )}
           </nav>
 
           {/* Auth Links - Desktop */}
           <div className="hidden md:flex items-center space-x-4">
             {isLoading ? (
               <div className="h-4 w-20 bg-gray-200 animate-pulse rounded" />
-            ) : isAuthenticated ? (
-              <>
-                {playerName && (
-                  <span className="text-sm text-gray-600">
-                    Welcome, {playerName}!
-                  </span>
-                )}
-                <Link
-                  href="/dashboard"
-                  className="text-sm text-gray-600 hover:text-gray-900"
-                >
-                  Dashboard
-                </Link>
-                {isAdmin && (
-                  <Link
-                    href="/admin"
-                    className="text-sm text-gray-600 hover:text-gray-900"
-                  >
-                    Admin
-                  </Link>
-                )}
-                <LogoutButton />
-              </>
+            ) : isAuthenticated && user ? (
+              <ProfileDropdown user={user} />
             ) : (
               <>
                 <Link
@@ -146,34 +136,24 @@ export function AppHeader() {
                   {link.label}
                 </Link>
               ))}
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  className={`text-sm font-medium ${
+                    pathname === '/admin' || pathname.startsWith('/admin/')
+                      ? 'text-blue-600'
+                      : 'text-gray-600'
+                  }`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Admin
+                </Link>
+              )}
               <div className="pt-4 border-t border-gray-200 flex flex-col space-y-4">
                 {isLoading ? (
                   <div className="h-4 w-20 bg-gray-200 animate-pulse rounded" />
-                ) : isAuthenticated ? (
-                  <>
-                    {playerName && (
-                      <span className="text-sm text-gray-600">
-                        Welcome, {playerName}!
-                      </span>
-                    )}
-                    <Link
-                      href="/dashboard"
-                      className="text-sm text-gray-600 hover:text-gray-900"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Dashboard
-                    </Link>
-                    {isAdmin && (
-                      <Link
-                        href="/admin"
-                        className="text-sm text-gray-600 hover:text-gray-900"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Admin
-                      </Link>
-                    )}
-                    <LogoutButton />
-                  </>
+                ) : isAuthenticated && user ? (
+                  <ProfileDropdown user={user} onSignOut={() => setMobileMenuOpen(false)} />
                 ) : (
                   <>
                     <Link

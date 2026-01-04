@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { RegisterPage, SignInPage } from './page-objects/auth.page';
-import { DashboardPage } from './page-objects/dashboard.page';
+import { ProfilePage } from './page-objects/profile.page';
 import { generateTestUser, type TestUser } from './fixtures/test-user';
 
 // Seeded test user credentials (from packages/db-prisma/prisma/seed.ts)
@@ -11,16 +11,16 @@ const SEEDED_USER = {
   playerName: 'Alice Champion',
 };
 
-test.describe('Dashboard - Authentication', () => {
+test.describe('Profile - Authentication', () => {
   test('should redirect to sign-in when not authenticated', async ({ page, context }) => {
     await context.clearCookies();
-    await page.goto('/dashboard');
+    await page.goto('/profile');
     await expect(page).toHaveURL(/\/sign-in/);
   });
 
-  test('should display dashboard without errors after authentication', async ({ page }) => {
+  test('should display profile without errors after authentication', async ({ page }) => {
     const signInPage = new SignInPage(page);
-    const dashboardPage = new DashboardPage(page);
+    const profilePage = new ProfilePage(page);
     const errors: string[] = [];
 
     page.on('pageerror', (err) => {
@@ -30,21 +30,21 @@ test.describe('Dashboard - Authentication', () => {
     // Use seeded user credentials
     await signInPage.goto();
     await signInPage.signIn(SEEDED_USER.email, SEEDED_USER.password);
-    await expect(page).toHaveURL('/dashboard');
-    await dashboardPage.expectLoaded();
+    await expect(page).toHaveURL('/profile');
+    await profilePage.expectLoaded();
 
     expect(errors).toEqual([]);
-    await expect(dashboardPage.heading).toBeVisible();
+    await expect(profilePage.heading).toBeVisible();
   });
 });
 
-test.describe('Dashboard - New User (Fresh Registration)', () => {
+test.describe('Profile - New User (Fresh Registration)', () => {
   // Note: New users automatically get a player profile created during registration.
   // However, they won't have any tournament results or stats until they participate.
   let testUser: TestUser;
 
   test.beforeEach(async ({ page }) => {
-    testUser = generateTestUser('dashboard');
+    testUser = generateTestUser('profile');
     const registerPage = new RegisterPage(page);
 
     await registerPage.goto();
@@ -52,94 +52,94 @@ test.describe('Dashboard - New User (Fresh Registration)', () => {
     await expect(page).toHaveURL('/profile');
   });
 
-  test('should display dashboard with player profile for new user', async ({ page }) => {
-    const dashboardPage = new DashboardPage(page);
+  test('should display profile with player profile for new user', async ({ page }) => {
+    const profilePage = new ProfilePage(page);
 
-    await dashboardPage.goto();
-    await dashboardPage.expectLoaded();
+    await profilePage.goto();
+    await profilePage.expectLoaded();
 
     // New users have a player profile (created during registration)
-    await dashboardPage.expectPlayerProfile();
+    await profilePage.expectPlayerProfile();
   });
 
   test('should display leaderboard card with seeded players', async ({ page }) => {
-    const dashboardPage = new DashboardPage(page);
+    const profilePage = new ProfilePage(page);
 
-    await dashboardPage.goto();
-    await dashboardPage.expectLoaded();
-    await dashboardPage.expectLeaderboardVisible();
+    await profilePage.goto();
+    await profilePage.expectLoaded();
+    await profilePage.expectLeaderboardVisible();
 
     // Should show seeded players in leaderboard
-    const entries = await dashboardPage.getLeaderboardEntries();
+    const entries = await profilePage.getLeaderboardEntries();
     expect(entries).toBeGreaterThan(0);
   });
 
   test('should display activity feed with recent tournaments', async ({ page }) => {
-    const dashboardPage = new DashboardPage(page);
+    const profilePage = new ProfilePage(page);
 
-    await dashboardPage.goto();
-    await dashboardPage.expectLoaded();
-    await dashboardPage.expectActivityFeedVisible();
+    await profilePage.goto();
+    await profilePage.expectLoaded();
+    await profilePage.expectActivityFeedVisible();
   });
 
   test('should have OPPRS logo linking to home', async ({ page }) => {
-    const dashboardPage = new DashboardPage(page);
+    const profilePage = new ProfilePage(page);
 
-    await dashboardPage.goto();
-    await dashboardPage.expectLoaded();
+    await profilePage.goto();
+    await profilePage.expectLoaded();
 
     // Verify the OPPRS logo is visible and links to home
-    await expect(dashboardPage.headerLogo).toBeVisible();
-    await expect(dashboardPage.headerLogo).toHaveAttribute('href', '/');
+    await expect(profilePage.headerLogo).toBeVisible();
+    await expect(profilePage.headerLogo).toHaveAttribute('href', '/');
   });
 
   test('should sign out and redirect to sign-in', async ({ page }) => {
-    const dashboardPage = new DashboardPage(page);
+    const profilePage = new ProfilePage(page);
     const signInPage = new SignInPage(page);
 
-    await dashboardPage.goto();
-    await dashboardPage.expectLoaded();
+    await profilePage.goto();
+    await profilePage.expectLoaded();
 
-    await Promise.all([page.waitForURL('/sign-in'), dashboardPage.signOut()]);
+    await Promise.all([page.waitForURL('/sign-in'), profilePage.signOut()]);
 
     await expect(page).toHaveURL('/sign-in');
     await expect(signInPage.heading).toBeVisible();
   });
 });
 
-test.describe('Dashboard - Leaderboard Interactions', () => {
+test.describe('Profile - Leaderboard Interactions', () => {
   test.beforeEach(async ({ page }) => {
     const signInPage = new SignInPage(page);
 
     // Use seeded user for leaderboard tests
     await signInPage.goto();
     await signInPage.signIn(SEEDED_USER.email, SEEDED_USER.password);
-    await expect(page).toHaveURL('/dashboard');
+    await expect(page).toHaveURL('/profile');
   });
 
   test('should toggle between Ranking and Rating leaderboard views', async ({ page }) => {
-    const dashboardPage = new DashboardPage(page);
+    const profilePage = new ProfilePage(page);
 
-    await dashboardPage.expectLoaded();
-    await dashboardPage.expectLeaderboardVisible();
+    await profilePage.expectLoaded();
+    await profilePage.expectLeaderboardVisible();
 
     // Initially on Ranking view
-    await expect(dashboardPage.rankingToggle).toHaveClass(/bg-blue-600/);
+    await expect(profilePage.rankingToggle).toHaveClass(/bg-blue-600/);
 
     // Switch to Rating view
-    await dashboardPage.switchToRatingLeaderboard();
-    await expect(dashboardPage.ratingToggle).toHaveClass(/bg-blue-600/);
+    await profilePage.switchToRatingLeaderboard();
+    await expect(profilePage.ratingToggle).toHaveClass(/bg-blue-600/);
 
     // Switch back to Ranking view
-    await dashboardPage.switchToRankingLeaderboard();
-    await expect(dashboardPage.rankingToggle).toHaveClass(/bg-blue-600/);
+    await profilePage.switchToRankingLeaderboard();
+    await expect(profilePage.rankingToggle).toHaveClass(/bg-blue-600/);
   });
 
   test('should show ranking positions in Ranking view', async ({ page }) => {
-    const dashboardPage = new DashboardPage(page);
+    const profilePage = new ProfilePage(page);
 
-    await dashboardPage.expectLoaded();
-    await dashboardPage.expectLeaderboardVisible();
+    await profilePage.expectLoaded();
+    await profilePage.expectLeaderboardVisible();
 
     // Ranking view should show positions in the leaderboard list
     const leaderboardList = page.locator('ul.space-y-2');
@@ -149,10 +149,10 @@ test.describe('Dashboard - Leaderboard Interactions', () => {
   });
 
   test('should show rating numbers in Rating view', async ({ page }) => {
-    const dashboardPage = new DashboardPage(page);
+    const profilePage = new ProfilePage(page);
 
-    await dashboardPage.expectLoaded();
-    await dashboardPage.switchToRatingLeaderboard();
+    await profilePage.expectLoaded();
+    await profilePage.switchToRatingLeaderboard();
 
     // Rating view should show rating numbers (4 digit numbers without #)
     const leaderboardList = page.locator('ul.space-y-2');
@@ -162,9 +162,9 @@ test.describe('Dashboard - Leaderboard Interactions', () => {
   });
 
   test('should display seeded players in leaderboard', async ({ page }) => {
-    const dashboardPage = new DashboardPage(page);
+    const profilePage = new ProfilePage(page);
 
-    await dashboardPage.expectLoaded();
+    await profilePage.expectLoaded();
 
     // Verify seeded player names are visible in the leaderboard list
     const leaderboardList = page.locator('ul.space-y-2');
@@ -176,34 +176,27 @@ test.describe('Dashboard - Leaderboard Interactions', () => {
   });
 });
 
-test.describe('Dashboard - With Player Profile (Seeded User)', () => {
+test.describe('Profile - With Player Profile (Seeded User)', () => {
   test.beforeEach(async ({ page }) => {
     const signInPage = new SignInPage(page);
 
     await signInPage.goto();
     await signInPage.signIn(SEEDED_USER.email, SEEDED_USER.password);
-    await expect(page).toHaveURL('/dashboard');
-  });
-
-  test('should display welcome message with player name', async ({ page }) => {
-    const dashboardPage = new DashboardPage(page);
-
-    await dashboardPage.expectLoaded();
-    await dashboardPage.expectWelcomeMessage(SEEDED_USER.playerName);
+    await expect(page).toHaveURL('/profile');
   });
 
   test('should display Player Stats card', async ({ page }) => {
-    const dashboardPage = new DashboardPage(page);
+    const profilePage = new ProfilePage(page);
 
-    await dashboardPage.expectLoaded();
-    await dashboardPage.expectPlayerStatsVisible();
+    await profilePage.expectLoaded();
+    await profilePage.expectPlayerStatsVisible();
   });
 
   test('should display Recent Results table with tournament history', async ({ page }) => {
-    const dashboardPage = new DashboardPage(page);
+    const profilePage = new ProfilePage(page);
 
-    await dashboardPage.expectLoaded();
-    await dashboardPage.expectRecentResultsVisible();
+    await profilePage.expectLoaded();
+    await profilePage.expectRecentResultsVisible();
 
     // Verify tournament names from seed data are visible in the results table
     const resultsTable = page.locator('table');
@@ -213,20 +206,20 @@ test.describe('Dashboard - With Player Profile (Seeded User)', () => {
   });
 
   test('should highlight current player in leaderboard', async ({ page }) => {
-    const dashboardPage = new DashboardPage(page);
+    const profilePage = new ProfilePage(page);
 
-    await dashboardPage.expectLoaded();
-    await dashboardPage.expectLeaderboardVisible();
+    await profilePage.expectLoaded();
+    await profilePage.expectLeaderboardVisible();
 
     // Current player (Alice Champion) should be highlighted with "(You)"
-    await dashboardPage.expectCurrentPlayerHighlighted();
+    await profilePage.expectCurrentPlayerHighlighted();
   });
 });
 
-test.describe('Dashboard - Error Handling', () => {
+test.describe('Profile - Error Handling', () => {
   test('should not show JavaScript errors during normal usage', async ({ page }) => {
     const signInPage = new SignInPage(page);
-    const dashboardPage = new DashboardPage(page);
+    const profilePage = new ProfilePage(page);
     const errors: string[] = [];
 
     page.on('pageerror', (err) => {
@@ -235,11 +228,11 @@ test.describe('Dashboard - Error Handling', () => {
 
     await signInPage.goto();
     await signInPage.signIn(SEEDED_USER.email, SEEDED_USER.password);
-    await dashboardPage.expectLoaded();
+    await profilePage.expectLoaded();
 
-    // Interact with the dashboard
-    await dashboardPage.switchToRatingLeaderboard();
-    await dashboardPage.switchToRankingLeaderboard();
+    // Interact with the profile page
+    await profilePage.switchToRatingLeaderboard();
+    await profilePage.switchToRankingLeaderboard();
 
     // Verify no errors occurred
     expect(errors).toEqual([]);
