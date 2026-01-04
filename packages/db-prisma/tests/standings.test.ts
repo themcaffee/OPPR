@@ -391,7 +391,8 @@ describe('standings', () => {
   });
 
   describe('updateStandingPoints', () => {
-    it('should update points and calculate decay', async () => {
+    it('should update points and calculate decay for recent tournament (100%)', async () => {
+      // Tournament from today - should be 100% decay multiplier
       const tournament = await createTournament(createTournamentInput());
       const player = await createPlayer(createPlayerInput());
       const standing = await createStanding({
@@ -405,9 +406,64 @@ describe('standings', () => {
       expect(updated.linearPoints).toBe(20);
       expect(updated.dynamicPoints).toBe(80);
       expect(updated.totalPoints).toBe(100);
-      expect(updated.ageInDays).toBeDefined();
-      expect(updated.decayMultiplier).toBeDefined();
-      expect(updated.decayedPoints).toBeDefined();
+      expect(updated.decayMultiplier).toBe(1.0);
+      expect(updated.decayedPoints).toBe(100);
+    });
+
+    it('should calculate 75% decay for 1-2 year old tournament', async () => {
+      // Tournament from 1.5 years ago
+      const date = new Date();
+      date.setFullYear(date.getFullYear() - 1);
+      date.setMonth(date.getMonth() - 6);
+      const tournament = await createTournament(createTournamentInput({ date }));
+      const player = await createPlayer(createPlayerInput());
+      const standing = await createStanding({
+        tournamentId: tournament.id,
+        playerId: player.id,
+        position: 1,
+      });
+
+      const updated = await updateStandingPoints(standing.id, 20, 80, 100);
+
+      expect(updated.decayMultiplier).toBe(0.75);
+      expect(updated.decayedPoints).toBe(75);
+    });
+
+    it('should calculate 50% decay for 2-3 year old tournament', async () => {
+      // Tournament from 2.5 years ago
+      const date = new Date();
+      date.setFullYear(date.getFullYear() - 2);
+      date.setMonth(date.getMonth() - 6);
+      const tournament = await createTournament(createTournamentInput({ date }));
+      const player = await createPlayer(createPlayerInput());
+      const standing = await createStanding({
+        tournamentId: tournament.id,
+        playerId: player.id,
+        position: 1,
+      });
+
+      const updated = await updateStandingPoints(standing.id, 20, 80, 100);
+
+      expect(updated.decayMultiplier).toBe(0.5);
+      expect(updated.decayedPoints).toBe(50);
+    });
+
+    it('should calculate 0% decay for 3+ year old tournament', async () => {
+      // Tournament from 4 years ago
+      const date = new Date();
+      date.setFullYear(date.getFullYear() - 4);
+      const tournament = await createTournament(createTournamentInput({ date }));
+      const player = await createPlayer(createPlayerInput());
+      const standing = await createStanding({
+        tournamentId: tournament.id,
+        playerId: player.id,
+        position: 1,
+      });
+
+      const updated = await updateStandingPoints(standing.id, 20, 80, 100);
+
+      expect(updated.decayMultiplier).toBe(0);
+      expect(updated.decayedPoints).toBe(0);
     });
 
     it('should throw error for non-existent standing', async () => {
@@ -502,6 +558,26 @@ describe('standings', () => {
       const stats = await getPlayerStats(player.id);
       expect(stats).toBeNull();
     });
+
+    it('should handle standings with null point values', async () => {
+      const tournament = await createTournament(createTournamentInput());
+      const player = await createPlayer(createPlayerInput());
+
+      // Create standing without points
+      await createStanding({
+        tournamentId: tournament.id,
+        playerId: player.id,
+        position: 2,
+        // No totalPoints, decayedPoints, or efficiency set
+      });
+
+      const stats = await getPlayerStats(player.id);
+      expect(stats).not.toBeNull();
+      expect(stats!.totalPoints).toBe(0);
+      expect(stats!.totalDecayedPoints).toBe(0);
+      expect(stats!.averageEfficiency).toBe(0);
+      expect(stats!.highestPoints).toBe(0);
+    });
   });
 
   describe('recalculateTimeDecay', () => {
@@ -522,13 +598,10 @@ describe('standings', () => {
       expect(updated[0].decayMultiplier).toBeDefined();
     });
 
-    it('should use reference date for decay calculation', async () => {
-      const oldDate = new Date('2022-01-01');
-      const tournament = await createTournament(
-        createTournamentInput({
-          date: oldDate,
-        }),
-      );
+    it('should calculate 75% decay for 1-2 year old tournament', async () => {
+      const referenceDate = new Date('2026-01-01');
+      const tournamentDate = new Date('2024-06-01'); // 1.5 years ago
+      const tournament = await createTournament(createTournamentInput({ date: tournamentDate }));
       const player = await createPlayer(createPlayerInput());
 
       await createStanding({
@@ -538,11 +611,48 @@ describe('standings', () => {
         totalPoints: 100,
       });
 
-      // Reference date 4 years after tournament
-      const referenceDate = new Date('2026-01-01');
       const updated = await recalculateTimeDecay(referenceDate);
 
-      // Tournament is > 3 years old, so decay should be 0
+      const standing = updated.find((s) => s.tournamentId === tournament.id);
+      expect(standing!.decayMultiplier).toBe(0.75);
+      expect(standing!.decayedPoints).toBe(75);
+    });
+
+    it('should calculate 50% decay for 2-3 year old tournament', async () => {
+      const referenceDate = new Date('2026-01-01');
+      const tournamentDate = new Date('2023-06-01'); // 2.5 years ago
+      const tournament = await createTournament(createTournamentInput({ date: tournamentDate }));
+      const player = await createPlayer(createPlayerInput());
+
+      await createStanding({
+        tournamentId: tournament.id,
+        playerId: player.id,
+        position: 1,
+        totalPoints: 100,
+      });
+
+      const updated = await recalculateTimeDecay(referenceDate);
+
+      const standing = updated.find((s) => s.tournamentId === tournament.id);
+      expect(standing!.decayMultiplier).toBe(0.5);
+      expect(standing!.decayedPoints).toBe(50);
+    });
+
+    it('should calculate 0% decay for 3+ year old tournament', async () => {
+      const referenceDate = new Date('2026-01-01');
+      const tournamentDate = new Date('2022-01-01'); // 4 years ago
+      const tournament = await createTournament(createTournamentInput({ date: tournamentDate }));
+      const player = await createPlayer(createPlayerInput());
+
+      await createStanding({
+        tournamentId: tournament.id,
+        playerId: player.id,
+        position: 1,
+        totalPoints: 100,
+      });
+
+      const updated = await recalculateTimeDecay(referenceDate);
+
       const standing = updated.find((s) => s.tournamentId === tournament.id);
       expect(standing!.decayMultiplier).toBe(0);
       expect(standing!.decayedPoints).toBe(0);

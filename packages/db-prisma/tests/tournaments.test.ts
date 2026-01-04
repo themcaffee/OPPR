@@ -12,11 +12,15 @@ import {
   deleteTournament,
   countTournaments,
   getTournamentWithResults,
+  getTournamentWithMatches,
   searchTournaments,
   getTournamentStats,
 } from '../src/tournaments.js';
 import { createPlayer } from '../src/players.js';
 import { createStanding, countStandings } from '../src/standings.js';
+import { createRound } from '../src/rounds.js';
+import { createMatch } from '../src/matches.js';
+import { createEntry } from '../src/entries.js';
 import {
   createTournamentInput,
   createMajorTournamentInput,
@@ -542,6 +546,45 @@ describe('tournaments', () => {
 
     it('should return null for non-existent tournament', async () => {
       const result = await getTournamentWithResults('non-existent-id');
+
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('getTournamentWithMatches', () => {
+    it('should return tournament with rounds, matches, and entries', async () => {
+      const tournament = await createTournament(createTournamentInput());
+      const player = await createPlayer(createPlayerInput({ name: 'Test Player' }));
+      const round = await createRound({
+        tournamentId: tournament.id,
+        number: 1,
+        name: 'Round 1',
+      });
+      const match = await createMatch({
+        tournamentId: tournament.id,
+        roundId: round.id,
+        number: 1,
+        machineName: 'Test Machine',
+      });
+      await createEntry({
+        matchId: match.id,
+        playerId: player.id,
+        result: 'WIN',
+        position: 1,
+      });
+
+      const result = await getTournamentWithMatches(tournament.id);
+
+      expect(result).not.toBeNull();
+      expect(result!.rounds).toBeDefined();
+      expect(result!.rounds).toHaveLength(1);
+      expect(result!.rounds[0].matches).toHaveLength(1);
+      expect(result!.rounds[0].matches[0].entries).toHaveLength(1);
+      expect(result!.rounds[0].matches[0].entries[0].player.name).toBe('Test Player');
+    });
+
+    it('should return null for non-existent tournament', async () => {
+      const result = await getTournamentWithMatches('non-existent-id');
 
       expect(result).toBeNull();
     });
