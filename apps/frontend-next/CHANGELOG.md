@@ -1,5 +1,11 @@
 # frontend-next
 
+## 2.3.0
+
+### Patch Changes
+
+- 2db0cbb: Add unit tests and e2e tests for the /players page and player profile page
+
 ## 2.2.1
 
 ### Patch Changes

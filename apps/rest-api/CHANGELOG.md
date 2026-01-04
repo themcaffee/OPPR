@@ -1,5 +1,12 @@
 # rest-api
 
+## 2.3.0
+
+### Patch Changes
+
+- Updated dependencies [0840995]
+  - @opprs/db-prisma@2.3.0
+
 ## 2.2.1
 
 ### Patch Changes
