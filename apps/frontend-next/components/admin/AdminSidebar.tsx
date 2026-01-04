@@ -4,9 +4,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const navItems = [
-  { href: '/admin', label: 'Dashboard' },
-  { href: '/admin/players', label: 'Players' },
   { href: '/admin/tournaments', label: 'Tournaments' },
+  { href: '/admin/players', label: 'Players' },
   { href: '/admin/users', label: 'Users' },
 ];
 
@@ -17,8 +16,7 @@ export function AdminSidebar() {
     <aside className="w-64 bg-white shadow-md min-h-screen">
       <nav className="p-4 space-y-2">
         {navItems.map((item) => {
-          const isActive =
-            pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
+          const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
 
           return (
             <Link
