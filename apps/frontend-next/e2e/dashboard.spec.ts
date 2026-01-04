@@ -9,9 +9,6 @@ const SEEDED_USER = {
   email: 'e2e-test@example.com',
   password: 'TestPassword123!',
   playerName: 'Alice Champion',
-  rating: 1850,
-  ratingDeviation: 50,
-  ranking: 5,
 };
 
 test.describe('Dashboard - Authentication', () => {
@@ -195,37 +192,6 @@ test.describe('Dashboard - With Player Profile (Seeded User)', () => {
     await dashboardPage.expectWelcomeMessage(SEEDED_USER.playerName);
   });
 
-  test('should display Rating card with correct values', async ({ page }) => {
-    const dashboardPage = new DashboardPage(page);
-
-    await dashboardPage.expectLoaded();
-    await dashboardPage.expectPlayerProfile();
-
-    // Verify rating card content
-    await dashboardPage.expectRatingCardContent(SEEDED_USER.rating, SEEDED_USER.ratingDeviation);
-
-    // Alice is a rated player (has 25 events)
-    await expect(dashboardPage.ratedPlayerBadge).toBeVisible();
-  });
-
-  test('should display Ranking card with world ranking', async ({ page }) => {
-    const dashboardPage = new DashboardPage(page);
-
-    await dashboardPage.expectLoaded();
-    await dashboardPage.expectPlayerProfile();
-
-    // Verify ranking card content
-    await dashboardPage.expectRankingCardContent(SEEDED_USER.ranking);
-    await expect(dashboardPage.rankingPoints).toBeVisible();
-  });
-
-  test('should display Quick Actions card with navigation links', async ({ page }) => {
-    const dashboardPage = new DashboardPage(page);
-
-    await dashboardPage.expectLoaded();
-    await dashboardPage.expectQuickActionsVisible();
-  });
-
   test('should display Player Stats card', async ({ page }) => {
     const dashboardPage = new DashboardPage(page);
 
@@ -254,33 +220,6 @@ test.describe('Dashboard - With Player Profile (Seeded User)', () => {
 
     // Current player (Alice Champion) should be highlighted with "(You)"
     await dashboardPage.expectCurrentPlayerHighlighted();
-  });
-
-  test('should navigate to results page via Quick Actions', async ({ page }) => {
-    const dashboardPage = new DashboardPage(page);
-
-    await dashboardPage.expectLoaded();
-    await dashboardPage.viewResultsLink.click();
-
-    await expect(page).toHaveURL('/dashboard/results');
-  });
-
-  test('should navigate to tournaments page via Quick Actions', async ({ page }) => {
-    const dashboardPage = new DashboardPage(page);
-
-    await dashboardPage.expectLoaded();
-    await dashboardPage.findTournamentsLink.click();
-
-    await expect(page).toHaveURL('/dashboard/tournaments');
-  });
-
-  test('should navigate to profile page via Quick Actions', async ({ page }) => {
-    const dashboardPage = new DashboardPage(page);
-
-    await dashboardPage.expectLoaded();
-    await dashboardPage.updateProfileLink.click();
-
-    await expect(page).toHaveURL('/dashboard/profile');
   });
 });
 

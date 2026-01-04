@@ -2,13 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api-client';
-import { RatingCard } from '@/components/dashboard/RatingCard';
-import { RankingCard } from '@/components/dashboard/RankingCard';
 import { PlayerStatsCard } from '@/components/dashboard/PlayerStatsCard';
 import { RecentResultsTable } from '@/components/dashboard/RecentResultsTable';
 import { LeaderboardCard } from '@/components/dashboard/LeaderboardCard';
 import { ActivityFeed } from '@/components/dashboard/ActivityFeed';
-import { QuickActionsCard } from '@/components/dashboard/QuickActionsCard';
 import { NoPlayerProfile } from '@/components/dashboard/NoPlayerProfile';
 import type {
   AuthUser,
@@ -126,22 +123,7 @@ export default function DashboardPage() {
             <NoPlayerProfile />
           ) : (
             <>
-              {/* Top row: Rating, Ranking, Quick Actions */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <RatingCard
-                  rating={user!.player!.rating}
-                  ratingDeviation={user!.player!.ratingDeviation}
-                  isRated={user!.player!.isRated}
-                  eventCount={user!.player!.eventCount}
-                />
-                <RankingCard
-                  ranking={user!.player!.ranking}
-                  totalDecayedPoints={stats?.totalDecayedPoints ?? 0}
-                />
-                <QuickActionsCard />
-              </div>
-
-              {/* Second row: Stats and Leaderboard */}
+              {/* First row: Stats and Leaderboard */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2">
                   {stats && <PlayerStatsCard stats={stats} />}
@@ -153,7 +135,7 @@ export default function DashboardPage() {
                 />
               </div>
 
-              {/* Third row: Recent Results and Activity Feed */}
+              {/* Second row: Recent Results and Activity Feed */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2">
                   <RecentResultsTable results={results} />
