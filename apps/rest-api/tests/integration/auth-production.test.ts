@@ -16,7 +16,7 @@ vi.mock('../../src/config/env.js', async (importOriginal) => {
 
 // Import after mocking
 const { buildApp } = await import('../../src/app.js');
-const { prisma } = await import('@opprs/db-prisma');
+const { prisma, generateUniquePlayerNumber } = await import('@opprs/db-prisma');
 
 /**
  * These tests cover the production code paths in auth.ts
@@ -41,8 +41,9 @@ describe('Auth endpoints (production mode)', () => {
 
     // Create a test user with hashed password
     const passwordHash = await bcrypt.hash(testUserPassword, 12);
+    const playerNumber = await generateUniquePlayerNumber();
     const player = await prisma.player.create({
-      data: { name: 'Test Player' },
+      data: { name: 'Test Player', playerNumber },
     });
     const user = await prisma.user.create({
       data: {

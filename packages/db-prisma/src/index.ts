@@ -14,6 +14,7 @@ export {
   createPlayer,
   findPlayerById,
   findPlayerByExternalId,
+  findPlayerByPlayerNumber,
   findPlayerByUserEmail,
   findPlayers,
   getRatedPlayers,
@@ -26,6 +27,9 @@ export {
   getPlayerWithResults,
   searchPlayers,
 } from './players.js';
+
+// Export player number utilities
+export { generateUniquePlayerNumber, isValidPlayerNumber } from './player-number.js';
 
 // Export tournament functions
 export {

@@ -1,5 +1,6 @@
 import { prisma } from './client.js';
 import type { User, Prisma } from '@prisma/client';
+import { generateUniquePlayerNumber } from './player-number.js';
 
 /**
  * Input for creating a new user
@@ -33,6 +34,7 @@ export interface UserWithPlayer {
   updatedAt: Date;
   player: {
     id: string;
+    playerNumber: number;
     name: string | null;
     rating: number;
     ratingDeviation: number;
@@ -59,10 +61,14 @@ export async function createUserWithPlayer(
   playerData: { name?: string },
 ): Promise<UserWithPlayer> {
   return prisma.$transaction(async (tx) => {
+    // Generate a unique player number
+    const playerNumber = await generateUniquePlayerNumber();
+
     // Create the player first
     const player = await tx.player.create({
       data: {
         name: playerData.name,
+        playerNumber,
       },
     });
 
@@ -76,6 +82,7 @@ export async function createUserWithPlayer(
         player: {
           select: {
             id: true,
+            playerNumber: true,
             name: true,
             rating: true,
             ratingDeviation: true,
@@ -124,6 +131,7 @@ export async function getUserWithPlayer(id: string): Promise<UserWithPlayer | nu
       player: {
         select: {
           id: true,
+          playerNumber: true,
           name: true,
           rating: true,
           ratingDeviation: true,
@@ -152,6 +160,7 @@ export async function getUserByEmailWithPlayer(email: string): Promise<UserWithP
       player: {
         select: {
           id: true,
+          playerNumber: true,
           name: true,
           rating: true,
           ratingDeviation: true,
@@ -227,6 +236,7 @@ export async function findUsers(params: {
       player: {
         select: {
           id: true,
+          playerNumber: true,
           name: true,
           rating: true,
           ratingDeviation: true,
@@ -277,6 +287,7 @@ export async function linkPlayerToUser(
         player: {
           select: {
             id: true,
+            playerNumber: true,
             name: true,
             rating: true,
             ratingDeviation: true,

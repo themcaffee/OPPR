@@ -18,6 +18,7 @@ model Player {
 
   // Player identification
   externalId       String?  @unique // External ID from OPPR or other systems
+  playerNumber     Int      @unique // 5-digit unique identifier (10000-99999)
   name             String?
 
   // OPPR Rating fields
@@ -36,6 +37,7 @@ model Player {
   user              User?
 
   @@index([externalId])
+  @@index([playerNumber])
   @@index([rating])
   @@index([ranking])
 }
