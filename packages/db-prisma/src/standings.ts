@@ -78,7 +78,9 @@ export async function createStanding(data: CreateStandingInput): Promise<Standin
 /**
  * Creates multiple standings at once
  */
-export async function createManyStandings(data: CreateStandingInput[]): Promise<Prisma.BatchPayload> {
+export async function createManyStandings(
+  data: CreateStandingInput[],
+): Promise<Prisma.BatchPayload> {
   const standingsData = data.map((item) => ({
     ...item,
     isFinals: item.isFinals ?? false,
