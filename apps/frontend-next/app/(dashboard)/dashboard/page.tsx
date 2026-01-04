@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api-client';
-import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { RatingCard } from '@/components/dashboard/RatingCard';
 import { RankingCard } from '@/components/dashboard/RankingCard';
 import { PlayerStatsCard } from '@/components/dashboard/PlayerStatsCard';
@@ -87,37 +86,31 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <>
-        <DashboardHeader />
-        <main className="p-6">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center py-12">
-              <p className="text-gray-500">Loading dashboard...</p>
-            </div>
+      <main className="p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center py-12">
+            <p className="text-gray-500">Loading dashboard...</p>
           </div>
-        </main>
-      </>
+        </div>
+      </main>
     );
   }
 
   if (error) {
     return (
-      <>
-        <DashboardHeader />
-        <main className="p-6">
-          <div className="max-w-7xl mx-auto">
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
-              <p className="text-red-700">{error}</p>
-              <button
-                onClick={() => window.location.reload()}
-                className="mt-2 text-sm text-red-600 underline hover:text-red-800"
-              >
-                Retry
-              </button>
-            </div>
+      <main className="p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+            <p className="text-red-700">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-2 text-sm text-red-600 underline hover:text-red-800"
+            >
+              Retry
+            </button>
           </div>
-        </main>
-      </>
+        </div>
+      </main>
     );
   }
 
@@ -125,11 +118,9 @@ export default function DashboardPage() {
   const hasPlayerProfile = user?.player != null;
 
   return (
-    <>
-      <DashboardHeader playerName={user?.player?.name} />
-      <main className="p-6">
-        <div className="max-w-7xl mx-auto space-y-6">
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+    <main className="p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
 
           {!hasPlayerProfile ? (
             <NoPlayerProfile />
@@ -171,8 +162,7 @@ export default function DashboardPage() {
               </div>
             </>
           )}
-        </div>
-      </main>
-    </>
+      </div>
+    </main>
   );
 }
