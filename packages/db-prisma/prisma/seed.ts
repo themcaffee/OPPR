@@ -14,7 +14,8 @@ async function main() {
     {
       externalId: 'player-1',
       playerNumber: 10001,
-      name: 'Alice Champion',
+      firstName: 'Alice',
+      lastName: 'Champion',
       rating: 1850,
       ratingDeviation: 50,
       ranking: 5,
@@ -24,7 +25,8 @@ async function main() {
     {
       externalId: 'player-2',
       playerNumber: 10002,
-      name: 'Bob Wizard',
+      firstName: 'Bob',
+      lastName: 'Wizard',
       rating: 1750,
       ratingDeviation: 60,
       ranking: 12,
@@ -34,7 +36,8 @@ async function main() {
     {
       externalId: 'player-3',
       playerNumber: 10003,
-      name: 'Charlie Flipper',
+      firstName: 'Charlie',
+      lastName: 'Flipper',
       rating: 1650,
       ratingDeviation: 75,
       ranking: 28,
@@ -44,7 +47,8 @@ async function main() {
     {
       externalId: 'player-4',
       playerNumber: 10004,
-      name: 'Diana Tilt',
+      firstName: 'Diana',
+      lastName: 'Tilt',
       rating: 1550,
       ratingDeviation: 100,
       ranking: 45,
@@ -54,7 +58,8 @@ async function main() {
     {
       externalId: 'player-5',
       playerNumber: 10005,
-      name: 'Eve Plunger',
+      firstName: 'Eve',
+      lastName: 'Plunger',
       rating: 1300,
       ratingDeviation: 150,
       ranking: null,
@@ -124,7 +129,7 @@ async function main() {
       update: { passwordHash: testPasswordHash, role: 'USER', playerId: player1.id },
       create: { email: seedTestEmail, passwordHash: testPasswordHash, role: 'USER', playerId: player1.id },
     });
-    console.log(`✓ Created test user (${seedTestEmail}) linked to ${player1.name}`);
+    console.log(`✓ Created test user (${seedTestEmail}) linked to ${player1.firstName} ${player1.lastName}`);
   } else {
     console.log('⏭ Skipping test user (SEED_TEST_EMAIL/SEED_TEST_PASSWORD not set)');
   }
