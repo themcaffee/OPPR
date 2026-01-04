@@ -45,28 +45,83 @@ export {
   deleteTournament,
   countTournaments,
   getTournamentWithResults,
+  getTournamentWithMatches,
   searchTournaments,
   getTournamentStats,
 } from './tournaments.js';
 
-// Export result functions
+// Export round functions
 export {
-  createResult,
-  createManyResults,
-  findResultById,
-  findResultByPlayerAndTournament,
-  findResults,
-  getPlayerResults,
-  getTournamentResults,
+  createRound,
+  createManyRounds,
+  findRoundById,
+  findRoundByTournamentAndNumber,
+  findRounds,
+  getTournamentRounds,
+  getQualifyingRounds,
+  getFinalsRounds,
+  updateRound,
+  deleteRound,
+  deleteRoundsByTournament,
+  countRounds,
+  getRoundWithMatches,
+} from './rounds.js';
+
+// Export match functions
+export {
+  createMatch,
+  createManyMatches,
+  findMatchById,
+  findMatches,
+  getTournamentMatches,
+  getRoundMatches,
+  updateMatch,
+  deleteMatch,
+  deleteMatchesByTournament,
+  deleteMatchesByRound,
+  countMatches,
+  getMatchWithEntries,
+  getPlayerTournamentMatches,
+} from './matches.js';
+
+// Export entry functions
+export {
+  createEntry,
+  createManyEntries,
+  findEntryById,
+  findEntryByMatchAndPlayer,
+  findEntries,
+  getMatchEntries,
+  getPlayerEntries,
+  getPlayerTournamentEntries,
+  updateEntry,
+  deleteEntry,
+  deleteEntriesByMatch,
+  countEntries,
+  getPlayerEntryStats,
+} from './entries.js';
+
+// Export standing functions
+export {
+  createStanding,
+  createManyStandings,
+  findStandingById,
+  findStandingByPlayerAndTournament,
+  findStandings,
+  getPlayerStandings,
+  getTournamentStandings,
+  getQualifyingStandings,
+  getFinalsStandings,
+  getMergedStandings,
   getPlayerTopFinishes,
-  updateResult,
-  updateResultPoints,
-  deleteResult,
-  deleteResultsByTournament,
-  countResults,
+  updateStanding,
+  updateStandingPoints,
+  deleteStanding,
+  deleteStandingsByTournament,
+  countStandings,
   getPlayerStats,
   recalculateTimeDecay,
-} from './results.js';
+} from './standings.js';
 
 // Export user functions
 export {

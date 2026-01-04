@@ -17,8 +17,12 @@ const { prisma } = await import('@opprs/db-prisma');
 
 beforeEach(async () => {
   // Clean all tables before each test (order matters due to foreign keys)
-  await prisma.tournamentResult.deleteMany();
+  await prisma.entry.deleteMany();
+  await prisma.standing.deleteMany();
+  await prisma.match.deleteMany();
+  await prisma.round.deleteMany();
   await prisma.tournament.deleteMany();
+  await prisma.location.deleteMany();
   await prisma.user.deleteMany();
   await prisma.player.deleteMany();
 });

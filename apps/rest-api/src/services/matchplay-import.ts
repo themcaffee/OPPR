@@ -25,8 +25,8 @@ import {
   createPlayer,
   updatePlayer,
   findPlayerByExternalId,
-  createManyResults,
-  deleteResultsByTournament,
+  createManyStandings,
+  deleteStandingsByTournament,
 } from '@opprs/db-prisma';
 import type { EventBoosterType, Tournament, Prisma } from '@opprs/db-prisma';
 import { NotFoundError, ExternalServiceError } from '../utils/errors.js';
@@ -172,7 +172,7 @@ export async function importTournament(
   let tournament: Tournament;
 
   if (isUpdate) {
-    await deleteResultsByTournament(existingTournament.id);
+    await deleteStandingsByTournament(existingTournament.id);
     tournament = await updateTournament(existingTournament.id, tournamentData);
   } else {
     tournament = await createTournament(tournamentData);
@@ -181,8 +181,10 @@ export async function importTournament(
   // Distribute points
   const pointDistributions = distributePoints(matchplayResults, firstPlaceValue);
 
-  // Calculate decay and create results
-  const resultData = pointDistributions.map((dist) => {
+  // Calculate decay and create standings
+  // Note: For now we create qualifying standings (isFinals: false)
+  // Future: Import match data and create finals standings separately
+  const standingData = pointDistributions.map((dist) => {
     const dbPlayerId = playerIdMap.get(dist.player.id);
     if (!dbPlayerId) {
       throw new Error(`Player mapping not found for ${dist.player.id}`);
@@ -196,6 +198,7 @@ export async function importTournament(
       playerId: dbPlayerId,
       tournamentId: tournament.id,
       position: dist.position,
+      isFinals: false, // Currently importing as qualifying standings
       optedOut: false,
       linearPoints: dist.linearPoints,
       dynamicPoints: dist.dynamicPoints,
@@ -206,13 +209,13 @@ export async function importTournament(
     };
   });
 
-  await createManyResults(resultData);
+  await createManyStandings(standingData);
 
   return {
     tournament,
     playersCreated,
     playersUpdated,
-    resultsCount: resultData.length,
+    resultsCount: standingData.length,
     created: !isUpdate,
   };
 }

@@ -193,19 +193,43 @@ export async function countTournaments(where?: Prisma.TournamentWhereInput): Pro
 }
 
 /**
- * Gets tournament with all results and player details
+ * Gets tournament with all standings and player details
  */
 export async function getTournamentWithResults(id: string) {
   return prisma.tournament.findUnique({
     where: { id },
     include: {
-      results: {
+      standings: {
         include: {
           player: true,
         },
-        orderBy: {
-          position: 'asc',
+        orderBy: [{ isFinals: 'desc' }, { position: 'asc' }],
+      },
+    },
+  });
+}
+
+/**
+ * Gets tournament with rounds, matches, and entries
+ */
+export async function getTournamentWithMatches(id: string) {
+  return prisma.tournament.findUnique({
+    where: { id },
+    include: {
+      rounds: {
+        include: {
+          matches: {
+            include: {
+              entries: {
+                include: {
+                  player: true,
+                },
+              },
+            },
+            orderBy: { number: 'asc' },
+          },
         },
+        orderBy: [{ isFinals: 'asc' }, { number: 'asc' }],
       },
     },
   });
@@ -237,7 +261,7 @@ export async function getTournamentStats(id: string) {
     return null;
   }
 
-  const playerCount = tournament.results.length;
+  const playerCount = tournament.standings.length;
 
   // Guard against division by zero
   if (playerCount === 0) {
@@ -251,9 +275,9 @@ export async function getTournamentStats(id: string) {
     };
   }
 
-  const totalPoints = tournament.results.reduce((sum, r) => sum + (r.totalPoints || 0), 0);
-  const totalEfficiency = tournament.results.reduce((sum, r) => sum + (r.efficiency || 0), 0);
-  const allPoints = tournament.results.map((r) => r.totalPoints || 0);
+  const totalPoints = tournament.standings.reduce((sum, s) => sum + (s.totalPoints || 0), 0);
+  const totalEfficiency = tournament.standings.reduce((sum, s) => sum + (s.efficiency || 0), 0);
+  const allPoints = tournament.standings.map((s) => s.totalPoints || 0);
 
   return {
     tournament,

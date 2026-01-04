@@ -1,24 +1,24 @@
 import type { FastifyPluginAsync } from 'fastify';
 import {
-  createResult,
-  createManyResults,
-  findResultById,
-  findResults,
-  updateResult,
-  deleteResult,
-  countResults,
+  createStanding,
+  createManyStandings,
+  findStandingById,
+  findStandings,
+  updateStanding,
+  deleteStanding,
+  countStandings,
   recalculateTimeDecay,
 } from '@opprs/db-prisma';
 import {
-  resultSchema,
-  resultWithRelationsSchema,
-  createResultSchema,
-  createManyResultsSchema,
-  updateResultSchema,
-  resultListQuerySchema,
-  batchResultResponseSchema,
+  standingSchema,
+  standingWithRelationsSchema,
+  createStandingSchema,
+  createManyStandingsSchema,
+  updateStandingSchema,
+  standingListQuerySchema,
+  batchStandingResponseSchema,
   recalculateDecayResponseSchema,
-} from '../../schemas/result.js';
+} from '../../schemas/standing.js';
 import {
   idParamSchema,
   errorResponseSchema,
@@ -27,11 +27,12 @@ import {
 import { parsePaginationParams, buildPaginatedResponse } from '../../utils/pagination.js';
 import { NotFoundError } from '../../utils/errors.js';
 
-interface ResultListQuery {
+interface StandingListQuery {
   page?: number;
   limit?: number;
   playerId?: string;
   tournamentId?: string;
+  isFinals?: boolean;
   sortBy?: 'position' | 'totalPoints' | 'decayedPoints' | 'createdAt';
   sortOrder?: 'asc' | 'desc';
 }
@@ -40,10 +41,11 @@ interface IdParams {
   id: string;
 }
 
-interface CreateResultBody {
+interface CreateStandingBody {
   playerId: string;
   tournamentId: string;
   position: number;
+  isFinals?: boolean;
   optedOut?: boolean;
   linearPoints?: number;
   dynamicPoints?: number;
@@ -54,7 +56,7 @@ interface CreateResultBody {
   efficiency?: number;
 }
 
-interface UpdateResultBody {
+interface UpdateStandingBody {
   position?: number;
   optedOut?: boolean;
   linearPoints?: number;
@@ -66,59 +68,60 @@ interface UpdateResultBody {
   efficiency?: number;
 }
 
-export const resultRoutes: FastifyPluginAsync = async (app) => {
-  // List results with pagination
-  app.get<{ Querystring: ResultListQuery }>(
+export const standingRoutes: FastifyPluginAsync = async (app) => {
+  // List standings with pagination
+  app.get<{ Querystring: StandingListQuery }>(
     '/',
     {
       schema: {
-        tags: ['Results'],
-        summary: 'List results with pagination',
+        tags: ['Standings'],
+        summary: 'List standings with pagination',
         security: [{ bearerAuth: [] }],
-        querystring: resultListQuerySchema,
+        querystring: standingListQuerySchema,
         response: {
-          200: paginatedResponseSchema(resultWithRelationsSchema),
+          200: paginatedResponseSchema(standingWithRelationsSchema),
           401: errorResponseSchema,
         },
       },
       preHandler: [app.authenticate],
     },
     async (request, reply) => {
-      const { playerId, tournamentId, sortBy, sortOrder } = request.query;
+      const { playerId, tournamentId, isFinals, sortBy, sortOrder } = request.query;
       const { skip, take, page, limit } = parsePaginationParams(request.query);
 
       const where: Record<string, unknown> = {};
       if (playerId) where.playerId = playerId;
       if (tournamentId) where.tournamentId = tournamentId;
+      if (isFinals !== undefined) where.isFinals = isFinals;
 
       const orderBy = sortBy ? { [sortBy]: sortOrder ?? 'asc' } : { position: 'asc' as const };
 
-      const [results, total] = await Promise.all([
-        findResults({
+      const [standings, total] = await Promise.all([
+        findStandings({
           take,
           skip,
           where: Object.keys(where).length > 0 ? where : undefined,
           orderBy,
           include: { player: true, tournament: true },
         }),
-        countResults(Object.keys(where).length > 0 ? where : undefined),
+        countStandings(Object.keys(where).length > 0 ? where : undefined),
       ]);
 
-      return reply.send(buildPaginatedResponse(results, page, limit, total));
+      return reply.send(buildPaginatedResponse(standings, page, limit, total));
     }
   );
 
-  // Get result by ID
+  // Get standing by ID
   app.get<{ Params: IdParams }>(
     '/:id',
     {
       schema: {
-        tags: ['Results'],
-        summary: 'Get result by ID',
+        tags: ['Standings'],
+        summary: 'Get standing by ID',
         security: [{ bearerAuth: [] }],
         params: idParamSchema,
         response: {
-          200: resultWithRelationsSchema,
+          200: standingWithRelationsSchema,
           401: errorResponseSchema,
           404: errorResponseSchema,
         },
@@ -126,28 +129,28 @@ export const resultRoutes: FastifyPluginAsync = async (app) => {
       preHandler: [app.authenticate],
     },
     async (request, reply) => {
-      const result = await findResultById(request.params.id, {
+      const standing = await findStandingById(request.params.id, {
         player: true,
         tournament: true,
       });
-      if (!result) {
-        throw new NotFoundError('Result', request.params.id);
+      if (!standing) {
+        throw new NotFoundError('Standing', request.params.id);
       }
-      return reply.send(result);
+      return reply.send(standing);
     }
   );
 
-  // Create result
-  app.post<{ Body: CreateResultBody }>(
+  // Create standing
+  app.post<{ Body: CreateStandingBody }>(
     '/',
     {
       schema: {
-        tags: ['Results'],
-        summary: 'Create a new result (admin only)',
+        tags: ['Standings'],
+        summary: 'Create a new standing (admin only)',
         security: [{ bearerAuth: [] }],
-        body: createResultSchema,
+        body: createStandingSchema,
         response: {
-          201: resultSchema,
+          201: standingSchema,
           401: errorResponseSchema,
           403: errorResponseSchema,
         },
@@ -155,22 +158,22 @@ export const resultRoutes: FastifyPluginAsync = async (app) => {
       preHandler: [app.requireAdmin],
     },
     async (request, reply) => {
-      const result = await createResult(request.body);
-      return reply.status(201).send(result);
+      const standing = await createStanding(request.body);
+      return reply.status(201).send(standing);
     }
   );
 
-  // Batch create results
-  app.post<{ Body: CreateResultBody[] }>(
+  // Batch create standings
+  app.post<{ Body: CreateStandingBody[] }>(
     '/batch',
     {
       schema: {
-        tags: ['Results'],
-        summary: 'Create multiple results at once (admin only)',
+        tags: ['Standings'],
+        summary: 'Create multiple standings at once (admin only)',
         security: [{ bearerAuth: [] }],
-        body: createManyResultsSchema,
+        body: createManyStandingsSchema,
         response: {
-          201: batchResultResponseSchema,
+          201: batchStandingResponseSchema,
           401: errorResponseSchema,
           403: errorResponseSchema,
         },
@@ -178,23 +181,23 @@ export const resultRoutes: FastifyPluginAsync = async (app) => {
       preHandler: [app.requireAdmin],
     },
     async (request, reply) => {
-      const result = await createManyResults(request.body);
+      const result = await createManyStandings(request.body);
       return reply.status(201).send({ count: result.count });
     }
   );
 
-  // Update result
-  app.patch<{ Params: IdParams; Body: UpdateResultBody }>(
+  // Update standing
+  app.patch<{ Params: IdParams; Body: UpdateStandingBody }>(
     '/:id',
     {
       schema: {
-        tags: ['Results'],
-        summary: 'Update a result (admin only)',
+        tags: ['Standings'],
+        summary: 'Update a standing (admin only)',
         security: [{ bearerAuth: [] }],
         params: idParamSchema,
-        body: updateResultSchema,
+        body: updateStandingSchema,
         response: {
-          200: resultSchema,
+          200: standingSchema,
           401: errorResponseSchema,
           403: errorResponseSchema,
           404: errorResponseSchema,
@@ -203,22 +206,22 @@ export const resultRoutes: FastifyPluginAsync = async (app) => {
       preHandler: [app.requireAdmin],
     },
     async (request, reply) => {
-      const existing = await findResultById(request.params.id);
+      const existing = await findStandingById(request.params.id);
       if (!existing) {
-        throw new NotFoundError('Result', request.params.id);
+        throw new NotFoundError('Standing', request.params.id);
       }
-      const result = await updateResult(request.params.id, request.body);
-      return reply.send(result);
+      const standing = await updateStanding(request.params.id, request.body);
+      return reply.send(standing);
     }
   );
 
-  // Delete result
+  // Delete standing
   app.delete<{ Params: IdParams }>(
     '/:id',
     {
       schema: {
-        tags: ['Results'],
-        summary: 'Delete a result (admin only)',
+        tags: ['Standings'],
+        summary: 'Delete a standing (admin only)',
         security: [{ bearerAuth: [] }],
         params: idParamSchema,
         response: {
@@ -231,22 +234,22 @@ export const resultRoutes: FastifyPluginAsync = async (app) => {
       preHandler: [app.requireAdmin],
     },
     async (request, reply) => {
-      const existing = await findResultById(request.params.id);
+      const existing = await findStandingById(request.params.id);
       if (!existing) {
-        throw new NotFoundError('Result', request.params.id);
+        throw new NotFoundError('Standing', request.params.id);
       }
-      await deleteResult(request.params.id);
+      await deleteStanding(request.params.id);
       return reply.status(204).send();
     }
   );
 
-  // Recalculate time decay for all results
+  // Recalculate time decay for all standings
   app.post(
     '/recalculate-decay',
     {
       schema: {
-        tags: ['Results'],
-        summary: 'Recalculate time decay for all results (admin only)',
+        tags: ['Standings'],
+        summary: 'Recalculate time decay for all standings (admin only)',
         security: [{ bearerAuth: [] }],
         response: {
           200: recalculateDecayResponseSchema,
@@ -257,10 +260,10 @@ export const resultRoutes: FastifyPluginAsync = async (app) => {
       preHandler: [app.requireAdmin],
     },
     async (_request, reply) => {
-      const updatedResults = await recalculateTimeDecay();
+      const updatedStandings = await recalculateTimeDecay();
       return reply.send({
-        count: updatedResults.length,
-        message: `Successfully recalculated decay for ${updatedResults.length} results`,
+        count: updatedStandings.length,
+        message: `Successfully recalculated decay for ${updatedStandings.length} standings`,
       });
     }
   );

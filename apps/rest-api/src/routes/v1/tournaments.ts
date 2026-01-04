@@ -211,13 +211,13 @@ export const tournamentRoutes: FastifyPluginAsync = async (app) => {
     }
   );
 
-  // Get tournament results (public)
+  // Get tournament standings (public)
   app.get<{ Params: IdParams }>(
     '/:id/results',
     {
       schema: {
         tags: ['Tournaments'],
-        summary: 'Get tournament results (standings)',
+        summary: 'Get tournament standings',
         params: idParamSchema,
         response: {
           200: { type: 'array', items: tournamentResultSchema },
@@ -230,7 +230,7 @@ export const tournamentRoutes: FastifyPluginAsync = async (app) => {
       if (!tournament) {
         throw new NotFoundError('Tournament', request.params.id);
       }
-      return reply.send(tournament.results);
+      return reply.send(tournament.standings);
     }
   );
 

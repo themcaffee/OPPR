@@ -34,8 +34,12 @@ describe('Auth endpoints (production mode)', () => {
 
   beforeEach(async () => {
     // Clean up and create test user
-    await prisma.tournamentResult.deleteMany();
+    await prisma.entry.deleteMany();
+    await prisma.standing.deleteMany();
+    await prisma.match.deleteMany();
+    await prisma.round.deleteMany();
     await prisma.tournament.deleteMany();
+    await prisma.location.deleteMany();
     await prisma.user.deleteMany();
     await prisma.player.deleteMany();
 

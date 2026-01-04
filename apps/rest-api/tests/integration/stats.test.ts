@@ -61,7 +61,7 @@ describe('Stats endpoints', () => {
 
       await authenticatedRequest(
         'POST',
-        '/api/v1/results',
+        '/api/v1/standings',
         createResultFixture(player.id, tournament.id)
       );
 

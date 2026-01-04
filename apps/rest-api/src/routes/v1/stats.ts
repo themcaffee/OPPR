@@ -2,7 +2,7 @@ import type { FastifyPluginAsync } from 'fastify';
 import {
   countPlayers,
   countTournaments,
-  countResults,
+  countStandings,
   getTopPlayersByRanking,
   getTopPlayersByRating,
 } from '@opprs/db-prisma';
@@ -60,11 +60,11 @@ export const statsRoutes: FastifyPluginAsync = async (app) => {
       },
     },
     async (_request, reply) => {
-      const [totalPlayers, ratedPlayers, totalTournaments, totalResults] = await Promise.all([
+      const [totalPlayers, ratedPlayers, totalTournaments, totalStandings] = await Promise.all([
         countPlayers(),
         countPlayers({ isRated: true }),
         countTournaments(),
-        countResults(),
+        countStandings(),
       ]);
 
       return reply.send({
@@ -76,7 +76,7 @@ export const statsRoutes: FastifyPluginAsync = async (app) => {
           total: totalTournaments,
         },
         results: {
-          total: totalResults,
+          total: totalStandings,
         },
       });
     }

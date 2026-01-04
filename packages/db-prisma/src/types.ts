@@ -4,7 +4,11 @@
 export type {
   Player,
   Tournament,
-  TournamentResult,
+  Round,
+  Match,
+  Entry,
+  Standing,
+  MatchResult,
   User,
   Location,
   EventBoosterType,
@@ -23,7 +27,18 @@ export type {
   FindTournamentsOptions,
 } from './tournaments.js';
 
-export type { CreateResultInput, UpdateResultInput, FindResultsOptions } from './results.js';
+export type { CreateRoundInput, UpdateRoundInput, FindRoundsOptions } from './rounds.js';
+
+export type { CreateMatchInput, UpdateMatchInput, FindMatchesOptions } from './matches.js';
+
+export type { CreateEntryInput, UpdateEntryInput, FindEntriesOptions } from './entries.js';
+
+export type {
+  CreateStandingInput,
+  UpdateStandingInput,
+  FindStandingsOptions,
+  MergedStanding,
+} from './standings.js';
 
 export type { CreateUserInput, UpdateUserInput, UserWithPlayer } from './users.js';
 
@@ -34,22 +49,23 @@ export type {
 } from './locations.js';
 
 /**
- * Player with full tournament results
+ * Player with full tournament standings
  */
 export interface PlayerWithResults {
   player: Player;
-  results: TournamentResultWithTournament[];
+  results: StandingWithTournament[];
   stats: PlayerStatistics;
 }
 
 /**
- * Tournament result with tournament details
+ * Standing with tournament details
  */
-export interface TournamentResultWithTournament {
+export interface StandingWithTournament {
   id: string;
   position: number;
-  totalPoints: number;
-  decayedPoints: number;
+  isFinals: boolean;
+  totalPoints: number | null;
+  decayedPoints: number | null;
   tournament: {
     id: string;
     name: string;

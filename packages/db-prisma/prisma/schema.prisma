@@ -33,9 +33,10 @@ model Player {
   lastEventDate    DateTime?
 
   // Relations
-  tournamentResults    TournamentResult[]
+  standings            Standing[]
+  entries              Entry[]
   user                 User?
-  organizedTournaments Tournament[]       @relation("OrganizedTournaments")
+  organizedTournaments Tournament[] @relation("OrganizedTournaments")
 
   @@index([externalId])
   @@index([playerNumber])
@@ -81,7 +82,9 @@ model Tournament {
   firstPlaceValue  Float?
 
   // Relations
-  results          TournamentResult[]
+  rounds           Round[]
+  matches          Match[]
+  standings        Standing[]
 
   @@index([date])
   @@index([eventBooster])
@@ -90,39 +93,103 @@ model Tournament {
   @@index([organizerId])
 }
 
-// Tournament Result - junction table linking players to tournaments
-model TournamentResult {
-  id               String   @id @default(cuid())
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+// Round model - groups matches within a tournament stage
+model Round {
+  id            String     @id @default(cuid())
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  tournamentId  String
+  tournament    Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+
+  number        Int        // Round number within the stage (1, 2, 3...)
+  name          String?    // Optional name (e.g., "Quarterfinals", "Semifinal")
+  isFinals      Boolean    @default(false)
 
   // Relations
-  playerId         String
-  player           Player     @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  matches       Match[]
+
+  @@unique([tournamentId, number, isFinals])
+  @@index([tournamentId])
+  @@index([tournamentId, isFinals])
+}
+
+// Match model - a single game with 1-4 players
+model Match {
+  id            String     @id @default(cuid())
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  tournamentId  String
+  tournament    Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  roundId       String?
+  round         Round?     @relation(fields: [roundId], references: [id], onDelete: SetNull)
+
+  number        Int?       // Match number within the round
+  machineName   String?    // Machine played on
+
+  // Relations
+  entries       Entry[]
+
+  @@index([tournamentId])
+  @@index([roundId])
+}
+
+// Entry model - a player's participation in a match
+model Entry {
+  id            String      @id @default(cuid())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  matchId       String
+  match         Match       @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  playerId      String
+  player        Player      @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  result        MatchResult // WIN, LOSS, TIE
+  position      Int?        // Position within the match (1st, 2nd, 3rd, 4th for group games)
+
+  @@unique([matchId, playerId])
+  @@index([matchId])
+  @@index([playerId])
+}
+
+// Standing model - final position for qualifying or finals
+model Standing {
+  id               String     @id @default(cuid())
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
   tournamentId     String
   tournament       Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  playerId         String
+  player           Player     @relation(fields: [playerId], references: [id], onDelete: Cascade)
 
-  // Result data
-  position         Int      // Finishing position (1 = first place)
-  optedOut         Boolean  @default(false)
+  position         Int        // Finishing position (1 = first place)
+  isFinals         Boolean    @default(false)
+  optedOut         Boolean    @default(false)
 
-  // Points awarded
-  linearPoints     Float?   @default(0) // Linear distribution points
-  dynamicPoints    Float?   @default(0) // Dynamic distribution points
-  totalPoints      Float?   // Total points (linear + dynamic)
+  // Points (calculated from merged standings)
+  linearPoints     Float?     @default(0)
+  dynamicPoints    Float?     @default(0)
+  totalPoints      Float?
+  ageInDays        Int?       @default(0)
+  decayMultiplier  Float?     @default(1.0)
+  decayedPoints    Float?
+  efficiency       Float?
 
-  // Time decay tracking
-  ageInDays        Int?     @default(0) // Age of event in days at calculation time
-  decayMultiplier  Float?   @default(1.0) // Time decay multiplier (1.0, 0.75, 0.5, or 0.0)
-  decayedPoints    Float?   // Points after applying decay (defaults to totalPoints via application logic)
-
-  // Efficiency tracking
-  efficiency       Float?   // Performance efficiency percentage
-
-  @@unique([playerId, tournamentId])
+  @@unique([playerId, tournamentId, isFinals])
   @@index([playerId])
   @@index([tournamentId])
+  @@index([tournamentId, isFinals])
   @@index([position])
+}
+
+// Enum for match results
+enum MatchResult {
+  WIN
+  LOSS
+  TIE
 }
 
 // Enum for event booster types
