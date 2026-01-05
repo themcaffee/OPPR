@@ -6,11 +6,7 @@ import {
   findPlayerByPlayerNumber,
   findPlayerByUserEmail,
   findPlayers,
-  getRatedPlayers,
-  getTopPlayersByRating,
-  getTopPlayersByRanking,
   updatePlayer,
-  updatePlayerRating,
   deletePlayer,
   countPlayers,
   getPlayerWithResults,
@@ -19,7 +15,7 @@ import {
 import { createTournament } from '../src/tournaments.js';
 import { createStanding } from '../src/standings.js';
 import { prisma } from '../src/client.js';
-import { createPlayerInput, createRatedPlayerInput, resetPlayerCounter } from './factories/player.factory.js';
+import { createPlayerInput, resetPlayerCounter } from './factories/player.factory.js';
 import { createTournamentInput, resetTournamentCounter } from './factories/tournament.factory.js';
 import { createStandingInput } from './factories/result.factory.js';
 
@@ -40,27 +36,14 @@ describe('players', () => {
 
     it('should create a player with all fields', async () => {
       const input = createPlayerInput({
-        ranking: 10,
+        eventCount: 3,
       });
 
       const player = await createPlayer(input);
 
       expect(player.externalId).toBe(input.externalId);
       expect(player.name).toBe(input.name);
-      expect(player.rating).toBe(input.rating);
-      expect(player.ratingDeviation).toBe(input.ratingDeviation);
-      expect(player.ranking).toBe(10);
-      expect(player.isRated).toBe(false);
-      expect(player.eventCount).toBe(0);
-    });
-
-    it('should create a rated player', async () => {
-      const input = createRatedPlayerInput();
-
-      const player = await createPlayer(input);
-
-      expect(player.isRated).toBe(true);
-      expect(player.eventCount).toBe(5);
+      expect(player.eventCount).toBe(3);
     });
 
     it('should auto-generate playerNumber when not provided', async () => {
@@ -233,25 +216,25 @@ describe('players', () => {
     });
 
     it('should support where filter', async () => {
-      await createPlayer(createPlayerInput({ isRated: true }));
-      await createPlayer(createPlayerInput({ isRated: false }));
+      await createPlayer(createPlayerInput({ eventCount: 5 }));
+      await createPlayer(createPlayerInput({ eventCount: 0 }));
 
-      const ratedPlayers = await findPlayers({ where: { isRated: true } });
+      const activePlayers = await findPlayers({ where: { eventCount: { gte: 5 } } });
 
-      expect(ratedPlayers).toHaveLength(1);
-      expect(ratedPlayers[0].isRated).toBe(true);
+      expect(activePlayers).toHaveLength(1);
+      expect(activePlayers[0].eventCount).toBe(5);
     });
 
     it('should support orderBy', async () => {
-      await createPlayer(createPlayerInput({ rating: 1400 }));
-      await createPlayer(createPlayerInput({ rating: 1600 }));
-      await createPlayer(createPlayerInput({ rating: 1500 }));
+      await createPlayer(createPlayerInput({ eventCount: 3 }));
+      await createPlayer(createPlayerInput({ eventCount: 10 }));
+      await createPlayer(createPlayerInput({ eventCount: 5 }));
 
-      const players = await findPlayers({ orderBy: { rating: 'desc' } });
+      const players = await findPlayers({ orderBy: { eventCount: 'desc' } });
 
-      expect(players[0].rating).toBe(1600);
-      expect(players[1].rating).toBe(1500);
-      expect(players[2].rating).toBe(1400);
+      expect(players[0].eventCount).toBe(10);
+      expect(players[1].eventCount).toBe(5);
+      expect(players[2].eventCount).toBe(3);
     });
 
     it('should support include option', async () => {
@@ -262,136 +245,6 @@ describe('players', () => {
       const players = await findPlayers({ include: { standings: true } });
 
       expect(players[0].standings).toBeDefined();
-    });
-  });
-
-  describe('getRatedPlayers', () => {
-    it('should return only rated players', async () => {
-      await createPlayer(createRatedPlayerInput());
-      await createPlayer(createPlayerInput({ isRated: false }));
-      await createPlayer(createRatedPlayerInput());
-
-      const ratedPlayers = await getRatedPlayers();
-
-      expect(ratedPlayers).toHaveLength(2);
-      ratedPlayers.forEach((p) => expect(p.isRated).toBe(true));
-    });
-
-    it('should return empty array when no rated players exist', async () => {
-      await createPlayer(createPlayerInput({ isRated: false }));
-
-      const ratedPlayers = await getRatedPlayers();
-
-      expect(ratedPlayers).toHaveLength(0);
-    });
-
-    it('should respect pagination options', async () => {
-      for (let i = 0; i < 5; i++) {
-        await createPlayer(createRatedPlayerInput());
-      }
-
-      const players = await getRatedPlayers({ take: 2 });
-
-      expect(players).toHaveLength(2);
-    });
-  });
-
-  describe('getTopPlayersByRating', () => {
-    it('should return players ordered by rating descending', async () => {
-      await createPlayer(createRatedPlayerInput({ rating: 1400 }));
-      await createPlayer(createRatedPlayerInput({ rating: 1700 }));
-      await createPlayer(createRatedPlayerInput({ rating: 1500 }));
-
-      const players = await getTopPlayersByRating();
-
-      expect(players[0].rating).toBe(1700);
-      expect(players[1].rating).toBe(1500);
-      expect(players[2].rating).toBe(1400);
-    });
-
-    it('should use default limit of 50', async () => {
-      for (let i = 0; i < 60; i++) {
-        await createPlayer(createRatedPlayerInput({ rating: 1500 + i }));
-      }
-
-      const players = await getTopPlayersByRating();
-
-      expect(players).toHaveLength(50);
-    });
-
-    it('should respect custom limit', async () => {
-      for (let i = 0; i < 10; i++) {
-        await createPlayer(createRatedPlayerInput());
-      }
-
-      const players = await getTopPlayersByRating(5);
-
-      expect(players).toHaveLength(5);
-    });
-
-    it('should only return rated players', async () => {
-      await createPlayer(createPlayerInput({ rating: 2000, isRated: false }));
-      await createPlayer(createRatedPlayerInput({ rating: 1500 }));
-
-      const players = await getTopPlayersByRating();
-
-      expect(players).toHaveLength(1);
-      expect(players[0].rating).toBe(1500);
-    });
-  });
-
-  describe('getTopPlayersByRanking', () => {
-    it('should return players ordered by ranking ascending', async () => {
-      await createPlayer(createRatedPlayerInput({ ranking: 10 }));
-      await createPlayer(createRatedPlayerInput({ ranking: 1 }));
-      await createPlayer(createRatedPlayerInput({ ranking: 5 }));
-
-      const players = await getTopPlayersByRanking();
-
-      expect(players[0].ranking).toBe(1);
-      expect(players[1].ranking).toBe(5);
-      expect(players[2].ranking).toBe(10);
-    });
-
-    it('should use default limit of 50', async () => {
-      for (let i = 0; i < 60; i++) {
-        await createPlayer(createRatedPlayerInput({ ranking: i + 1 }));
-      }
-
-      const players = await getTopPlayersByRanking();
-
-      expect(players).toHaveLength(50);
-    });
-
-    it('should respect custom limit', async () => {
-      for (let i = 0; i < 10; i++) {
-        await createPlayer(createRatedPlayerInput({ ranking: i + 1 }));
-      }
-
-      const players = await getTopPlayersByRanking(3);
-
-      expect(players).toHaveLength(3);
-    });
-
-    it('should exclude players with null ranking', async () => {
-      await createPlayer(createRatedPlayerInput({ ranking: null }));
-      await createPlayer(createRatedPlayerInput({ ranking: 5 }));
-      await createPlayer(createRatedPlayerInput({ ranking: 10 }));
-
-      const players = await getTopPlayersByRanking();
-
-      expect(players).toHaveLength(2);
-      players.forEach((p) => expect(p.ranking).not.toBeNull());
-    });
-
-    it('should only return rated players', async () => {
-      await createPlayer(createPlayerInput({ ranking: 1, isRated: false }));
-      await createPlayer(createRatedPlayerInput({ ranking: 5 }));
-
-      const players = await getTopPlayersByRanking();
-
-      expect(players).toHaveLength(1);
-      expect(players[0].ranking).toBe(5);
     });
   });
 
@@ -410,13 +263,11 @@ describe('players', () => {
 
       const updated = await updatePlayer(player.id, {
         name: 'Updated Name',
-        rating: 1800,
-        ratingDeviation: 150,
+        eventCount: 10,
       });
 
       expect(updated.name).toBe('Updated Name');
-      expect(updated.rating).toBe(1800);
-      expect(updated.ratingDeviation).toBe(150);
+      expect(updated.eventCount).toBe(10);
     });
 
     it('should update timestamps', async () => {
@@ -429,74 +280,6 @@ describe('players', () => {
       const updated = await updatePlayer(player.id, { name: 'New Name' });
 
       expect(updated.updatedAt.getTime()).toBeGreaterThanOrEqual(originalUpdatedAt.getTime());
-    });
-  });
-
-  describe('updatePlayerRating', () => {
-    it('should update rating and ratingDeviation', async () => {
-      const player = await createPlayer(createPlayerInput({ rating: 1500, ratingDeviation: 200 }));
-
-      const updated = await updatePlayerRating(player.id, 1600, 150);
-
-      expect(updated.rating).toBe(1600);
-      expect(updated.ratingDeviation).toBe(150);
-    });
-
-    it('should set lastRatingUpdate and lastEventDate', async () => {
-      const player = await createPlayer(createPlayerInput());
-      const beforeUpdate = new Date();
-
-      const updated = await updatePlayerRating(player.id, 1600, 150);
-
-      expect(updated.lastRatingUpdate).not.toBeNull();
-      expect(updated.lastRatingUpdate!.getTime()).toBeGreaterThanOrEqual(beforeUpdate.getTime());
-      expect(updated.lastEventDate).not.toBeNull();
-      expect(updated.lastEventDate!.getTime()).toBeGreaterThanOrEqual(beforeUpdate.getTime());
-    });
-
-    it('should not update eventCount or isRated when eventCount is undefined', async () => {
-      const player = await createPlayer(createPlayerInput({ isRated: false, eventCount: 3 }));
-
-      const updated = await updatePlayerRating(player.id, 1700, 120);
-
-      expect(updated.isRated).toBe(false);
-      expect(updated.eventCount).toBe(3);
-    });
-
-    it('should set isRated=false when eventCount < 5', async () => {
-      const player = await createPlayer(createPlayerInput());
-
-      const updated = await updatePlayerRating(player.id, 1600, 150, 4);
-
-      expect(updated.isRated).toBe(false);
-      expect(updated.eventCount).toBe(4);
-    });
-
-    it('should set isRated=true when eventCount = 5', async () => {
-      const player = await createPlayer(createPlayerInput());
-
-      const updated = await updatePlayerRating(player.id, 1600, 150, 5);
-
-      expect(updated.isRated).toBe(true);
-      expect(updated.eventCount).toBe(5);
-    });
-
-    it('should set isRated=true when eventCount > 5', async () => {
-      const player = await createPlayer(createPlayerInput());
-
-      const updated = await updatePlayerRating(player.id, 1600, 150, 10);
-
-      expect(updated.isRated).toBe(true);
-      expect(updated.eventCount).toBe(10);
-    });
-
-    it('should handle eventCount = 0', async () => {
-      const player = await createPlayer(createPlayerInput({ eventCount: 5, isRated: true }));
-
-      const updated = await updatePlayerRating(player.id, 1500, 200, 0);
-
-      expect(updated.isRated).toBe(false);
-      expect(updated.eventCount).toBe(0);
     });
   });
 
@@ -536,19 +319,19 @@ describe('players', () => {
     });
 
     it('should count with filter', async () => {
-      await createPlayer(createPlayerInput({ isRated: true }));
-      await createPlayer(createPlayerInput({ isRated: false }));
-      await createPlayer(createPlayerInput({ isRated: true }));
+      await createPlayer(createPlayerInput({ eventCount: 5 }));
+      await createPlayer(createPlayerInput({ eventCount: 0 }));
+      await createPlayer(createPlayerInput({ eventCount: 10 }));
 
-      const count = await countPlayers({ isRated: true });
+      const count = await countPlayers({ eventCount: { gte: 5 } });
 
       expect(count).toBe(2);
     });
 
     it('should return 0 for no matches', async () => {
-      await createPlayer(createPlayerInput({ isRated: false }));
+      await createPlayer(createPlayerInput({ eventCount: 0 }));
 
-      const count = await countPlayers({ isRated: true });
+      const count = await countPlayers({ eventCount: { gte: 5 } });
 
       expect(count).toBe(0);
     });

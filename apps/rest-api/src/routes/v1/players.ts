@@ -8,8 +8,8 @@ import {
   countPlayers,
   searchPlayers,
   getPlayerWithResults,
-  getTopPlayersByRating,
-  getTopPlayersByRanking,
+  getTopPlayersByOpprRating,
+  getTopPlayersByOpprRanking,
   getPlayerStats,
 } from '@opprs/db-prisma';
 import {
@@ -33,9 +33,8 @@ import { NotFoundError } from '../../utils/errors.js';
 interface PlayerListQuery {
   page?: number;
   limit?: number;
-  sortBy?: 'rating' | 'ranking' | 'name' | 'eventCount' | 'createdAt';
+  sortBy?: 'name' | 'eventCount' | 'createdAt';
   sortOrder?: 'asc' | 'desc';
-  isRated?: boolean;
 }
 
 interface PlayerSearchQuery {
@@ -66,15 +65,14 @@ export const playerRoutes: FastifyPluginAsync = async (app) => {
       },
     },
     async (request, reply) => {
-      const { sortBy, sortOrder, isRated } = request.query;
+      const { sortBy, sortOrder } = request.query;
       const { skip, take, page, limit } = parsePaginationParams(request.query);
 
-      const where = isRated !== undefined ? { isRated } : undefined;
       const orderBy = sortBy ? { [sortBy]: sortOrder ?? 'asc' } : undefined;
 
       const [players, total] = await Promise.all([
-        findPlayers({ take, skip, where, orderBy }),
-        countPlayers(where),
+        findPlayers({ take, skip, orderBy }),
+        countPlayers(),
       ]);
 
       return reply.send(buildPaginatedResponse(players, page, limit, total));
@@ -116,7 +114,16 @@ export const playerRoutes: FastifyPluginAsync = async (app) => {
     },
     async (request, reply) => {
       const { limit = 50 } = request.query;
-      const players = await getTopPlayersByRating(limit);
+      const rankings = await getTopPlayersByOpprRating(limit);
+      // Return player data with ranking info embedded
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const players = rankings.map((r: any) => ({
+        ...r.player,
+        rating: r.rating,
+        ratingDeviation: r.ratingDeviation,
+        ranking: r.ranking,
+        isRated: r.isRated,
+      }));
       return reply.send(players);
     }
   );
@@ -136,7 +143,16 @@ export const playerRoutes: FastifyPluginAsync = async (app) => {
     },
     async (request, reply) => {
       const { limit = 50 } = request.query;
-      const players = await getTopPlayersByRanking(limit);
+      const rankings = await getTopPlayersByOpprRanking(limit);
+      // Return player data with ranking info embedded
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const players = rankings.map((r: any) => ({
+        ...r.player,
+        rating: r.rating,
+        ratingDeviation: r.ratingDeviation,
+        ranking: r.ranking,
+        isRated: r.isRated,
+      }));
       return reply.send(players);
     }
   );

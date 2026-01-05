@@ -14,6 +14,9 @@ export type {
   EventBoosterType,
   Role,
   Prisma,
+  OpprPlayerRanking,
+  OpprRankingHistory,
+  OpprRankingChangeType,
 } from '@prisma/client';
 
 /**
@@ -47,6 +50,13 @@ export type {
   UpdateLocationInput,
   FindLocationsOptions,
 } from './locations.js';
+
+export type {
+  CreateOpprPlayerRankingInput,
+  UpdateOpprPlayerRankingInput,
+  FindOpprPlayerRankingsOptions,
+  CreateOpprRankingHistoryInput,
+} from './oppr-rankings.js';
 
 /**
  * Player with full tournament standings
