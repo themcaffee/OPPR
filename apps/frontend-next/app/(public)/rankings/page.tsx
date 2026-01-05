@@ -10,7 +10,6 @@ export default function RankingsPage() {
   const [data, setData] = useState<PaginatedResponse<Player> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [viewType, setViewType] = useState<'ranking' | 'rating'>('ranking');
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchInput, setSearchInput] = useState('');
@@ -30,8 +29,8 @@ export default function RankingsPage() {
           const result = await apiClient.players.list({
             page,
             limit,
-            sortBy: viewType,
-            sortOrder: viewType === 'ranking' ? 'asc' : 'desc',
+            sortBy: 'ranking',
+            sortOrder: 'asc',
             isRated: true,
           });
           setData(result);
@@ -44,12 +43,7 @@ export default function RankingsPage() {
       }
     }
     fetchData();
-  }, [page, viewType, searchQuery]);
-
-  const handleViewTypeChange = (type: 'ranking' | 'rating') => {
-    setViewType(type);
-    setPage(1);
-  };
+  }, [page, searchQuery]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,9 +61,7 @@ export default function RankingsPage() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Player Rankings</h1>
-        <p className="text-gray-600">
-          View all rated players sorted by {viewType === 'ranking' ? 'world ranking' : 'Glicko rating'}.
-        </p>
+        <p className="text-gray-600">View all rated players sorted by world ranking.</p>
       </div>
 
       <Card>
@@ -105,30 +97,6 @@ export default function RankingsPage() {
           <h2 className="text-lg font-semibold text-gray-900">
             {searchQuery ? 'Search Results' : 'Leaderboard'}
           </h2>
-          {!searchQuery && (
-            <div className="flex rounded-md shadow-sm">
-              <button
-                onClick={() => handleViewTypeChange('ranking')}
-                className={`px-4 py-2 text-sm font-medium rounded-l-md border ${
-                  viewType === 'ranking'
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                Ranking
-              </button>
-              <button
-                onClick={() => handleViewTypeChange('rating')}
-                className={`px-4 py-2 text-sm font-medium rounded-r-md border-t border-b border-r ${
-                  viewType === 'rating'
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                Rating
-              </button>
-            </div>
-          )}
         </div>
 
         {isLoading ? (
@@ -156,7 +124,10 @@ export default function RankingsPage() {
                       Player
                     </th>
                     <th className="text-right py-3 px-4 text-sm font-medium text-gray-500">
-                      {searchQuery ? 'Rating' : viewType === 'ranking' ? 'Rank' : 'Rating'}
+                      Rank
+                    </th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-gray-500">
+                      Rating
                     </th>
                     <th className="text-right py-3 px-4 text-sm font-medium text-gray-500">
                       Events
@@ -166,11 +137,6 @@ export default function RankingsPage() {
                 <tbody>
                   {data.data.map((player, index) => {
                     const position = (page - 1) * limit + index + 1;
-                    const displayValue = searchQuery
-                      ? Math.round(player.rating)
-                      : viewType === 'ranking'
-                        ? player.ranking ?? '-'
-                        : Math.round(player.rating);
 
                     return (
                       <tr
@@ -192,9 +158,10 @@ export default function RankingsPage() {
                           )}
                         </td>
                         <td className="py-3 px-4 text-right text-sm font-medium text-gray-700">
-                          {!searchQuery && viewType === 'ranking' && typeof displayValue === 'number'
-                            ? `#${displayValue}`
-                            : displayValue}
+                          {player.ranking != null ? `#${player.ranking}` : '-'}
+                        </td>
+                        <td className="py-3 px-4 text-right text-sm text-gray-500">
+                          {Math.round(player.rating)}
                         </td>
                         <td className="py-3 px-4 text-right text-sm text-gray-500">
                           {player.eventCount}
