@@ -10,11 +10,6 @@ interface LandingData {
   rankingLeaderboard: Player[];
   ratingLeaderboard: Player[];
   recentTournaments: Tournament[];
-  stats: {
-    players: { total: number; rated: number };
-    tournaments: { total: number };
-    results: { total: number };
-  };
 }
 
 function formatDate(dateString: string): string {
@@ -44,19 +39,16 @@ export default function LandingPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [rankingLeaderboard, ratingLeaderboard, recentTournaments, stats] =
-          await Promise.all([
-            apiClient.stats.leaderboard({ type: 'ranking', limit: 10 }),
-            apiClient.stats.leaderboard({ type: 'rating', limit: 10 }),
-            apiClient.tournaments.recent({ limit: 5 }),
-            apiClient.stats.overview(),
-          ]);
+        const [rankingLeaderboard, ratingLeaderboard, recentTournaments] = await Promise.all([
+          apiClient.stats.leaderboard({ type: 'ranking', limit: 10 }),
+          apiClient.stats.leaderboard({ type: 'rating', limit: 10 }),
+          apiClient.tournaments.recent({ limit: 5 }),
+        ]);
 
         setData({
           rankingLeaderboard,
           ratingLeaderboard,
           recentTournaments,
-          stats,
         });
       } catch (err) {
         setError('Failed to load data');
@@ -73,10 +65,9 @@ export default function LandingPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="animate-pulse space-y-8">
           <div className="h-32 bg-gray-200 rounded-lg"></div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="h-24 bg-gray-200 rounded-lg"></div>
-            <div className="h-24 bg-gray-200 rounded-lg"></div>
-            <div className="h-24 bg-gray-200 rounded-lg"></div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="h-64 bg-gray-200 rounded-lg"></div>
+            <div className="h-64 bg-gray-200 rounded-lg"></div>
           </div>
         </div>
       </div>
@@ -105,23 +96,6 @@ export default function LandingPage() {
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           Track player rankings, tournament results, and ratings across competitive pinball events.
         </p>
-      </div>
-
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        <Card className="text-center">
-          <div className="text-3xl font-bold text-gray-900">{data.stats.players.total}</div>
-          <div className="text-sm text-gray-600">Total Players</div>
-          <div className="text-xs text-gray-500 mt-1">{data.stats.players.rated} rated</div>
-        </Card>
-        <Card className="text-center">
-          <div className="text-3xl font-bold text-gray-900">{data.stats.tournaments.total}</div>
-          <div className="text-sm text-gray-600">Tournaments</div>
-        </Card>
-        <Card className="text-center">
-          <div className="text-3xl font-bold text-gray-900">{data.stats.results.total}</div>
-          <div className="text-sm text-gray-600">Results Recorded</div>
-        </Card>
       </div>
 
       {/* Main Content Grid */}
