@@ -1,14 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { TGPConfigForm, defaultTGPConfig, type EventBoosterType } from '@/components/admin/TGPConfigForm';
+import { TGPConfigForm, defaultTGPConfig, type EventBoosterType, type ApiTournamentFormatType } from '@/components/admin/TGPConfigForm';
 import type { TGPConfig } from '@opprs/core';
 
 describe('TGPConfigForm', () => {
   const defaultProps = {
     tgpConfig: { ...defaultTGPConfig },
     eventBooster: 'NONE' as EventBoosterType,
+    qualifyingFormat: 'NONE' as ApiTournamentFormatType,
     onTGPConfigChange: vi.fn(),
     onEventBoosterChange: vi.fn(),
+    onQualifyingFormatChange: vi.fn(),
   };
 
   beforeEach(() => {
@@ -25,8 +27,28 @@ describe('TGPConfigForm', () => {
   it('renders finals format type dropdown', () => {
     render(<TGPConfigForm {...defaultProps} />);
 
-    expect(screen.getByLabelText(/format type/i)).toBeInTheDocument();
+    // There are two Format Type labels now (qualifying and finals)
+    const finalsFormatSelect = screen.getByLabelText('Format Type', { selector: '#finalsFormatType' });
+    expect(finalsFormatSelect).toBeInTheDocument();
     expect(screen.getByDisplayValue('Single Elimination')).toBeInTheDocument();
+  });
+
+  it('renders qualifying format dropdown', () => {
+    render(<TGPConfigForm {...defaultProps} />);
+
+    // Qualifying format dropdown should show NONE by default
+    const qualifyingFormatSelect = screen.getByLabelText('Format Type', { selector: '#qualifyingFormat' });
+    expect(qualifyingFormatSelect).toBeInTheDocument();
+    expect(qualifyingFormatSelect).toHaveValue('NONE');
+  });
+
+  it('calls onQualifyingFormatChange when qualifying format changes', () => {
+    render(<TGPConfigForm {...defaultProps} />);
+
+    const select = screen.getByLabelText('Format Type', { selector: '#qualifyingFormat' });
+    fireEvent.change(select, { target: { value: 'MATCH_PLAY' } });
+
+    expect(defaultProps.onQualifyingFormatChange).toHaveBeenCalledWith('MATCH_PLAY');
   });
 
   it('shows hours input when qualifying type is unlimited', () => {
@@ -62,7 +84,8 @@ describe('TGPConfigForm', () => {
   it('calls onTGPConfigChange when finals format changes', () => {
     render(<TGPConfigForm {...defaultProps} />);
 
-    const select = screen.getByLabelText(/format type/i);
+    // Use specific selector to get finals format dropdown
+    const select = screen.getByLabelText('Format Type', { selector: '#finalsFormatType' });
     fireEvent.change(select, { target: { value: 'double-elimination' } });
 
     expect(defaultProps.onTGPConfigChange).toHaveBeenCalledWith(

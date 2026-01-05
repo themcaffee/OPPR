@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify';
-import type { EventBoosterType, Prisma } from '@opprs/db-prisma';
+import type { EventBoosterType, TournamentFormatType, Prisma } from '@opprs/db-prisma';
 import {
   createTournament,
   findTournamentById,
@@ -61,6 +61,7 @@ interface CreateTournamentBody {
   organizerId?: string;
   tgpConfig?: Prisma.InputJsonValue;
   eventBooster?: EventBoosterType;
+  qualifyingFormat?: TournamentFormatType;
   allowsOptOut?: boolean;
   baseValue?: number;
   tvaRating?: number;
@@ -79,6 +80,7 @@ interface UpdateTournamentBody {
   organizerId?: string | null;
   tgpConfig?: Prisma.InputJsonValue;
   eventBooster?: EventBoosterType;
+  qualifyingFormat?: TournamentFormatType;
   allowsOptOut?: boolean;
   baseValue?: number;
   tvaRating?: number;
