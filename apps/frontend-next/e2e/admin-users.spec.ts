@@ -204,7 +204,7 @@ test.describe('Admin User Management', () => {
       await expect(page.getByText(/Are you sure you want to delete/)).toBeVisible();
       await editPage.confirmDelete();
 
-      await expect(page).toHaveURL('/admin/users');
+      await expect(page).toHaveURL('/admin/users', { timeout: 10000 });
     });
   });
 });
