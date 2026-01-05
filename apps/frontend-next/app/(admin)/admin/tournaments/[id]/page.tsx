@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/Card';
 import { FormField } from '@/components/ui/FormField';
 import { Button } from '@/components/ui/Button';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
+import { LocationSelector } from '@/components/admin/LocationSelector';
 import {
   TGPConfigForm,
   defaultTGPConfig,
@@ -40,6 +41,7 @@ export default function AdminTournamentEditPage() {
   // TGP Configuration state
   const [tgpConfig, setTgpConfig] = useState<TGPConfig>(defaultTGPConfig);
   const [eventBooster, setEventBooster] = useState<EventBoosterType>('NONE');
+  const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
 
   const {
     register,
@@ -57,6 +59,7 @@ export default function AdminTournamentEditPage() {
           date: t.date.split('T')[0],
         });
         setEventBooster(t.eventBooster as EventBoosterType);
+        setSelectedLocationId(t.locationId ?? null);
         // Load TGP config if available
         if (t.tgpConfig && typeof t.tgpConfig === 'object') {
           const config = t.tgpConfig as Record<string, unknown>;
@@ -75,6 +78,7 @@ export default function AdminTournamentEditPage() {
       date: new Date(data.date).toISOString(),
       eventBooster,
       tgpConfig: tgpConfig as unknown as Record<string, unknown>,
+      locationId: selectedLocationId,
     };
     if (isNew) {
       const createPayload = {
@@ -82,6 +86,7 @@ export default function AdminTournamentEditPage() {
         date: new Date(data.date).toISOString(),
         eventBooster,
         tgpConfig: tgpConfig as unknown as Record<string, unknown>,
+        locationId: selectedLocationId ?? undefined,
       };
       const created = await apiClient.tournaments.create(createPayload);
       // Navigate to the newly created tournament to allow adding results
@@ -168,10 +173,10 @@ export default function AdminTournamentEditPage() {
 
       {/* Details Tab */}
       {(isNew || activeTab === 'details') && (
-        <div className="space-y-6 mt-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-6">
           {/* Basic Info */}
           <Card>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -190,19 +195,15 @@ export default function AdminTournamentEditPage() {
                 />
               </div>
 
-              {/* Location management moved to separate Location entity */}
-
-              <div className="flex justify-end pt-4 border-t">
-                <div className="flex space-x-3">
-                  <Button type="button" variant="outline" onClick={() => router.back()}>
-                    Cancel
-                  </Button>
-                  <Button type="submit" isLoading={isSubmitting}>
-                    {isNew ? 'Create Tournament' : 'Save Changes'}
-                  </Button>
-                </div>
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                <LocationSelector
+                  value={selectedLocationId}
+                  onChange={setSelectedLocationId}
+                  placeholder="Search for a location..."
+                />
               </div>
-            </form>
+            </div>
           </Card>
 
           {/* TGP Configuration */}
@@ -229,7 +230,21 @@ export default function AdminTournamentEditPage() {
               </p>
             </div>
           )}
-        </div>
+
+          {/* Form Actions */}
+          <Card>
+            <div className="flex justify-end">
+              <div className="flex space-x-3">
+                <Button type="button" variant="outline" onClick={() => router.back()}>
+                  Cancel
+                </Button>
+                <Button type="submit" isLoading={isSubmitting}>
+                  {isNew ? 'Create Tournament' : 'Save Changes'}
+                </Button>
+              </div>
+            </div>
+          </Card>
+        </form>
       )}
 
       {/* Results Tab */}
