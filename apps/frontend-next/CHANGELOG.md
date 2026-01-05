@@ -1,5 +1,22 @@
 # frontend-next
 
+## 2.6.0
+
+### Minor Changes
+
+- c3d513e: Consolidate ranking/rating tabs into single view with both values displayed side-by-side
+- 11b4651: Add multi-result tournament entry with unique placement validation
+  - Admin can now add multiple tournament results at once using a dynamic multi-row form
+  - Real-time validation prevents duplicate positions within the form and conflicts with existing results
+  - Backend validation on batch endpoint rejects submissions with duplicate positions
+
+- 4bd4fa2: Add qualifyingFormat field to Tournament model for specifying tournament qualifying format type (single-elimination, double-elimination, match-play, etc.)
+
+### Patch Changes
+
+- Updated dependencies [4bd4fa2]
+  - @opprs/rest-api-client@2.6.0
+
 ## 2.5.0
 
 ### Minor Changes

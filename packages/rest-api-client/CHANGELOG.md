@@ -1,5 +1,11 @@
 # @opprs/rest-api-client
 
+## 2.6.0
+
+### Minor Changes
+
+- 4bd4fa2: Add qualifyingFormat field to Tournament model for specifying tournament qualifying format type (single-elimination, double-elimination, match-play, etc.)
+
 ## 2.5.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
   "name": "@opprs/db-prisma",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "description": "Database backend for OPPR (Open Pinball Player Ranking System) using Prisma and PostgreSQL",
   "keywords": [
     "oppr",
