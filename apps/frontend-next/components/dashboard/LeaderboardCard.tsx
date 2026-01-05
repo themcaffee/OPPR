@@ -1,51 +1,17 @@
-'use client';
-
-import { useState } from 'react';
 import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import type { Player } from '@opprs/rest-api-client';
 
 interface LeaderboardCardProps {
-  rankingPlayers: Player[];
-  ratingPlayers: Player[];
+  players: Player[];
   currentPlayerId?: string;
 }
 
-export function LeaderboardCard({
-  rankingPlayers,
-  ratingPlayers,
-  currentPlayerId,
-}: LeaderboardCardProps) {
-  const [viewType, setViewType] = useState<'ranking' | 'rating'>('ranking');
-
-  const players = viewType === 'ranking' ? rankingPlayers : ratingPlayers;
-
+export function LeaderboardCard({ players, currentPlayerId }: LeaderboardCardProps) {
   return (
     <Card>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900">Leaderboard</h3>
-        <div className="flex rounded-md shadow-sm">
-          <button
-            onClick={() => setViewType('ranking')}
-            className={`px-3 py-1 text-sm font-medium rounded-l-md border ${
-              viewType === 'ranking'
-                ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-            }`}
-          >
-            Ranking
-          </button>
-          <button
-            onClick={() => setViewType('rating')}
-            className={`px-3 py-1 text-sm font-medium rounded-r-md border-t border-b border-r ${
-              viewType === 'rating'
-                ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-            }`}
-          >
-            Rating
-          </button>
-        </div>
       </div>
 
       {players.length === 0 ? (
@@ -54,10 +20,6 @@ export function LeaderboardCard({
         <ul className="space-y-2">
           {players.map((player, index) => {
             const isCurrentUser = player.id === currentPlayerId;
-            const displayValue =
-              viewType === 'ranking'
-                ? `#${player.ranking ?? index + 1}`
-                : Math.round(player.rating);
 
             return (
               <li
@@ -80,7 +42,12 @@ export function LeaderboardCard({
                     )}
                   </Link>
                 </div>
-                <span className="text-sm font-medium text-gray-700">{displayValue}</span>
+                <div className="flex items-center space-x-4">
+                  <span className="text-sm font-medium text-gray-700">
+                    #{player.ranking ?? index + 1}
+                  </span>
+                  <span className="text-sm text-gray-500">{Math.round(player.rating)}</span>
+                </div>
               </li>
             );
           })}

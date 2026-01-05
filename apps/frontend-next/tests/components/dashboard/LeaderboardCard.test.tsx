@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { LeaderboardCard } from '@/components/dashboard/LeaderboardCard';
 import type { Player } from '@opprs/rest-api-client';
 
 describe('LeaderboardCard', () => {
-  const mockRankingPlayers: Player[] = [
+  const mockPlayers: Player[] = [
     {
       id: 'p1',
       externalId: null,
@@ -35,118 +35,51 @@ describe('LeaderboardCard', () => {
     },
   ];
 
-  const mockRatingPlayers: Player[] = [
-    {
-      id: 'p3',
-      externalId: null,
-      name: 'Charlie',
-      rating: 1900,
-      ratingDeviation: 40,
-      ranking: 3,
-      isRated: true,
-      eventCount: 25,
-      lastRatingUpdate: null,
-      lastEventDate: null,
-      createdAt: '2024-01-01',
-      updatedAt: '2024-01-01',
-    },
-  ];
-
   it('renders leaderboard title', () => {
-    render(
-      <LeaderboardCard
-        rankingPlayers={mockRankingPlayers}
-        ratingPlayers={mockRatingPlayers}
-      />
-    );
+    render(<LeaderboardCard players={mockPlayers} />);
 
     expect(screen.getByText('Leaderboard')).toBeInTheDocument();
   });
 
-  it('shows ranking view by default', () => {
-    render(
-      <LeaderboardCard
-        rankingPlayers={mockRankingPlayers}
-        ratingPlayers={mockRatingPlayers}
-      />
-    );
+  it('shows all players', () => {
+    render(<LeaderboardCard players={mockPlayers} />);
 
     expect(screen.getByText('Alice')).toBeInTheDocument();
     expect(screen.getByText('Bob')).toBeInTheDocument();
   });
 
-  it('switches to rating view when clicking Rating button', () => {
-    render(
-      <LeaderboardCard
-        rankingPlayers={mockRankingPlayers}
-        ratingPlayers={mockRatingPlayers}
-      />
-    );
-
-    fireEvent.click(screen.getByRole('button', { name: 'Rating' }));
-
-    expect(screen.getByText('Charlie')).toBeInTheDocument();
-  });
-
   it('highlights current user in the list', () => {
-    render(
-      <LeaderboardCard
-        rankingPlayers={mockRankingPlayers}
-        ratingPlayers={mockRatingPlayers}
-        currentPlayerId="p1"
-      />
-    );
+    render(<LeaderboardCard players={mockPlayers} currentPlayerId="p1" />);
 
     expect(screen.getByText('(You)')).toBeInTheDocument();
   });
 
   it('shows empty state when no players', () => {
-    render(
-      <LeaderboardCard rankingPlayers={[]} ratingPlayers={[]} />
-    );
+    render(<LeaderboardCard players={[]} />);
 
     expect(screen.getByText('No players ranked yet.')).toBeInTheDocument();
   });
 
-  it('displays ranking values in ranking view', () => {
-    render(
-      <LeaderboardCard
-        rankingPlayers={mockRankingPlayers}
-        ratingPlayers={mockRatingPlayers}
-      />
-    );
+  it('displays both ranking and rating values', () => {
+    render(<LeaderboardCard players={mockPlayers} />);
 
+    // Rankings
     expect(screen.getByText('#1')).toBeInTheDocument();
     expect(screen.getByText('#2')).toBeInTheDocument();
-  });
-
-  it('displays rating values in rating view', () => {
-    render(
-      <LeaderboardCard
-        rankingPlayers={mockRankingPlayers}
-        ratingPlayers={mockRatingPlayers}
-      />
-    );
-
-    fireEvent.click(screen.getByRole('button', { name: 'Rating' }));
-
-    expect(screen.getByText('1900')).toBeInTheDocument();
+    // Ratings
+    expect(screen.getByText('1800')).toBeInTheDocument();
+    expect(screen.getByText('1750')).toBeInTheDocument();
   });
 
   it('shows Unknown Player for null names', () => {
     const playersWithNullName: Player[] = [
       {
-        ...mockRankingPlayers[0],
+        ...mockPlayers[0],
         name: null,
       },
     ];
 
-    render(
-      <LeaderboardCard
-        rankingPlayers={playersWithNullName}
-        ratingPlayers={[]}
-      />
-    );
+    render(<LeaderboardCard players={playersWithNullName} />);
 
     expect(screen.getByText('Unknown Player')).toBeInTheDocument();
   });

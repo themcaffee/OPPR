@@ -20,8 +20,7 @@ interface ProfileData {
   user: AuthUser | null;
   stats: PlayerStats | null;
   results: PlayerResult[];
-  rankingLeaderboard: Player[];
-  ratingLeaderboard: Player[];
+  leaderboard: Player[];
   recentTournaments: Tournament[];
 }
 
@@ -30,8 +29,7 @@ export default function ProfilePage() {
     user: null,
     stats: null,
     results: [],
-    rankingLeaderboard: [],
-    ratingLeaderboard: [],
+    leaderboard: [],
     recentTournaments: [],
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -44,9 +42,8 @@ export default function ProfilePage() {
         const user = (await apiClient.getMe()) as AuthUser;
 
         // Fetch data that doesn't require a player profile
-        const [rankingLeaderboard, ratingLeaderboard, recentTournaments] = await Promise.all([
+        const [leaderboard, recentTournaments] = await Promise.all([
           apiClient.stats.leaderboard({ type: 'ranking', limit: 10 }),
-          apiClient.stats.leaderboard({ type: 'rating', limit: 10 }),
           apiClient.tournaments.recent({ limit: 5 }),
         ]);
 
@@ -67,8 +64,7 @@ export default function ProfilePage() {
           user,
           stats,
           results,
-          rankingLeaderboard,
-          ratingLeaderboard,
+          leaderboard,
           recentTournaments,
         });
       } catch (err) {
@@ -112,7 +108,7 @@ export default function ProfilePage() {
     );
   }
 
-  const { user, stats, results, rankingLeaderboard, ratingLeaderboard, recentTournaments } = data;
+  const { user, stats, results, leaderboard, recentTournaments } = data;
   const hasPlayerProfile = user?.player != null;
 
   return (
@@ -133,8 +129,7 @@ export default function ProfilePage() {
                   {stats && <PlayerStatsCard stats={stats} />}
                 </div>
                 <LeaderboardCard
-                  rankingPlayers={rankingLeaderboard}
-                  ratingPlayers={ratingLeaderboard}
+                  players={leaderboard}
                   currentPlayerId={user?.player?.id}
                 />
               </div>
