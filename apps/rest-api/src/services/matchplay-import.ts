@@ -27,6 +27,8 @@ import {
   findPlayerByExternalId,
   createManyStandings,
   deleteStandingsByTournament,
+  getOrCreateOpprPlayerRanking,
+  updateOpprPlayerRanking,
 } from '@opprs/db-prisma';
 import type { EventBoosterType, Tournament, Prisma } from '@opprs/db-prisma';
 import { NotFoundError, ExternalServiceError } from '../utils/errors.js';
@@ -130,24 +132,25 @@ export async function importTournament(
 
     if (dbPlayer) {
       dbPlayer = await updatePlayer(dbPlayer.id, {
-        rating: player.rating,
-        ratingDeviation: player.ratingDeviation,
-        ranking: player.ranking,
-        isRated: player.isRated,
         eventCount: player.eventCount,
       });
       playersUpdated++;
     } else {
       dbPlayer = await createPlayer({
         externalId: playerExternalId,
-        rating: player.rating,
-        ratingDeviation: player.ratingDeviation,
-        ranking: player.ranking,
-        isRated: player.isRated,
         eventCount: player.eventCount,
       });
       playersCreated++;
     }
+
+    // Create or update OPPR ranking for the player
+    await getOrCreateOpprPlayerRanking(dbPlayer.id);
+    await updateOpprPlayerRanking(dbPlayer.id, {
+      rating: player.rating,
+      ratingDeviation: player.ratingDeviation,
+      ranking: player.ranking ?? undefined,
+      isRated: player.isRated,
+    });
 
     playerIdMap.set(player.id, dbPlayer.id);
   }

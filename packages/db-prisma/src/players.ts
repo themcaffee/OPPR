@@ -9,11 +9,8 @@ export interface CreatePlayerInput {
   externalId?: string;
   playerNumber?: number;
   name?: string;
-  rating?: number;
-  ratingDeviation?: number;
-  ranking?: number;
-  isRated?: boolean;
   eventCount?: number;
+  lastEventDate?: Date;
 }
 
 /**
@@ -21,12 +18,7 @@ export interface CreatePlayerInput {
  */
 export interface UpdatePlayerInput {
   name?: string;
-  rating?: number;
-  ratingDeviation?: number;
-  ranking?: number;
-  isRated?: boolean;
   eventCount?: number;
-  lastRatingUpdate?: Date;
   lastEventDate?: Date;
 }
 
@@ -122,43 +114,6 @@ export async function findPlayers(options: FindPlayersOptions = {}): Promise<Pla
 }
 
 /**
- * Gets all rated players (has 5+ events)
- */
-export async function getRatedPlayers(
-  options: Omit<FindPlayersOptions, 'where'> = {},
-): Promise<Player[]> {
-  return findPlayers({
-    ...options,
-    where: { isRated: true },
-  });
-}
-
-/**
- * Gets top players by rating
- */
-export async function getTopPlayersByRating(limit: number = 50): Promise<Player[]> {
-  return findPlayers({
-    take: limit,
-    orderBy: { rating: 'desc' },
-    where: { isRated: true },
-  });
-}
-
-/**
- * Gets top players by ranking
- */
-export async function getTopPlayersByRanking(limit: number = 50): Promise<Player[]> {
-  return findPlayers({
-    take: limit,
-    orderBy: { ranking: 'asc' },
-    where: {
-      isRated: true,
-      ranking: { not: null },
-    },
-  });
-}
-
-/**
  * Updates a player
  */
 export async function updatePlayer(id: string, data: UpdatePlayerInput): Promise<Player> {
@@ -166,30 +121,6 @@ export async function updatePlayer(id: string, data: UpdatePlayerInput): Promise
     where: { id },
     data,
   });
-}
-
-/**
- * Updates player rating after a tournament
- */
-export async function updatePlayerRating(
-  id: string,
-  rating: number,
-  ratingDeviation: number,
-  eventCount?: number,
-): Promise<Player> {
-  const updateData: UpdatePlayerInput = {
-    rating,
-    ratingDeviation,
-    lastRatingUpdate: new Date(),
-    lastEventDate: new Date(),
-  };
-
-  if (eventCount !== undefined) {
-    updateData.eventCount = eventCount;
-    updateData.isRated = eventCount >= 5;
-  }
-
-  return updatePlayer(id, updateData);
 }
 
 /**

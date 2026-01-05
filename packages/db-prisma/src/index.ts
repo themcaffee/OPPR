@@ -17,16 +17,35 @@ export {
   findPlayerByPlayerNumber,
   findPlayerByUserEmail,
   findPlayers,
-  getRatedPlayers,
-  getTopPlayersByRating,
-  getTopPlayersByRanking,
   updatePlayer,
-  updatePlayerRating,
   deletePlayer,
   countPlayers,
   getPlayerWithResults,
   searchPlayers,
 } from './players.js';
+
+// Export OPPR ranking functions
+export {
+  getOrCreateOpprPlayerRanking,
+  createOpprPlayerRanking,
+  findOpprPlayerRankingById,
+  findOpprPlayerRankingByPlayerId,
+  findOpprPlayerRankings,
+  getTopPlayersByOpprRating,
+  getTopPlayersByOpprRanking,
+  getRatedOpprPlayers,
+  updateOpprPlayerRanking,
+  updateOpprRatingAfterTournament,
+  updateWorldRankings,
+  applyRDDecayForInactivePlayers,
+  deleteOpprPlayerRanking,
+  countOpprPlayerRankings,
+  createOpprRankingHistory,
+  getOpprRankingHistory,
+  getOpprRankingHistoryByDateRange,
+  getLatestOpprRankingHistory,
+  countOpprRankingHistory,
+} from './oppr-rankings.js';
 
 // Export player number utilities
 export { generateUniquePlayerNumber, isValidPlayerNumber } from './player-number.js';
@@ -138,6 +157,22 @@ export {
   countUsers,
   linkPlayerToUser,
 } from './users.js';
+
+// Export API key functions
+export {
+  createApiKey,
+  findApiKeyById,
+  findApiKeysByPrefix,
+  getUserApiKeys,
+  countUserApiKeys,
+  updateApiKeyLastUsed,
+  deleteApiKey,
+  deleteUserApiKey,
+  MAX_API_KEYS_PER_USER,
+  type CreateApiKeyInput,
+  type ApiKeyWithUser,
+  type ApiKeyInfo,
+} from './api-keys.js';
 
 // Export location functions
 export {

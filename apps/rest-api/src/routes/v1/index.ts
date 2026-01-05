@@ -12,6 +12,7 @@ import { userRoutes } from './users.js';
 import { locationRoutes } from './locations.js';
 import { blogPostRoutes } from './blog-posts.js';
 import { blogTagRoutes } from './blog-tags.js';
+import { apiKeyRoutes } from './api-keys.js';
 
 export const v1Routes: FastifyPluginAsync = async (app) => {
   await app.register(authRoutes, { prefix: '/auth' });
@@ -27,4 +28,5 @@ export const v1Routes: FastifyPluginAsync = async (app) => {
   await app.register(locationRoutes, { prefix: '/locations' });
   await app.register(blogPostRoutes, { prefix: '/blog-posts' });
   await app.register(blogTagRoutes, { prefix: '/blog-tags' });
+  await app.register(apiKeyRoutes, { prefix: '/api-keys' });
 };

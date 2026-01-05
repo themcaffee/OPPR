@@ -3,8 +3,9 @@ import {
   countPlayers,
   countTournaments,
   countStandings,
-  getTopPlayersByRanking,
-  getTopPlayersByRating,
+  getTopPlayersByOpprRanking,
+  getTopPlayersByOpprRating,
+  countOpprPlayerRankings,
 } from '@opprs/db-prisma';
 import { playerSchema } from '../../schemas/player.js';
 
@@ -62,7 +63,7 @@ export const statsRoutes: FastifyPluginAsync = async (app) => {
     async (_request, reply) => {
       const [totalPlayers, ratedPlayers, totalTournaments, totalStandings] = await Promise.all([
         countPlayers(),
-        countPlayers({ isRated: true }),
+        countOpprPlayerRankings({ isRated: true }),
         countTournaments(),
         countStandings(),
       ]);
@@ -98,10 +99,20 @@ export const statsRoutes: FastifyPluginAsync = async (app) => {
     async (request, reply) => {
       const { limit = 50, type = 'ranking' } = request.query;
 
-      const players =
+      const rankings =
         type === 'rating'
-          ? await getTopPlayersByRating(limit)
-          : await getTopPlayersByRanking(limit);
+          ? await getTopPlayersByOpprRating(limit)
+          : await getTopPlayersByOpprRanking(limit);
+
+      // Return player data with ranking info embedded
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const players = rankings.map((r: any) => ({
+        ...r.player,
+        rating: r.rating,
+        ratingDeviation: r.ratingDeviation,
+        ranking: r.ranking,
+        isRated: r.isRated,
+      }));
 
       return reply.send(players);
     }
