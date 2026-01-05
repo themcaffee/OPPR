@@ -6,6 +6,7 @@ import type { Tournament, EventBoosterType, Prisma } from '@prisma/client';
  */
 export interface CreateTournamentInput {
   externalId?: string;
+  externalUrl?: string;
   name: string;
   description?: string;
   date: Date;
@@ -27,6 +28,7 @@ export interface CreateTournamentInput {
  * Input for updating a tournament
  */
 export interface UpdateTournamentInput {
+  externalUrl?: string | null;
   name?: string;
   description?: string | null;
   date?: Date;
