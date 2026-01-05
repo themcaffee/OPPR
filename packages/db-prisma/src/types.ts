@@ -12,6 +12,7 @@ export type {
   User,
   Location,
   EventBoosterType,
+  TournamentFormatType,
   Role,
   Prisma,
   OpprPlayerRanking,

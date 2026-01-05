@@ -63,6 +63,7 @@ model Tournament {
 
   // Event classification
   eventBooster     EventBoosterType @default(NONE)
+  qualifyingFormat TournamentFormatType @default(NONE)
   allowsOptOut     Boolean          @default(false)
 
   // Tournament value calculations (can be calculated or cached)
@@ -193,6 +194,21 @@ enum EventBoosterType {
   CERTIFIED_PLUS
   CHAMPIONSHIP_SERIES
   MAJOR
+}
+
+// Enum for tournament format types (qualifying and finals)
+enum TournamentFormatType {
+  SINGLE_ELIMINATION
+  DOUBLE_ELIMINATION
+  MATCH_PLAY
+  BEST_GAME
+  CARD_QUALIFYING
+  PIN_GOLF
+  FLIP_FRENZY
+  STRIKE_FORMAT
+  TARGET_MATCH_PLAY
+  HYBRID
+  NONE
 }
 
 // Enum for user roles
