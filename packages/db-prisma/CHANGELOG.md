@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.6.0
+
+### Minor Changes
+
+- 4bd4fa2: Add qualifyingFormat field to Tournament model for specifying tournament qualifying format type (single-elimination, double-elimination, match-play, etc.)
+
+### Patch Changes
+
+- 93558b4: Add optional externalUrl field to Tournament model for linking to external tournament pages
+
 ## 2.5.0
 
 ### Minor Changes

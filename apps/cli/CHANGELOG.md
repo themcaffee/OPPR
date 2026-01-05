@@ -1,5 +1,12 @@
 # @opprs/cli
 
+## 1.1.5
+
+### Patch Changes
+
+- Updated dependencies [4bd4fa2]
+  - @opprs/rest-api-client@2.6.0
+
 ## 1.1.4
 
 ### Patch Changes
