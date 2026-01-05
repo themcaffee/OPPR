@@ -137,7 +137,8 @@ describe('TournamentResultsManager', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /add result/i }));
 
-    expect(screen.getByText('Add New Result')).toBeInTheDocument();
+    // Form heading should appear
+    expect(screen.getByRole('heading', { name: 'Add Results' })).toBeInTheDocument();
   });
 
   it('shows inline edit form when Edit clicked', async () => {

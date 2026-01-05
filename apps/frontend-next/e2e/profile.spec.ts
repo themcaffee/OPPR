@@ -117,46 +117,17 @@ test.describe('Profile - Leaderboard Interactions', () => {
     await expect(page).toHaveURL('/profile');
   });
 
-  test('should toggle between Ranking and Rating leaderboard views', async ({ page }) => {
+  test('should show both ranking positions and ratings in leaderboard', async ({ page }) => {
     const profilePage = new ProfilePage(page);
 
     await profilePage.expectLoaded();
     await profilePage.expectLeaderboardVisible();
 
-    // Initially on Ranking view
-    await expect(profilePage.rankingToggle).toHaveClass(/bg-blue-600/);
-
-    // Switch to Rating view
-    await profilePage.switchToRatingLeaderboard();
-    await expect(profilePage.ratingToggle).toHaveClass(/bg-blue-600/);
-
-    // Switch back to Ranking view
-    await profilePage.switchToRankingLeaderboard();
-    await expect(profilePage.rankingToggle).toHaveClass(/bg-blue-600/);
-  });
-
-  test('should show ranking positions in Ranking view', async ({ page }) => {
-    const profilePage = new ProfilePage(page);
-
-    await profilePage.expectLoaded();
-    await profilePage.expectLeaderboardVisible();
-
-    // Ranking view should show positions in the leaderboard list
+    // Leaderboard should show both ranking (#N) and rating (4-digit number) for each player
     const leaderboardList = page.locator('ul.space-y-2');
     await expect(leaderboardList.locator('li').first()).toBeVisible();
     // Verify list contains ranking format (#N)
     await expect(leaderboardList.locator('li').first().getByText(/#\d+/)).toBeVisible();
-  });
-
-  test('should show rating numbers in Rating view', async ({ page }) => {
-    const profilePage = new ProfilePage(page);
-
-    await profilePage.expectLoaded();
-    await profilePage.switchToRatingLeaderboard();
-
-    // Rating view should show rating numbers (4 digit numbers without #)
-    const leaderboardList = page.locator('ul.space-y-2');
-    await expect(leaderboardList.locator('li').first()).toBeVisible();
     // Verify list contains rating format (4-digit number)
     await expect(leaderboardList.locator('li').first().getByText(/\d{4}/)).toBeVisible();
   });
@@ -230,9 +201,8 @@ test.describe('Profile - Error Handling', () => {
     await signInPage.signIn(SEEDED_USER.email, SEEDED_USER.password);
     await profilePage.expectLoaded();
 
-    // Interact with the profile page
-    await profilePage.switchToRatingLeaderboard();
-    await profilePage.switchToRankingLeaderboard();
+    // Interact with the profile page - verify leaderboard loads
+    await profilePage.expectLeaderboardVisible();
 
     // Verify no errors occurred
     expect(errors).toEqual([]);
