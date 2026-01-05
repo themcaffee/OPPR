@@ -58,9 +58,7 @@ export interface CreateOpprRankingHistoryInput {
 /**
  * Gets or creates an OPPR player ranking for a player
  */
-export async function getOrCreateOpprPlayerRanking(
-  playerId: string,
-): Promise<OpprPlayerRanking> {
+export async function getOrCreateOpprPlayerRanking(playerId: string): Promise<OpprPlayerRanking> {
   const existing = await prisma.opprPlayerRanking.findUnique({
     where: { playerId },
   });
@@ -127,9 +125,7 @@ export async function findOpprPlayerRankings(
 /**
  * Gets all rated players ordered by rating (highest first)
  */
-export async function getTopPlayersByOpprRating(
-  limit: number = 50,
-): Promise<OpprPlayerRanking[]> {
+export async function getTopPlayersByOpprRating(limit: number = 50): Promise<OpprPlayerRanking[]> {
   return prisma.opprPlayerRanking.findMany({
     take: limit,
     where: { isRated: true },
@@ -141,9 +137,7 @@ export async function getTopPlayersByOpprRating(
 /**
  * Gets all ranked players ordered by world ranking (best first)
  */
-export async function getTopPlayersByOpprRanking(
-  limit: number = 50,
-): Promise<OpprPlayerRanking[]> {
+export async function getTopPlayersByOpprRanking(limit: number = 50): Promise<OpprPlayerRanking[]> {
   return prisma.opprPlayerRanking.findMany({
     take: limit,
     where: {
