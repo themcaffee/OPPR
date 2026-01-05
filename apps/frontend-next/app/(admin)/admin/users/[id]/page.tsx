@@ -93,7 +93,7 @@ export default function AdminUserEditPage() {
     }
   };
 
-  const handlePlayerChange = (selectedPlayerId: string, _player: Player) => {
+  const handlePlayerChange = (selectedPlayerId: string, _player: Player | null) => {
     setValue('playerId', selectedPlayerId || null);
   };
 
@@ -123,7 +123,10 @@ export default function AdminUserEditPage() {
               <p className="mt-1 text-xs text-gray-500">Email cannot be changed</p>
             </div>
 
-            <FormField label="Role" id="role">
+            <div className="space-y-1">
+              <label htmlFor="role" className="block text-sm font-medium text-gray-700">
+                Role
+              </label>
               <select
                 id="role"
                 {...register('role')}
@@ -132,7 +135,7 @@ export default function AdminUserEditPage() {
                 <option value="USER">User</option>
                 <option value="ADMIN">Admin</option>
               </select>
-            </FormField>
+            </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Linked Player</label>
