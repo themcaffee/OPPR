@@ -1,5 +1,47 @@
 # frontend-next
 
+## 2.5.0
+
+### Minor Changes
+
+- 4754a06: Add blog system with TipTap WYSIWYG editor
+  - Add BlogPost and BlogTag database models with draft/published workflow
+  - Add REST API endpoints for blog posts and tags
+  - Add API client resources for blog posts and tags
+  - Add TipTap WYSIWYG editor component for admin post editing
+  - Add admin pages for managing blog posts and tags
+  - Add public blog listing and detail pages with tag filtering
+  - Support featured images, excerpts, and SEO fields
+
+- 9b5fc07: Add policy acceptance to user registration
+  - Add Terms of Service, Privacy Policy, and Code of Conduct acceptance tracking
+  - New DateTime fields on User model: tosAcceptedAt, privacyPolicyAcceptedAt, codeOfConductAcceptedAt
+  - Registration form requires acceptPolicies checkbox
+  - New public pages: /terms, /privacy, /code-of-conduct
+  - Footer links to policy pages
+
+### Patch Changes
+
+- b943669: feat: Split tournament results into Round, Match, Entry, and Standing models
+
+  This is a major schema refactoring that replaces the flat `TournamentResult` model with a hierarchical structure for tracking tournament matches and results:
+  - **Round** - Groups matches within a stage (e.g., "Round 1", "Quarterfinals") with `isFinals` flag
+  - **Match** - A single game with 1-4 players, optionally belonging to a Round
+  - **Entry** - A player's participation in a match (records WIN/LOSS/TIE outcome)
+  - **Standing** - Final position for qualifying or finals standings
+
+  Key changes:
+  - New Prisma models: Round, Match, Entry, Standing, MatchResult enum
+  - New REST API endpoints: `/standings`, `/rounds`, `/matches`, `/entries`
+  - Updated matchplay import service to create full tournament structure
+  - Players can appear in both qualifying AND finals standings for the same tournament
+  - Points are calculated using "merged standings" (finalists use finals position, non-finalists use qualifying position)
+
+- Updated dependencies [4754a06]
+- Updated dependencies [9b5fc07]
+- Updated dependencies [b943669]
+  - @opprs/rest-api-client@2.5.0
+
 ## 2.4.0
 
 ### Minor Changes
