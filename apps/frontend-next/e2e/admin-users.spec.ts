@@ -36,7 +36,7 @@ test.describe('Admin User Management', () => {
       await usersPage.expectLoaded();
 
       // The admin user we logged in as should be in the list
-      await expect(page.getByText(ADMIN_USER.email)).toBeVisible();
+      await expect(page.getByRole('cell', { name: ADMIN_USER.email })).toBeVisible();
     });
 
     test('should navigate to edit page when clicking Edit', async ({ page }) => {
@@ -60,7 +60,7 @@ test.describe('Admin User Management', () => {
       await usersPage.clickEditForUser(ADMIN_USER.email);
 
       await editPage.expectLoaded();
-      await expect(page.getByText(ADMIN_USER.email)).toBeVisible();
+      await expect(page.getByRole('main').getByText(ADMIN_USER.email)).toBeVisible();
     });
 
     test('should show role selector', async ({ page }) => {
@@ -183,7 +183,7 @@ test.describe('Admin User Management', () => {
       await editPage.expectLoaded();
 
       // Verify we can see the user's email
-      await expect(page.getByText(testUser.email)).toBeVisible();
+      await expect(page.getByRole('main').getByText(testUser.email)).toBeVisible();
 
       // Change role to ADMIN
       await editPage.setRole('ADMIN');
