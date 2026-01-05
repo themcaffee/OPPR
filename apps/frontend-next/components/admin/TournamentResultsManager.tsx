@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { apiClient } from '@/lib/api-client';
 import { Button } from '@/components/ui/Button';
@@ -14,7 +14,8 @@ interface TournamentResultsManagerProps {
   tournamentName?: string;
 }
 
-interface AddResultForm {
+interface ResultRowForm {
+  id: string;
   playerId: string;
   player: Player | null;
   position: number;
@@ -33,12 +34,7 @@ export function TournamentResultsManager({
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const [addForm, setAddForm] = useState<AddResultForm>({
-    playerId: '',
-    player: null,
-    position: 1,
-    optedOut: false,
-  });
+  const [formRows, setFormRows] = useState<ResultRowForm[]>([]);
 
   const [editForm, setEditForm] = useState<{ position: number; optedOut: boolean }>({
     position: 1,
@@ -63,23 +59,104 @@ export function TournamentResultsManager({
     loadResults();
   }, [loadResults]);
 
-  const handleAddResult = async () => {
-    if (!addForm.playerId) return;
+  // Helper functions for multi-row form
+  const createNewRow = useCallback(
+    (position: number): ResultRowForm => ({
+      id: crypto.randomUUID(),
+      playerId: '',
+      player: null,
+      position,
+      optedOut: false,
+    }),
+    []
+  );
+
+  const initializeFormRows = useCallback(() => {
+    const nextPosition = results.length + 1;
+    setFormRows([createNewRow(nextPosition)]);
+  }, [results.length, createNewRow]);
+
+  const addFormRow = useCallback(() => {
+    setFormRows((prev) => {
+      const lastPosition = prev.length > 0 ? Math.max(...prev.map((r) => r.position)) : results.length;
+      return [...prev, createNewRow(lastPosition + 1)];
+    });
+  }, [createNewRow, results.length]);
+
+  const removeFormRow = useCallback((id: string) => {
+    setFormRows((prev) => {
+      const filtered = prev.filter((r) => r.id !== id);
+      // Renumber positions to fill gaps
+      return filtered.map((row, idx) => ({
+        ...row,
+        position: results.length + 1 + idx,
+      }));
+    });
+  }, [results.length]);
+
+  const updateFormRow = useCallback((id: string, updates: Partial<ResultRowForm>) => {
+    setFormRows((prev) => prev.map((row) => (row.id === id ? { ...row, ...updates } : row)));
+  }, []);
+
+  // Validation logic
+  const formValidation = useMemo(() => {
+    const positionsInForm = formRows.map((r) => r.position);
+    const existingPositions = results.map((r) => r.position);
+
+    // Find duplicates within the form
+    const duplicatesInForm = positionsInForm.filter(
+      (pos, idx) => positionsInForm.indexOf(pos) !== idx
+    );
+
+    // Find conflicts with existing results
+    const conflictsWithExisting = positionsInForm.filter((pos) => existingPositions.includes(pos));
+
+    const allPlayersSelected = formRows.length > 0 && formRows.every((r) => r.playerId);
+
+    return {
+      isValid:
+        duplicatesInForm.length === 0 && conflictsWithExisting.length === 0 && allPlayersSelected,
+      duplicatesInForm: [...new Set(duplicatesInForm)],
+      conflictsWithExisting: [...new Set(conflictsWithExisting)],
+      allPlayersSelected,
+    };
+  }, [formRows, results]);
+
+  const getPositionError = useCallback(
+    (position: number, rowId: string): string | null => {
+      // Check if this position conflicts with existing results
+      if (formValidation.conflictsWithExisting.includes(position)) {
+        return 'Position already exists';
+      }
+      // Check if this position is duplicated in the form (only show error on second+ occurrence)
+      const rowsWithPosition = formRows.filter((r) => r.position === position);
+      if (rowsWithPosition.length > 1 && rowsWithPosition[0].id !== rowId) {
+        return 'Duplicate position';
+      }
+      return null;
+    },
+    [formRows, formValidation.conflictsWithExisting]
+  );
+
+  const handleAddResults = async () => {
+    if (!formValidation.isValid) return;
 
     setIsSaving(true);
     try {
-      await apiClient.standings.create({
+      const requests = formRows.map((row) => ({
         tournamentId,
-        playerId: addForm.playerId,
-        position: addForm.position,
-        optedOut: addForm.optedOut,
-      });
+        playerId: row.playerId,
+        position: row.position,
+        optedOut: row.optedOut,
+      }));
+
+      await apiClient.standings.createBatch(requests);
       await loadResults();
       setShowAddForm(false);
-      setAddForm({ playerId: '', player: null, position: results.length + 1, optedOut: false });
+      setFormRows([]);
     } catch (error) {
-      console.error('Failed to add result:', error);
-      alert('Failed to add result. The player may already have a result in this tournament.');
+      console.error('Failed to add results:', error);
+      alert('Failed to add results. Check for duplicate positions or players.');
     } finally {
       setIsSaving(false);
     }
@@ -147,78 +224,178 @@ export function TournamentResultsManager({
           Tournament Results
           {tournamentName && <span className="text-gray-500 font-normal"> - {tournamentName}</span>}
         </h3>
-        <Button type="button" onClick={() => setShowAddForm(true)} disabled={showAddForm}>
-          Add Result
+        <Button
+          type="button"
+          onClick={() => {
+            initializeFormRows();
+            setShowAddForm(true);
+          }}
+          disabled={showAddForm}
+        >
+          Add Results
         </Button>
       </div>
 
-      {/* Add Result Form */}
+      {/* Add Results Form */}
       {showAddForm && (
         <Card>
           <div className="p-4 space-y-4 bg-blue-50 border-l-4 border-blue-500">
-            <h4 className="font-medium text-gray-900">Add New Result</h4>
+            <h4 className="font-medium text-gray-900">Add Results</h4>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Player</label>
-                <PlayerSelector
-                  value={addForm.playerId}
-                  onChange={(playerId, player) =>
-                    setAddForm({ ...addForm, playerId, player })
-                  }
-                  excludePlayerIds={existingPlayerIds}
-                  placeholder="Search for a player..."
-                />
+            {/* Validation error banner */}
+            {!formValidation.isValid && formRows.length > 0 && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-700">
+                {formValidation.duplicatesInForm.length > 0 && (
+                  <p>Duplicate positions in form: {formValidation.duplicatesInForm.join(', ')}</p>
+                )}
+                {formValidation.conflictsWithExisting.length > 0 && (
+                  <p>
+                    Positions already exist: {formValidation.conflictsWithExisting.join(', ')}
+                  </p>
+                )}
+                {!formValidation.allPlayersSelected && <p>All rows must have a player selected</p>}
               </div>
+            )}
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Position</label>
-                <input
-                  type="number"
-                  value={addForm.position}
-                  onChange={(e) => setAddForm({ ...addForm, position: Number(e.target.value) })}
-                  min="1"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+            {/* Form rows */}
+            <div className="space-y-3">
+              {formRows.map((row, index) => {
+                const positionError = getPositionError(row.position, row.id);
+                // Exclude other selected players from this row's selector
+                const excludeForThisRow = [
+                  ...existingPlayerIds,
+                  ...formRows.filter((r) => r.id !== row.id && r.playerId).map((r) => r.playerId),
+                ];
+
+                return (
+                  <div
+                    key={row.id}
+                    className="grid grid-cols-1 md:grid-cols-12 gap-3 items-start p-3 bg-white rounded-md border border-gray-200"
+                  >
+                    {/* Row number */}
+                    <div className="md:col-span-1 flex items-center justify-center text-sm font-medium text-gray-500 pt-2">
+                      #{index + 1}
+                    </div>
+
+                    {/* Player selector */}
+                    <div className="md:col-span-5">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Player</label>
+                      <PlayerSelector
+                        value={row.playerId}
+                        onChange={(playerId, player) =>
+                          updateFormRow(row.id, { playerId, player })
+                        }
+                        excludePlayerIds={excludeForThisRow}
+                        placeholder="Search for a player..."
+                      />
+                    </div>
+
+                    {/* Position */}
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Position
+                      </label>
+                      <input
+                        type="number"
+                        value={row.position}
+                        onChange={(e) =>
+                          updateFormRow(row.id, { position: Number(e.target.value) })
+                        }
+                        min="1"
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          positionError
+                            ? 'border-red-500 bg-red-50'
+                            : 'border-gray-300'
+                        }`}
+                      />
+                      {positionError && (
+                        <p className="mt-1 text-xs text-red-600">{positionError}</p>
+                      )}
+                    </div>
+
+                    {/* Opted out */}
+                    <div className="md:col-span-3 flex items-center pt-6">
+                      <input
+                        type="checkbox"
+                        id={`optedOut-${row.id}`}
+                        checked={row.optedOut}
+                        onChange={(e) => updateFormRow(row.id, { optedOut: e.target.checked })}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <label
+                        htmlFor={`optedOut-${row.id}`}
+                        className="ml-2 text-sm text-gray-700"
+                      >
+                        Opted Out
+                      </label>
+                    </div>
+
+                    {/* Remove button */}
+                    <div className="md:col-span-1 flex items-center justify-center pt-6">
+                      {formRows.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeFormRow(row.id)}
+                          className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                          title="Remove row"
+                        >
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="addOptedOut"
-                checked={addForm.optedOut}
-                onChange={(e) => setAddForm({ ...addForm, optedOut: e.target.checked })}
-                className="h-4 w-4 rounded border-gray-300"
-              />
-              <label htmlFor="addOptedOut" className="ml-2 text-sm text-gray-700">
-                Opted Out (player will not receive ranking points)
-              </label>
-            </div>
+            {/* Add another player button */}
+            <button
+              type="button"
+              onClick={addFormRow}
+              className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              Add Another Player
+            </button>
 
-            <div className="flex justify-end space-x-3">
+            {/* Form actions */}
+            <div className="flex justify-end space-x-3 pt-2 border-t border-gray-200">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => {
                   setShowAddForm(false);
-                  setAddForm({
-                    playerId: '',
-                    player: null,
-                    position: results.length + 1,
-                    optedOut: false,
-                  });
+                  setFormRows([]);
                 }}
               >
                 Cancel
               </Button>
               <Button
                 type="button"
-                onClick={handleAddResult}
-                disabled={!addForm.playerId || isSaving}
+                onClick={handleAddResults}
+                disabled={!formValidation.isValid || isSaving}
                 isLoading={isSaving}
               >
-                Add Result
+                Add {formRows.length} Result{formRows.length !== 1 ? 's' : ''}
               </Button>
             </div>
           </div>

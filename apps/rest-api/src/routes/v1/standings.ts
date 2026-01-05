@@ -25,7 +25,7 @@ import {
   paginatedResponseSchema,
 } from '../../schemas/common.js';
 import { parsePaginationParams, buildPaginatedResponse } from '../../utils/pagination.js';
-import { NotFoundError } from '../../utils/errors.js';
+import { NotFoundError, BadRequestError } from '../../utils/errors.js';
 
 interface StandingListQuery {
   page?: number;
@@ -174,6 +174,7 @@ export const standingRoutes: FastifyPluginAsync = async (app) => {
         body: createManyStandingsSchema,
         response: {
           201: batchStandingResponseSchema,
+          400: errorResponseSchema,
           401: errorResponseSchema,
           403: errorResponseSchema,
         },
@@ -181,7 +182,49 @@ export const standingRoutes: FastifyPluginAsync = async (app) => {
       preHandler: [app.requireAdmin],
     },
     async (request, reply) => {
-      const result = await createManyStandings(request.body);
+      const standings = request.body;
+
+      // 1. Check for duplicate positions WITHIN the batch
+      const positionsByKey = new Map<string, Set<number>>();
+      for (const standing of standings) {
+        const key = `${standing.tournamentId}-${standing.isFinals ?? false}`;
+        let positions = positionsByKey.get(key);
+        if (!positions) {
+          positions = new Set();
+          positionsByKey.set(key, positions);
+        }
+        if (positions.has(standing.position)) {
+          throw new BadRequestError(
+            `Duplicate position ${standing.position} in batch`
+          );
+        }
+        positions.add(standing.position);
+      }
+
+      // 2. Check for conflicts with EXISTING standings
+      const tournamentIds = [...new Set(standings.map((s) => s.tournamentId))];
+      for (const tournamentId of tournamentIds) {
+        const batchPositions = standings
+          .filter((s) => s.tournamentId === tournamentId)
+          .map((s) => s.position);
+
+        const existingConflicts = await findStandings({
+          where: {
+            tournamentId,
+            position: { in: batchPositions },
+          },
+        });
+
+        if (existingConflicts.length > 0) {
+          const conflicting = existingConflicts.map((s) => s.position).join(', ');
+          throw new BadRequestError(
+            `Positions already exist: ${conflicting}`
+          );
+        }
+      }
+
+      // 3. Proceed with creation
+      const result = await createManyStandings(standings);
       return reply.status(201).send({ count: result.count });
     }
   );
