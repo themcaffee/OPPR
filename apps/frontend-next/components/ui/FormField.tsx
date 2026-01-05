@@ -8,7 +8,7 @@ interface FormFieldProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
-  ({ label, error, hint, id, ...props }, ref) => {
+  ({ label, error, hint, id, children: _children, ...props }, ref) => {
     return (
       <div className="space-y-1">
         <label htmlFor={id} className="block text-sm font-medium text-gray-700">

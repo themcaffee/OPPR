@@ -6,7 +6,7 @@ import type { Player } from '@opprs/rest-api-client';
 
 interface PlayerSelectorProps {
   value: string | null;
-  onChange: (playerId: string, player: Player) => void;
+  onChange: (playerId: string, player: Player | null) => void;
   placeholder?: string;
   disabled?: boolean;
   excludePlayerIds?: string[];
@@ -117,7 +117,7 @@ export function PlayerSelector({
   const handleClear = () => {
     setSelectedPlayer(null);
     setSearchQuery('');
-    onChange('', null as unknown as Player);
+    onChange('', null);
   };
 
   const displayPlayers = searchQuery.length >= 2 ? players : recentPlayers;

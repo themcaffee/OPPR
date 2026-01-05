@@ -30,7 +30,7 @@ export function UserPlayerLink({ user, onUpdate }: UserPlayerLinkProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isEditing]);
 
-  const handleLinkPlayer = async (playerId: string, _player: Player) => {
+  const handleLinkPlayer = async (playerId: string, _player: Player | null) => {
     setIsLoading(true);
     try {
       await apiClient.users.linkPlayer(user.id, playerId);
