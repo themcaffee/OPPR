@@ -11,6 +11,7 @@ import {
   updateOpprPlayerRanking,
   updateOpprRatingAfterTournament,
   updateWorldRankings,
+  applyRDDecayForInactivePlayers,
   deleteOpprPlayerRanking,
   countOpprPlayerRankings,
   createOpprRankingHistory,
@@ -660,6 +661,16 @@ describe('oppr-rankings', () => {
 
       expect(history).toHaveLength(0);
     });
+
+    it('should return empty for non-existent player', async () => {
+      const now = new Date();
+      const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+      const oneHourFromNow = new Date(now.getTime() + 60 * 60 * 1000);
+
+      const history = await getOpprRankingHistoryByDateRange('non-existent', oneHourAgo, oneHourFromNow);
+
+      expect(history).toHaveLength(0);
+    });
   });
 
   describe('getLatestOpprRankingHistory', () => {
@@ -704,6 +715,95 @@ describe('oppr-rankings', () => {
       const latest = await getLatestOpprRankingHistory(player.id);
 
       expect(latest).toBeNull();
+    });
+  });
+
+  describe('applyRDDecayForInactivePlayers', () => {
+    it('should return 0 when no inactive players', async () => {
+      // Create a player with recent rating update
+      const player = await createPlayer(createPlayerInput());
+      await createOpprPlayerRanking({
+        playerId: player.id,
+        rating: 1600,
+        ratingDeviation: 100,
+      });
+
+      const updatedCount = await applyRDDecayForInactivePlayers(30);
+
+      expect(updatedCount).toBe(0);
+    });
+
+    it('should apply RD decay to inactive players', async () => {
+      // Create a player with old rating update
+      const player = await createPlayer(createPlayerInput());
+      const ranking = await createOpprPlayerRanking({
+        playerId: player.id,
+        rating: 1600,
+        ratingDeviation: 100,
+      });
+
+      // Manually update lastRatingUpdate to 60 days ago
+      const sixtyDaysAgo = new Date();
+      sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
+      await updateOpprPlayerRanking(player.id, {
+        lastRatingUpdate: sixtyDaysAgo,
+      });
+
+      const updatedCount = await applyRDDecayForInactivePlayers(30, 0.3, 200);
+
+      expect(updatedCount).toBe(1);
+
+      // Verify RD was increased
+      const updatedRanking = await findOpprPlayerRankingByPlayerId(player.id);
+      expect(updatedRanking!.ratingDeviation).toBeGreaterThan(100);
+
+      // Verify history was created
+      const history = await getOpprRankingHistory(player.id);
+      expect(history.length).toBe(1);
+      expect(history[0].changeType).toBe('RD_DECAY');
+    });
+
+    it('should not exceed maxRD when applying decay', async () => {
+      // Create a player with RD close to max
+      const player = await createPlayer(createPlayerInput());
+      await createOpprPlayerRanking({
+        playerId: player.id,
+        rating: 1600,
+        ratingDeviation: 190,
+      });
+
+      // Set lastRatingUpdate to 100 days ago
+      const hundredDaysAgo = new Date();
+      hundredDaysAgo.setDate(hundredDaysAgo.getDate() - 100);
+      await updateOpprPlayerRanking(player.id, {
+        lastRatingUpdate: hundredDaysAgo,
+      });
+
+      await applyRDDecayForInactivePlayers(30, 0.3, 200);
+
+      const updatedRanking = await findOpprPlayerRankingByPlayerId(player.id);
+      expect(updatedRanking!.ratingDeviation).toBe(200);
+    });
+
+    it('should not apply decay to players already at maxRD', async () => {
+      // Create a player already at max RD
+      const player = await createPlayer(createPlayerInput());
+      await createOpprPlayerRanking({
+        playerId: player.id,
+        rating: 1600,
+        ratingDeviation: 200,
+      });
+
+      // Set lastRatingUpdate to 60 days ago
+      const sixtyDaysAgo = new Date();
+      sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
+      await updateOpprPlayerRanking(player.id, {
+        lastRatingUpdate: sixtyDaysAgo,
+      });
+
+      const updatedCount = await applyRDDecayForInactivePlayers(30, 0.3, 200);
+
+      expect(updatedCount).toBe(0);
     });
   });
 });
