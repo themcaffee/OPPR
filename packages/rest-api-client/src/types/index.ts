@@ -63,4 +63,19 @@ export type {
   UserListParams,
   UpdateUserRoleRequest,
   UpdateUserRequest,
+  // Blog Posts
+  PostStatus,
+  BlogPost,
+  CreateBlogPostRequest,
+  UpdateBlogPostRequest,
+  BlogPostListParams,
+  AdminBlogPostListParams,
+  BlogPostSearchParams,
+  // Blog Tags
+  BlogTag,
+  BlogTagWithCount,
+  CreateBlogTagRequest,
+  UpdateBlogTagRequest,
+  BlogTagListParams,
+  BlogTagSearchParams,
 } from './api-types.js';

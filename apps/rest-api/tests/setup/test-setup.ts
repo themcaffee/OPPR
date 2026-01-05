@@ -23,6 +23,7 @@ beforeEach(async () => {
   await prisma.round.deleteMany();
   await prisma.tournament.deleteMany();
   await prisma.location.deleteMany();
+  await prisma.apiKey.deleteMany();
   await prisma.user.deleteMany();
   await prisma.player.deleteMany();
 });
