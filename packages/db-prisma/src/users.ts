@@ -42,10 +42,6 @@ export interface UserWithPlayer {
     id: string;
     playerNumber: number;
     name: string | null;
-    rating: number;
-    ratingDeviation: number;
-    ranking: number | null;
-    isRated: boolean;
     eventCount: number;
   } | null;
 }
@@ -90,10 +86,6 @@ export async function createUserWithPlayer(
             id: true,
             playerNumber: true,
             name: true,
-            rating: true,
-            ratingDeviation: true,
-            ranking: true,
-            isRated: true,
             eventCount: true,
           },
         },
@@ -139,10 +131,6 @@ export async function getUserWithPlayer(id: string): Promise<UserWithPlayer | nu
           id: true,
           playerNumber: true,
           name: true,
-          rating: true,
-          ratingDeviation: true,
-          ranking: true,
-          isRated: true,
           eventCount: true,
         },
       },
@@ -168,10 +156,6 @@ export async function getUserByEmailWithPlayer(email: string): Promise<UserWithP
           id: true,
           playerNumber: true,
           name: true,
-          rating: true,
-          ratingDeviation: true,
-          ranking: true,
-          isRated: true,
           eventCount: true,
         },
       },
@@ -244,10 +228,6 @@ export async function findUsers(params: {
           id: true,
           playerNumber: true,
           name: true,
-          rating: true,
-          ratingDeviation: true,
-          ranking: true,
-          isRated: true,
           eventCount: true,
         },
       },
@@ -295,10 +275,6 @@ export async function linkPlayerToUser(
             id: true,
             playerNumber: true,
             name: true,
-            rating: true,
-            ratingDeviation: true,
-            ranking: true,
-            isRated: true,
             eventCount: true,
           },
         },

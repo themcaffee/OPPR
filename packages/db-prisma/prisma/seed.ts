@@ -15,52 +15,41 @@ async function main() {
       externalId: 'player-1',
       playerNumber: 10001,
       name: 'Alice Champion',
-      rating: 1850,
-      ratingDeviation: 50,
-      ranking: 5,
-      isRated: true,
       eventCount: 25,
     },
     {
       externalId: 'player-2',
       playerNumber: 10002,
       name: 'Bob Wizard',
-      rating: 1750,
-      ratingDeviation: 60,
-      ranking: 12,
-      isRated: true,
       eventCount: 18,
     },
     {
       externalId: 'player-3',
       playerNumber: 10003,
       name: 'Charlie Flipper',
-      rating: 1650,
-      ratingDeviation: 75,
-      ranking: 28,
-      isRated: true,
       eventCount: 12,
     },
     {
       externalId: 'player-4',
       playerNumber: 10004,
       name: 'Diana Tilt',
-      rating: 1550,
-      ratingDeviation: 100,
-      ranking: 45,
-      isRated: true,
       eventCount: 8,
     },
     {
       externalId: 'player-5',
       playerNumber: 10005,
       name: 'Eve Plunger',
-      rating: 1300,
-      ratingDeviation: 150,
-      ranking: null,
-      isRated: false,
       eventCount: 3,
     },
+  ];
+
+  // OPPR ranking data for each player
+  const rankingData = [
+    { rating: 1850, ratingDeviation: 50, ranking: 5, isRated: true },
+    { rating: 1750, ratingDeviation: 60, ranking: 12, isRated: true },
+    { rating: 1650, ratingDeviation: 75, ranking: 28, isRated: true },
+    { rating: 1550, ratingDeviation: 100, ranking: 45, isRated: true },
+    { rating: 1300, ratingDeviation: 150, ranking: null, isRated: false },
   ];
 
   const player1 = await prisma.player.upsert({
@@ -94,6 +83,18 @@ async function main() {
   });
 
   console.log(`✓ Created ${await prisma.player.count()} players`);
+
+  // Create OPPR rankings for each player
+  console.log('Creating OPPR rankings...');
+  const players = [player1, player2, player3, player4, player5];
+  for (let i = 0; i < players.length; i++) {
+    await prisma.opprPlayerRanking.upsert({
+      where: { playerId: players[i].id },
+      update: rankingData[i],
+      create: { playerId: players[i].id, ...rankingData[i] },
+    });
+  }
+  console.log(`✓ Created ${await prisma.opprPlayerRanking.count()} OPPR rankings`);
 
   // Seed users from environment variables (development only)
   const seedAdminEmail = process.env.SEED_ADMIN_EMAIL;
@@ -496,6 +497,7 @@ async function main() {
   console.log('');
   console.log('Summary:');
   console.log(`  - ${await prisma.player.count()} players`);
+  console.log(`  - ${await prisma.opprPlayerRanking.count()} OPPR rankings`);
   console.log(`  - ${await prisma.user.count()} users`);
   console.log(`  - ${await prisma.location.count()} locations`);
   console.log(`  - ${await prisma.tournament.count()} tournaments`);
