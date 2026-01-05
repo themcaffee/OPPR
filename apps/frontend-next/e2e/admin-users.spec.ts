@@ -195,7 +195,7 @@ test.describe('Admin User Management', () => {
       // Verify the role was updated by checking the list
       await usersPage.expectLoaded();
       const userRow = await usersPage.getUserRow(testUser.email);
-      await expect(userRow.getByText('ADMIN')).toBeVisible();
+      await expect(userRow.locator('span', { hasText: 'ADMIN' })).toBeVisible();
 
       // Clean up: delete the test user
       await usersPage.clickEditForUser(testUser.email);
