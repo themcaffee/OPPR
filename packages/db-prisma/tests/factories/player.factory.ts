@@ -12,24 +12,19 @@ export function createPlayerInput(overrides: Partial<CreatePlayerInput> = {}): C
     externalId: `ext-player-${id}`,
     playerNumber: playerNumberCounter++,
     name: `Test Player ${id}`,
-    rating: 1500,
-    ratingDeviation: 200,
-    isRated: false,
     eventCount: 0,
     ...overrides,
   };
 }
 
 /**
- * Creates a rated player input (eventCount >= 5)
+ * Creates a player input with high event count (for rated players)
  */
-export function createRatedPlayerInput(overrides: Partial<CreatePlayerInput> = {}): CreatePlayerInput {
+export function createActivePlayerInput(
+  overrides: Partial<CreatePlayerInput> = {},
+): CreatePlayerInput {
   return createPlayerInput({
-    isRated: true,
     eventCount: 5,
-    rating: 1600,
-    ratingDeviation: 100,
-    ranking: 1,
     ...overrides,
   });
 }

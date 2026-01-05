@@ -21,15 +21,8 @@ model Player {
   playerNumber     Int      @unique // 5-digit unique identifier (10000-99999)
   name             String?
 
-  // OPPR Rating fields
-  rating           Float    @default(1500) // Glicko rating
-  ratingDeviation  Float    @default(200)  // Rating uncertainty (RD)
-  ranking          Int?                     // World ranking position
-  isRated          Boolean  @default(false) // Has 5+ events
+  // General player statistics
   eventCount       Int      @default(0)     // Number of events participated
-
-  // Timestamps for rating calculations
-  lastRatingUpdate DateTime @default(now())
   lastEventDate    DateTime?
 
   // Relations
@@ -37,11 +30,10 @@ model Player {
   entries              Entry[]
   user                 User?
   organizedTournaments Tournament[] @relation("OrganizedTournaments")
+  opprRanking          OpprPlayerRanking?
 
   @@index([externalId])
   @@index([playerNumber])
-  @@index([rating])
-  @@index([ranking])
 }
 
 // Tournament model - represents a pinball tournament event
@@ -82,9 +74,10 @@ model Tournament {
   firstPlaceValue  Float?
 
   // Relations
-  rounds           Round[]
-  matches          Match[]
-  standings        Standing[]
+  rounds                Round[]
+  matches               Match[]
+  standings             Standing[]
+  rankingHistoryRecords OpprRankingHistory[]
 
   @@index([date])
   @@index([eventBooster])
@@ -280,4 +273,69 @@ model Location {
   @@index([externalId])
   @@index([name])
   @@index([city])
+}
+
+// OPPR Player Ranking - OPPR-specific rating and ranking data
+// Separated from Player to allow for future alternative ranking systems
+model OpprPlayerRanking {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relation to Player (one-to-one)
+  playerId         String   @unique
+  player           Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  // Glicko Rating fields
+  rating           Float    @default(1500) // Glicko rating
+  ratingDeviation  Float    @default(200)  // Rating uncertainty (RD)
+  lastRatingUpdate DateTime @default(now())
+
+  // World Ranking fields
+  ranking          Int?                     // World ranking position (1 = best)
+  isRated          Boolean  @default(false) // Has 5+ events (eligible for ranking)
+
+  // Relations
+  history          OpprRankingHistory[]
+
+  @@index([playerId])
+  @@index([rating])
+  @@index([ranking])
+  @@index([isRated])
+}
+
+// OPPR Ranking History - Historical record of ranking/rating changes
+model OpprRankingHistory {
+  id                    String   @id @default(cuid())
+  createdAt             DateTime @default(now())
+
+  // Relation to OpprPlayerRanking
+  opprPlayerRankingId   String
+  opprPlayerRanking     OpprPlayerRanking @relation(fields: [opprPlayerRankingId], references: [id], onDelete: Cascade)
+
+  // Snapshot of values at this point in time
+  rating                Float
+  ratingDeviation       Float
+  ranking               Int?
+  isRated               Boolean
+
+  // Context for the change
+  changeType            OpprRankingChangeType
+  tournamentId          String?
+  tournament            Tournament? @relation(fields: [tournamentId], references: [id], onDelete: SetNull)
+  notes                 String?  @db.VarChar(500)
+
+  @@index([opprPlayerRankingId])
+  @@index([createdAt])
+  @@index([tournamentId])
+  @@index([opprPlayerRankingId, createdAt])
+}
+
+// Enum for tracking what caused the ranking change
+enum OpprRankingChangeType {
+  INITIAL           // First ranking record created
+  TOURNAMENT_RESULT // Rating updated after tournament
+  RANKING_REFRESH   // Periodic ranking recalculation
+  RD_DECAY          // RD increased due to inactivity
+  MANUAL_ADJUSTMENT // Administrative correction
 }
