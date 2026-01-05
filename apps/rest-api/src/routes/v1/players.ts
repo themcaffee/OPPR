@@ -35,7 +35,7 @@ import { NotFoundError } from '../../utils/errors.js';
 interface PlayerListQuery {
   page?: number;
   limit?: number;
-  sortBy?: 'name' | 'eventCount' | 'createdAt';
+  sortBy?: 'name' | 'eventCount' | 'createdAt' | 'rating' | 'ranking';
   sortOrder?: 'asc' | 'desc';
   isRated?: boolean;
 }
@@ -116,7 +116,15 @@ export const playerRoutes: FastifyPluginAsync = async (app) => {
       const { sortBy, sortOrder, isRated } = request.query;
       const { skip, take, page, limit } = parsePaginationParams(request.query);
 
-      const orderBy = sortBy ? { [sortBy]: sortOrder ?? 'asc' } : undefined;
+      // Build orderBy - rating/ranking fields are on the opprRanking relation
+      let orderBy;
+      if (sortBy) {
+        if (sortBy === 'rating' || sortBy === 'ranking') {
+          orderBy = { opprRanking: { [sortBy]: sortOrder ?? 'asc' } };
+        } else {
+          orderBy = { [sortBy]: sortOrder ?? 'asc' };
+        }
+      }
 
       // Build where clause - filter by isRated through the opprRanking relation
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
