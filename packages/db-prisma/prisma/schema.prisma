@@ -232,7 +232,33 @@ model User {
   privacyPolicyAcceptedAt DateTime?
   codeOfConductAcceptedAt DateTime?
 
+  // API Keys
+  apiKeys          ApiKey[]
+
   @@index([email])
+}
+
+// ApiKey model - represents an API key for programmatic access
+model ApiKey {
+  id           String    @id @default(cuid())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Key identification
+  name         String    // User-provided name (e.g., "CI Pipeline", "Mobile App")
+  keyPrefix    String    // First 14 characters of the key for display/lookup
+  keyHash      String    // bcrypt hash of the full key
+
+  // Ownership
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Lifecycle
+  expiresAt    DateTime? // Optional expiration date
+  lastUsedAt   DateTime? // Updated on each successful authentication
+
+  @@index([userId])
+  @@index([keyPrefix])
 }
 
 // Location model - represents a venue where tournaments are held
