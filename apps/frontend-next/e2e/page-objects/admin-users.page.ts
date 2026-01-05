@@ -101,7 +101,7 @@ export class AdminUserEditPage {
   }
 
   async confirmDelete() {
-    await this.page.getByRole('button', { name: 'Delete' }).click();
+    await this.page.getByRole('button', { name: 'Delete', exact: true }).click();
   }
 
   async cancelDelete() {
