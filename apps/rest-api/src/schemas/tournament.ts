@@ -1,5 +1,19 @@
 export const eventBoosterTypes = ['NONE', 'CERTIFIED', 'CERTIFIED_PLUS', 'CHAMPIONSHIP_SERIES', 'MAJOR'] as const;
 
+export const tournamentFormatTypes = [
+  'SINGLE_ELIMINATION',
+  'DOUBLE_ELIMINATION',
+  'MATCH_PLAY',
+  'BEST_GAME',
+  'CARD_QUALIFYING',
+  'PIN_GOLF',
+  'FLIP_FRENZY',
+  'STRIKE_FORMAT',
+  'TARGET_MATCH_PLAY',
+  'HYBRID',
+  'NONE',
+] as const;
+
 export const tournamentSchema = {
   type: 'object',
   properties: {
@@ -32,6 +46,7 @@ export const tournamentSchema = {
     },
     tgpConfig: { type: 'object', additionalProperties: true, nullable: true },
     eventBooster: { type: 'string', enum: eventBoosterTypes },
+    qualifyingFormat: { type: 'string', enum: tournamentFormatTypes },
     allowsOptOut: { type: 'boolean' },
     baseValue: { type: 'number', nullable: true },
     tvaRating: { type: 'number', nullable: true },
@@ -57,6 +72,7 @@ export const createTournamentSchema = {
     organizerId: { type: 'string' },
     tgpConfig: { type: 'object', additionalProperties: true },
     eventBooster: { type: 'string', enum: eventBoosterTypes, default: 'NONE' },
+    qualifyingFormat: { type: 'string', enum: tournamentFormatTypes, default: 'NONE' },
     allowsOptOut: { type: 'boolean', default: false },
     baseValue: { type: 'number' },
     tvaRating: { type: 'number' },
@@ -78,6 +94,7 @@ export const updateTournamentSchema = {
     organizerId: { type: 'string', nullable: true },
     tgpConfig: { type: 'object', additionalProperties: true },
     eventBooster: { type: 'string', enum: eventBoosterTypes },
+    qualifyingFormat: { type: 'string', enum: tournamentFormatTypes },
     allowsOptOut: { type: 'boolean' },
     baseValue: { type: 'number' },
     tvaRating: { type: 'number' },

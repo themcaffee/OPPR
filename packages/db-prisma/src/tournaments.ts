@@ -1,11 +1,12 @@
 import { prisma } from './client.js';
-import type { Tournament, EventBoosterType, Prisma } from '@prisma/client';
+import type { Tournament, EventBoosterType, TournamentFormatType, Prisma } from '@prisma/client';
 
 /**
  * Input for creating a new tournament
  */
 export interface CreateTournamentInput {
   externalId?: string;
+  externalUrl?: string;
   name: string;
   description?: string;
   date: Date;
@@ -13,6 +14,7 @@ export interface CreateTournamentInput {
   organizerId?: string;
   tgpConfig?: Prisma.InputJsonValue; // TGPConfig from OPPR
   eventBooster?: EventBoosterType;
+  qualifyingFormat?: TournamentFormatType;
   allowsOptOut?: boolean;
   baseValue?: number;
   tvaRating?: number;
@@ -27,6 +29,7 @@ export interface CreateTournamentInput {
  * Input for updating a tournament
  */
 export interface UpdateTournamentInput {
+  externalUrl?: string | null;
   name?: string;
   description?: string | null;
   date?: Date;
@@ -34,6 +37,7 @@ export interface UpdateTournamentInput {
   organizerId?: string | null;
   tgpConfig?: Prisma.InputJsonValue;
   eventBooster?: EventBoosterType;
+  qualifyingFormat?: TournamentFormatType;
   allowsOptOut?: boolean;
   baseValue?: number;
   tvaRating?: number;

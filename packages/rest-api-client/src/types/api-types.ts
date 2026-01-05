@@ -222,6 +222,19 @@ export type EventBoosterType =
   | 'CHAMPIONSHIP_SERIES'
   | 'MAJOR';
 
+export type TournamentFormatType =
+  | 'SINGLE_ELIMINATION'
+  | 'DOUBLE_ELIMINATION'
+  | 'MATCH_PLAY'
+  | 'BEST_GAME'
+  | 'CARD_QUALIFYING'
+  | 'PIN_GOLF'
+  | 'FLIP_FRENZY'
+  | 'STRIKE_FORMAT'
+  | 'TARGET_MATCH_PLAY'
+  | 'HYBRID'
+  | 'NONE';
+
 export interface Tournament {
   id: string;
   externalId: string | null;
@@ -237,6 +250,7 @@ export interface Tournament {
   } | null;
   tgpConfig: Record<string, unknown> | null;
   eventBooster: EventBoosterType;
+  qualifyingFormat: TournamentFormatType;
   allowsOptOut: boolean;
   baseValue: number | null;
   tvaRating: number | null;
@@ -258,6 +272,7 @@ export interface CreateTournamentRequest {
   organizerId?: string;
   tgpConfig?: Record<string, unknown>;
   eventBooster?: EventBoosterType;
+  qualifyingFormat?: TournamentFormatType;
   allowsOptOut?: boolean;
   baseValue?: number;
   tvaRating?: number;
@@ -276,6 +291,7 @@ export interface UpdateTournamentRequest {
   organizerId?: string | null;
   tgpConfig?: Record<string, unknown>;
   eventBooster?: EventBoosterType;
+  qualifyingFormat?: TournamentFormatType;
   allowsOptOut?: boolean;
   baseValue?: number;
   tvaRating?: number;

@@ -18,8 +18,6 @@ export class ProfilePage {
   // Leaderboard card
   readonly leaderboardCard: Locator;
   readonly leaderboardHeading: Locator;
-  readonly rankingToggle: Locator;
-  readonly ratingToggle: Locator;
   readonly leaderboardList: Locator;
   readonly currentPlayerHighlight: Locator;
   readonly noPlayersMessage: Locator;
@@ -57,8 +55,6 @@ export class ProfilePage {
     // Leaderboard card
     this.leaderboardCard = page.getByText('Leaderboard').locator('..');
     this.leaderboardHeading = page.getByRole('heading', { name: 'Leaderboard' });
-    this.rankingToggle = page.getByRole('button', { name: 'Ranking' });
-    this.ratingToggle = page.getByRole('button', { name: 'Rating' });
     this.leaderboardList = page.locator('ul').filter({ has: page.locator('li') });
     this.currentPlayerHighlight = page.getByText('(You)');
     this.noPlayersMessage = page.getByText('No players ranked yet.');
@@ -96,20 +92,6 @@ export class ProfilePage {
 
   async expectLeaderboardVisible() {
     await expect(this.leaderboardHeading).toBeVisible();
-    await expect(this.rankingToggle).toBeVisible();
-    await expect(this.ratingToggle).toBeVisible();
-  }
-
-  async switchToRatingLeaderboard() {
-    await this.ratingToggle.click();
-    // Wait for toggle to update
-    await expect(this.ratingToggle).toHaveClass(/bg-blue-600/);
-  }
-
-  async switchToRankingLeaderboard() {
-    await this.rankingToggle.click();
-    // Wait for toggle to update
-    await expect(this.rankingToggle).toHaveClass(/bg-blue-600/);
   }
 
   async expectActivityFeedVisible() {

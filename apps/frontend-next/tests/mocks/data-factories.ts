@@ -30,6 +30,7 @@ export function createMockTournament(overrides: Partial<Tournament> = {}): Tourn
     organizerId: null,
     organizer: null,
     eventBooster: 'NONE',
+    qualifyingFormat: 'NONE',
     tgpConfig: null,
     allowsOptOut: false,
     firstPlaceValue: 100,

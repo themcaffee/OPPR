@@ -9,11 +9,27 @@ export type EventBoosterType =
   | 'CHAMPIONSHIP_SERIES'
   | 'MAJOR';
 
+// API format type (SCREAMING_SNAKE_CASE)
+export type ApiTournamentFormatType =
+  | 'SINGLE_ELIMINATION'
+  | 'DOUBLE_ELIMINATION'
+  | 'MATCH_PLAY'
+  | 'BEST_GAME'
+  | 'CARD_QUALIFYING'
+  | 'PIN_GOLF'
+  | 'FLIP_FRENZY'
+  | 'STRIKE_FORMAT'
+  | 'TARGET_MATCH_PLAY'
+  | 'HYBRID'
+  | 'NONE';
+
 interface TGPConfigFormProps {
   tgpConfig: TGPConfig;
   eventBooster: EventBoosterType;
+  qualifyingFormat: ApiTournamentFormatType;
   onTGPConfigChange: (config: TGPConfig) => void;
   onEventBoosterChange: (booster: EventBoosterType) => void;
+  onQualifyingFormatChange: (format: ApiTournamentFormatType) => void;
 }
 
 const formatTypes: TournamentFormatType[] = [
@@ -46,6 +62,21 @@ const ballCounts = [
   { balls: 3, multiplier: 1.0 },
 ];
 
+// API format types for qualifying format dropdown
+const apiFormatTypes: { value: ApiTournamentFormatType; label: string }[] = [
+  { value: 'SINGLE_ELIMINATION', label: 'Single Elimination' },
+  { value: 'DOUBLE_ELIMINATION', label: 'Double Elimination' },
+  { value: 'MATCH_PLAY', label: 'Match Play' },
+  { value: 'BEST_GAME', label: 'Best Game' },
+  { value: 'CARD_QUALIFYING', label: 'Card Qualifying' },
+  { value: 'PIN_GOLF', label: 'Pin Golf' },
+  { value: 'FLIP_FRENZY', label: 'Flip Frenzy' },
+  { value: 'STRIKE_FORMAT', label: 'Strike Format' },
+  { value: 'TARGET_MATCH_PLAY', label: 'Target Match Play' },
+  { value: 'HYBRID', label: 'Hybrid' },
+  { value: 'NONE', label: 'None' },
+];
+
 function formatTypeName(type: string): string {
   return type
     .split('-')
@@ -56,8 +87,10 @@ function formatTypeName(type: string): string {
 export function TGPConfigForm({
   tgpConfig,
   eventBooster,
+  qualifyingFormat,
   onTGPConfigChange,
   onEventBoosterChange,
+  onQualifyingFormatChange,
 }: TGPConfigFormProps) {
   const updateQualifying = (field: string, value: string | number | boolean | undefined) => {
     onTGPConfigChange({
@@ -92,6 +125,24 @@ export function TGPConfigForm({
         {/* Qualifying Section */}
         <div className="space-y-4">
           <h4 className="text-md font-semibold text-gray-800 border-b pb-2">Qualifying</h4>
+
+          <div>
+            <label htmlFor="qualifyingFormat" className={labelClasses}>
+              Format Type
+            </label>
+            <select
+              id="qualifyingFormat"
+              value={qualifyingFormat}
+              onChange={(e) => onQualifyingFormatChange(e.target.value as ApiTournamentFormatType)}
+              className={inputClasses}
+            >
+              {apiFormatTypes.map((format) => (
+                <option key={format.value} value={format.value}>
+                  {format.label}
+                </option>
+              ))}
+            </select>
+          </div>
 
           <div>
             <label htmlFor="qualifyingType" className={labelClasses}>

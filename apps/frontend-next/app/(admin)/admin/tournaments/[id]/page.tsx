@@ -13,6 +13,7 @@ import {
   TGPConfigForm,
   defaultTGPConfig,
   type EventBoosterType,
+  type ApiTournamentFormatType,
 } from '@/components/admin/TGPConfigForm';
 import { TournamentValueDisplay } from '@/components/admin/TournamentValueDisplay';
 import { TournamentResultsManager } from '@/components/admin/TournamentResultsManager';
@@ -41,6 +42,7 @@ export default function AdminTournamentEditPage() {
   // TGP Configuration state
   const [tgpConfig, setTgpConfig] = useState<TGPConfig>(defaultTGPConfig);
   const [eventBooster, setEventBooster] = useState<EventBoosterType>('NONE');
+  const [qualifyingFormat, setQualifyingFormat] = useState<ApiTournamentFormatType>('NONE');
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
 
   const {
@@ -59,6 +61,7 @@ export default function AdminTournamentEditPage() {
           date: t.date.split('T')[0],
         });
         setEventBooster(t.eventBooster as EventBoosterType);
+        setQualifyingFormat(t.qualifyingFormat as ApiTournamentFormatType);
         setSelectedLocationId(t.locationId ?? null);
         // Load TGP config if available
         if (t.tgpConfig && typeof t.tgpConfig === 'object') {
@@ -77,6 +80,7 @@ export default function AdminTournamentEditPage() {
       name: data.name,
       date: new Date(data.date).toISOString(),
       eventBooster,
+      qualifyingFormat,
       tgpConfig: tgpConfig as unknown as Record<string, unknown>,
       locationId: selectedLocationId,
     };
@@ -85,6 +89,7 @@ export default function AdminTournamentEditPage() {
         name: data.name,
         date: new Date(data.date).toISOString(),
         eventBooster,
+        qualifyingFormat,
         tgpConfig: tgpConfig as unknown as Record<string, unknown>,
         locationId: selectedLocationId ?? undefined,
       };
@@ -210,8 +215,10 @@ export default function AdminTournamentEditPage() {
           <TGPConfigForm
             tgpConfig={tgpConfig}
             eventBooster={eventBooster}
+            qualifyingFormat={qualifyingFormat}
             onTGPConfigChange={setTgpConfig}
             onEventBoosterChange={setEventBooster}
+            onQualifyingFormatChange={setQualifyingFormat}
           />
 
           {/* Tournament Value Preview */}

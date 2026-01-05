@@ -7,8 +7,7 @@ import { Card } from '@/components/ui/Card';
 import type { BlogPost, Player, Tournament } from '@opprs/rest-api-client';
 
 interface LandingData {
-  rankingLeaderboard: Player[];
-  ratingLeaderboard: Player[];
+  leaderboard: Player[];
   recentTournaments: Tournament[];
   recentBlogPosts: BlogPost[];
 }
@@ -35,22 +34,18 @@ export default function LandingPage() {
   const [data, setData] = useState<LandingData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [viewType, setViewType] = useState<'ranking' | 'rating'>('ranking');
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [rankingLeaderboard, ratingLeaderboard, recentTournaments, blogPostsResponse] =
-          await Promise.all([
-            apiClient.stats.leaderboard({ type: 'ranking', limit: 10 }),
-            apiClient.stats.leaderboard({ type: 'rating', limit: 10 }),
-            apiClient.tournaments.recent({ limit: 5 }),
-            apiClient.blogPosts.list({ limit: 3, sortBy: 'publishedAt', sortOrder: 'desc' }),
-          ]);
+        const [leaderboard, recentTournaments, blogPostsResponse] = await Promise.all([
+          apiClient.stats.leaderboard({ type: 'ranking', limit: 10 }),
+          apiClient.tournaments.recent({ limit: 5 }),
+          apiClient.blogPosts.list({ limit: 3, sortBy: 'publishedAt', sortOrder: 'desc' }),
+        ]);
 
         setData({
-          rankingLeaderboard,
-          ratingLeaderboard,
+          leaderboard,
           recentTournaments,
           recentBlogPosts: blogPostsResponse.data,
         });
@@ -88,8 +83,6 @@ export default function LandingPage() {
     );
   }
 
-  const players = viewType === 'ranking' ? data.rankingLeaderboard : data.ratingLeaderboard;
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Hero Section */}
@@ -108,60 +101,36 @@ export default function LandingPage() {
         <Card>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900">Top 10 Leaderboard</h2>
-            <div className="flex rounded-md shadow-sm">
-              <button
-                onClick={() => setViewType('ranking')}
-                className={`px-3 py-1 text-sm font-medium rounded-l-md border ${
-                  viewType === 'ranking'
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                Ranking
-              </button>
-              <button
-                onClick={() => setViewType('rating')}
-                className={`px-3 py-1 text-sm font-medium rounded-r-md border-t border-b border-r ${
-                  viewType === 'rating'
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                Rating
-              </button>
-            </div>
           </div>
 
-          {players.length === 0 ? (
+          {data.leaderboard.length === 0 ? (
             <p className="text-gray-500 text-center py-4">No players ranked yet.</p>
           ) : (
             <ul className="space-y-2">
-              {players.map((player, index) => {
-                const displayValue =
-                  viewType === 'ranking'
-                    ? `#${player.ranking ?? index + 1}`
-                    : Math.round(player.rating);
-
-                return (
-                  <li
-                    key={player.id}
-                    className="flex items-center justify-between py-2 px-3 rounded hover:bg-gray-50"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <span className="text-sm font-medium text-gray-500 w-6">
-                        {index + 1}.
-                      </span>
-                      <Link
-                        href={`/players/${player.id}`}
-                        className="text-sm text-gray-900 hover:text-blue-600"
-                      >
-                        {player.name ?? 'Unknown Player'}
-                      </Link>
-                    </div>
-                    <span className="text-sm font-medium text-gray-700">{displayValue}</span>
-                  </li>
-                );
-              })}
+              {data.leaderboard.map((player, index) => (
+                <li
+                  key={player.id}
+                  className="flex items-center justify-between py-2 px-3 rounded hover:bg-gray-50"
+                >
+                  <div className="flex items-center space-x-3">
+                    <span className="text-sm font-medium text-gray-500 w-6">
+                      {index + 1}.
+                    </span>
+                    <Link
+                      href={`/players/${player.id}`}
+                      className="text-sm text-gray-900 hover:text-blue-600"
+                    >
+                      {player.name ?? 'Unknown Player'}
+                    </Link>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <span className="text-sm font-medium text-gray-700">
+                      #{player.ranking ?? index + 1}
+                    </span>
+                    <span className="text-sm text-gray-500">{Math.round(player.rating)}</span>
+                  </div>
+                </li>
+              ))}
             </ul>
           )}
 
