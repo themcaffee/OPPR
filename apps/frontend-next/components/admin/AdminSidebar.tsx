@@ -7,6 +7,7 @@ const navItems = [
   { href: '/admin/tournaments', label: 'Tournaments' },
   { href: '/admin/players', label: 'Players' },
   { href: '/admin/locations', label: 'Locations' },
+  { href: '/admin/blog', label: 'Blog' },
   { href: '/admin/users', label: 'Users' },
 ];
 

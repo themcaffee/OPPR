@@ -152,5 +152,47 @@ export {
   getLocationWithTournaments,
 } from './locations.js';
 
+// Export blog post functions
+export {
+  createBlogPost,
+  findBlogPostById,
+  findBlogPostBySlug,
+  findBlogPosts,
+  findPublishedBlogPosts,
+  searchBlogPosts,
+  updateBlogPost,
+  deleteBlogPost,
+  countBlogPosts,
+  countPublishedBlogPosts,
+} from './blog-posts.js';
+
+// Export blog tag functions
+export {
+  createBlogTag,
+  findBlogTagById,
+  findBlogTagBySlug,
+  findBlogTags,
+  searchBlogTags,
+  updateBlogTag,
+  deleteBlogTag,
+  countBlogTags,
+  getBlogTagWithPostCount,
+  getBlogTagsWithPostCounts,
+} from './blog-tags.js';
+
+// Export blog types
+export type {
+  BlogPostWithRelations,
+  CreateBlogPostInput,
+  UpdateBlogPostInput,
+  FindBlogPostsOptions,
+} from './blog-posts.js';
+
+export type {
+  CreateBlogTagInput,
+  UpdateBlogTagInput,
+  FindBlogTagsOptions,
+} from './blog-tags.js';
+
 // Export all types
 export * from './types.js';

@@ -28,6 +28,8 @@ import { StatsResource } from './resources/stats.js';
 import { ImportResource } from './resources/import.js';
 import { UsersResource } from './resources/users.js';
 import { LocationsResource } from './resources/locations.js';
+import { BlogPostsResource } from './resources/blog-posts.js';
+import { BlogTagsResource } from './resources/blog-tags.js';
 
 const DEFAULT_BASE_URL = '/api/v1';
 const DEFAULT_TIMEOUT = 30000;
@@ -429,5 +431,19 @@ export class OpprsClient {
    */
   get locations(): LocationsResource {
     return new LocationsResource(this.request.bind(this), this.buildQueryString.bind(this));
+  }
+
+  /**
+   * Blog posts resource
+   */
+  get blogPosts(): BlogPostsResource {
+    return new BlogPostsResource(this.request.bind(this), this.buildQueryString.bind(this));
+  }
+
+  /**
+   * Blog tags resource
+   */
+  get blogTags(): BlogTagsResource {
+    return new BlogTagsResource(this.request.bind(this), this.buildQueryString.bind(this));
   }
 }

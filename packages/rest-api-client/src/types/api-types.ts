@@ -474,3 +474,118 @@ export interface UpdateUserRequest {
   playerId?: string | null;
   password?: string;
 }
+
+// ==================== Blog Posts ====================
+
+export type PostStatus = 'DRAFT' | 'PUBLISHED';
+
+export interface BlogTag {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BlogTagWithCount extends BlogTag {
+  _count: {
+    posts: number;
+  };
+}
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt: string | null;
+  status: PostStatus;
+  publishedAt: string | null;
+  featuredImageUrl: string | null;
+  featuredImageAlt: string | null;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  ogTitle: string | null;
+  ogDescription: string | null;
+  ogImageUrl: string | null;
+  authorId: string;
+  author: {
+    id: string;
+    email: string;
+  };
+  tags: BlogTag[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateBlogPostRequest {
+  title: string;
+  slug: string;
+  content: string;
+  excerpt?: string;
+  status?: PostStatus;
+  featuredImageUrl?: string;
+  featuredImageAlt?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImageUrl?: string;
+  tagIds?: string[];
+}
+
+export interface UpdateBlogPostRequest {
+  title?: string;
+  slug?: string;
+  content?: string;
+  excerpt?: string | null;
+  status?: PostStatus;
+  featuredImageUrl?: string | null;
+  featuredImageAlt?: string | null;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  ogTitle?: string | null;
+  ogDescription?: string | null;
+  ogImageUrl?: string | null;
+  tagIds?: string[];
+}
+
+export interface BlogPostListParams extends PaginationParams {
+  sortBy?: 'publishedAt' | 'title' | 'createdAt';
+  sortOrder?: 'asc' | 'desc';
+  tagSlug?: string;
+}
+
+export interface AdminBlogPostListParams extends BlogPostListParams {
+  status?: PostStatus;
+}
+
+export interface BlogPostSearchParams {
+  q: string;
+  limit?: number;
+}
+
+// ==================== Blog Tags ====================
+
+export interface CreateBlogTagRequest {
+  name: string;
+  slug: string;
+  description?: string;
+}
+
+export interface UpdateBlogTagRequest {
+  name?: string;
+  slug?: string;
+  description?: string | null;
+}
+
+export interface BlogTagListParams extends PaginationParams {
+  sortBy?: 'name' | 'createdAt';
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface BlogTagSearchParams {
+  q: string;
+  limit?: number;
+}
