@@ -44,6 +44,7 @@ model Tournament {
 
   // Tournament identification
   externalId       String?  @unique // External ID from OPPR or other systems
+  externalUrl      String?          // URL to external tournament page (e.g., IFPA, Matchplay)
   name             String
   description      String?  @db.VarChar(2000)
   date             DateTime
