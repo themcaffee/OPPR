@@ -126,7 +126,7 @@ describe('TournamentResultsManager', () => {
     });
   });
 
-  it('opens add form when "Add Result" clicked', async () => {
+  it('opens add form when "Add Results" clicked', async () => {
     mockTournamentsGetResults.mockResolvedValue([]);
 
     render(<TournamentResultsManager tournamentId="tour-1" />);
