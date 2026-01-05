@@ -22,7 +22,7 @@ describe('API Keys endpoints', () => {
   let app: FastifyInstance;
   const testUserEmail = 'apikey-test@example.com';
   const testUserPassword = 'password123';
-  let testUserId: string;
+  let _testUserId: string;
 
   beforeAll(async () => {
     app = await buildApp({ logger: false });
@@ -53,7 +53,7 @@ describe('API Keys endpoints', () => {
         playerId: player.id,
       },
     });
-    testUserId = user.id;
+    _testUserId = user.id;
   });
 
   afterAll(async () => {
@@ -441,7 +441,7 @@ describe('API Keys endpoints', () => {
       });
 
       // Wait a bit for the fire-and-forget update
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => globalThis.setTimeout(resolve, 100));
 
       // Verify lastUsedAt is updated
       const afterKey = await prisma.apiKey.findUnique({ where: { id } });
