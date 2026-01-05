@@ -200,6 +200,12 @@ enum Role {
   ADMIN
 }
 
+// Enum for blog post status
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+}
+
 // User model - represents an authenticated user account
 model User {
   id               String   @id @default(cuid())
@@ -224,6 +230,9 @@ model User {
   tosAcceptedAt           DateTime?
   privacyPolicyAcceptedAt DateTime?
   codeOfConductAcceptedAt DateTime?
+
+  // Blog posts authored by this user
+  blogPosts               BlogPost[]
 
   // API Keys
   apiKeys          ApiKey[]
@@ -273,6 +282,62 @@ model Location {
   @@index([externalId])
   @@index([name])
   @@index([city])
+}
+
+// BlogPost model - represents a blog article
+model BlogPost {
+  id               String      @id @default(cuid())
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  // Content
+  title            String
+  slug             String      @unique
+  content          String      @db.Text
+  excerpt          String?     @db.VarChar(500)
+
+  // Status
+  status           PostStatus  @default(DRAFT)
+  publishedAt      DateTime?
+
+  // Featured image (external URL)
+  featuredImageUrl String?
+  featuredImageAlt String?
+
+  // SEO fields
+  metaTitle        String?     @db.VarChar(60)
+  metaDescription  String?     @db.VarChar(160)
+  ogTitle          String?
+  ogDescription    String?
+  ogImageUrl       String?
+
+  // Author (User who created the post)
+  authorId         String
+  author           User        @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  // Tags relation
+  tags             BlogTag[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([publishedAt])
+  @@index([authorId])
+}
+
+// BlogTag model - for categorizing blog posts
+model BlogTag {
+  id          String     @id @default(cuid())
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  name        String     @unique
+  slug        String     @unique
+  description String?
+
+  // Posts with this tag
+  posts       BlogPost[]
+
+  @@index([slug])
 }
 
 // OPPR Player Ranking - OPPR-specific rating and ranking data
