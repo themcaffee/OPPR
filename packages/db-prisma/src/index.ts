@@ -223,11 +223,7 @@ export type {
   FindBlogPostsOptions,
 } from './blog-posts.js';
 
-export type {
-  CreateBlogTagInput,
-  UpdateBlogTagInput,
-  FindBlogTagsOptions,
-} from './blog-tags.js';
+export type { CreateBlogTagInput, UpdateBlogTagInput, FindBlogTagsOptions } from './blog-tags.js';
 
 // Export all types
 export * from './types.js';
