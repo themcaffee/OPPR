@@ -158,6 +158,22 @@ export {
   linkPlayerToUser,
 } from './users.js';
 
+// Export API key functions
+export {
+  createApiKey,
+  findApiKeyById,
+  findApiKeysByPrefix,
+  getUserApiKeys,
+  countUserApiKeys,
+  updateApiKeyLastUsed,
+  deleteApiKey,
+  deleteUserApiKey,
+  MAX_API_KEYS_PER_USER,
+  type CreateApiKeyInput,
+  type ApiKeyWithUser,
+  type ApiKeyInfo,
+} from './api-keys.js';
+
 // Export location functions
 export {
   createLocation,
