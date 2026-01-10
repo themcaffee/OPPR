@@ -4,11 +4,12 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { apiClient } from '@/lib/api-client';
 import { Card } from '@/components/ui/Card';
-import type { Player, Tournament } from '@opprs/rest-api-client';
+import type { BlogPost, Player, Tournament } from '@opprs/rest-api-client';
 
 interface LandingData {
   leaderboard: Player[];
   recentTournaments: Tournament[];
+  recentBlogPosts: BlogPost[];
 }
 
 function formatDate(dateString: string): string {
@@ -37,14 +38,16 @@ export default function LandingPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [leaderboard, recentTournaments] = await Promise.all([
+        const [leaderboard, recentTournaments, blogPostsResponse] = await Promise.all([
           apiClient.stats.leaderboard({ type: 'ranking', limit: 10 }),
           apiClient.tournaments.recent({ limit: 5 }),
+          apiClient.blogPosts.list({ limit: 3, sortBy: 'publishedAt', sortOrder: 'desc' }),
         ]);
 
         setData({
           leaderboard,
           recentTournaments,
+          recentBlogPosts: blogPostsResponse.data,
         });
       } catch (err) {
         setError('Failed to load data');
@@ -192,6 +195,46 @@ export default function LandingPage() {
           </div>
         </Card>
       </div>
+
+      {/* Recent Blog Posts */}
+      {data.recentBlogPosts.length > 0 && (
+        <div className="mt-8">
+          <Card>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Blog Posts</h2>
+            <ul className="space-y-4">
+              {data.recentBlogPosts.map((post) => (
+                <li
+                  key={post.id}
+                  className="border-b border-gray-100 pb-4 last:border-0 last:pb-0"
+                >
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    className="text-sm font-medium text-gray-900 hover:text-blue-600"
+                  >
+                    {post.title}
+                  </Link>
+                  {post.excerpt && (
+                    <p className="text-sm text-gray-500 mt-1 line-clamp-2">{post.excerpt}</p>
+                  )}
+                  {post.publishedAt && (
+                    <p className="text-xs text-gray-400 mt-1">
+                      {formatDate(post.publishedAt)}
+                    </p>
+                  )}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <Link
+                href="/blog"
+                className="text-sm text-blue-600 hover:text-blue-800"
+              >
+                View all posts →
+              </Link>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
