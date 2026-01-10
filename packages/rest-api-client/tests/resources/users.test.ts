@@ -73,21 +73,6 @@ describe('UsersResource', () => {
     });
   });
 
-  describe('updateRole', () => {
-    it('should update user role', async () => {
-      const updatedUser = { ...mockUser, role: 'ADMIN' as const };
-      mockRequest.mockResolvedValue(updatedUser);
-
-      const result = await resource.updateRole('user-1', { role: 'ADMIN' });
-
-      expect(result.role).toBe('ADMIN');
-      expect(mockRequest).toHaveBeenCalledWith('/users/user-1', {
-        method: 'PATCH',
-        body: JSON.stringify({ role: 'ADMIN' }),
-      });
-    });
-  });
-
   describe('update', () => {
     it('should update user', async () => {
       const updatedUser = { ...mockUser, role: 'ADMIN' as const };

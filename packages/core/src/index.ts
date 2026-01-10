@@ -12,7 +12,6 @@ export type {
   Tournament,
   TournamentFormatType,
   QualifyingType,
-  GroupSize,
   EventBoosterType,
   TGPConfig,
   PlayerResult,

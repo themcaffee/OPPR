@@ -481,10 +481,6 @@ export interface UserListParams extends PaginationParams {
   sortOrder?: 'asc' | 'desc';
 }
 
-export interface UpdateUserRoleRequest {
-  role: 'USER' | 'ADMIN';
-}
-
 export interface UpdateUserRequest {
   role?: 'USER' | 'ADMIN';
   playerId?: string | null;

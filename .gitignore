@@ -42,6 +42,7 @@ pnpm-debug.log*
 
 # Temporary files
 *.tmp
+*.old
 .cache/
 
 # Package LICENSE files (copied from root during build)
