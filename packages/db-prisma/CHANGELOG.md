@@ -1,5 +1,24 @@
 # Changelog
 
+## 3.0.0
+
+### Major Changes
+
+- e9f4d2b: Remove Entry, Match, and Round database models
+
+  BREAKING CHANGE: This removes the following from the public API:
+  - `Entry`, `Match`, `Round` Prisma models
+  - `MatchResult` enum
+  - All entry, match, and round query functions
+  - `getTournamentWithMatches` function
+
+  Tournament results now only track final standings via the Standing model.
+
+### Patch Changes
+
+- Updated dependencies [3a435d6]
+  - @opprs/core@3.0.0
+
 ## 2.6.0
 
 ### Minor Changes
