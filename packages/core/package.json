@@ -11,7 +11,7 @@
     "scoring"
   ],
   "author": "Mitch McAffee",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "repository": {
     "type": "git",
     "url": "https://github.com/themcaffee/OPPR",
@@ -35,6 +35,7 @@
   ],
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "postbuild": "cp ../../LICENSE .",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
