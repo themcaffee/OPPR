@@ -51,6 +51,9 @@ COPY --from=pruner /app/out/full/ .
 # Copy root tsconfig.json (needed for packages that extend it)
 COPY --from=pruner /app/tsconfig.json ./tsconfig.json
 
+# Copy LICENSE file (needed for postbuild scripts that copy it to packages)
+COPY --from=pruner /app/LICENSE ./LICENSE
+
 # Remote caching support (optional, passed via --build-arg)
 ARG TURBO_TEAM
 ARG TURBO_TOKEN
