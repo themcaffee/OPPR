@@ -48,6 +48,158 @@ pnpm --filter @opprs/db-prisma run db:seed
 pnpm --filter @opprs/db-prisma run db:studio
 ```
 
+## Migrations
+
+Prisma Migrate is a declarative database migration system that generates SQL migration files from your Prisma schema changes, applies them to your database, and tracks migration history.
+
+### Development Workflow
+
+#### Making Schema Changes
+
+1. Edit the Prisma schema in `packages/db-prisma/prisma/schema.prisma`
+
+2. Create and apply the migration:
+
+```bash
+pnpm --filter @opprs/db-prisma exec prisma migrate dev --name describe_your_change
+```
+
+Examples:
+```bash
+pnpm --filter @opprs/db-prisma exec prisma migrate dev --name add_player_location
+pnpm --filter @opprs/db-prisma exec prisma migrate dev --name update_tournament_fields
+```
+
+#### Viewing Migration Status
+
+Check which migrations have been applied:
+
+```bash
+pnpm --filter @opprs/db-prisma exec prisma migrate status
+```
+
+#### Resetting the Database
+
+WARNING: This deletes all data!
+
+```bash
+pnpm --filter @opprs/db-prisma exec prisma migrate reset
+```
+
+This will drop the database, create a new one, apply all migrations, and run seed scripts if configured.
+
+### Production Deployment
+
+In production, use `migrate deploy` instead of `migrate dev`:
+
+```bash
+npx prisma migrate deploy
+```
+
+This only applies pending migrations, does not create new migrations, and is safe for production use.
+
+#### Example CI/CD Pipeline
+
+```yaml
+# Example GitHub Actions workflow
+deploy:
+  steps:
+    - name: Install dependencies
+      run: pnpm install
+
+    - name: Run migrations
+      run: npx prisma migrate deploy
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+    - name: Deploy application
+      run: pnpm run deploy
+```
+
+### Common Commands
+
+```bash
+# Generate Prisma Client after schema changes
+pnpm --filter @opprs/db-prisma run db:generate
+
+# Create and apply a new migration (development)
+pnpm --filter @opprs/db-prisma exec prisma migrate dev --name migration_name
+
+# Apply pending migrations (production)
+npx prisma migrate deploy
+
+# Check migration status
+pnpm --filter @opprs/db-prisma exec prisma migrate status
+
+# Reset database (WARNING: deletes data)
+pnpm --filter @opprs/db-prisma exec prisma migrate reset
+
+# Push schema changes without migrations (prototyping only)
+pnpm --filter @opprs/db-prisma exec prisma db push
+
+# Open Prisma Studio (database GUI)
+pnpm --filter @opprs/db-prisma run db:studio
+
+# Seed the database
+pnpm --filter @opprs/db-prisma run db:seed
+```
+
+### Migration Files
+
+Migrations are stored in `packages/db-prisma/prisma/migrations/` directory:
+
+```
+prisma/
+  migrations/
+    20240315120000_init/
+      migration.sql
+    20240320140000_add_player_location/
+      migration.sql
+    migration_lock.toml
+```
+
+Each migration contains a timestamp prefix for ordering, a descriptive name, and a SQL file with migration commands.
+
+### Troubleshooting
+
+#### Migration Failed
+
+If a migration fails:
+
+1. Check the error message
+2. Fix the issue (database constraints, etc.)
+3. Try again or use `migrate resolve`:
+
+```bash
+npx prisma migrate resolve --applied migration_name
+```
+
+#### Schema Drift Detected
+
+If Prisma detects differences between your schema and database:
+
+```bash
+# In development
+pnpm --filter @opprs/db-prisma exec prisma migrate dev
+
+# To sync without migrations (not recommended for production)
+pnpm --filter @opprs/db-prisma exec prisma db push
+```
+
+### Best Practices
+
+1. **Always version control migrations** - Commit migration files to git and never edit applied migrations
+
+2. **Test migrations before production** - Run on staging environment first and verify data integrity
+
+3. **Use descriptive migration names** - `add_player_email` is good, `update_schema` is not
+
+4. **Backup before major migrations** - Always backup production data and test rollback procedures
+
+5. **Use `migrate deploy` in production** - Never use `migrate dev` or `db push` in production
+
+6. **Keep schema changes small** - One logical change per migration makes rollback easier
+
 ## Schema Overview
 
 The database schema consists of three main models:
