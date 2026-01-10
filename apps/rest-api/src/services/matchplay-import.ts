@@ -4,6 +4,7 @@ import {
   MatchplayApiError,
   MatchplayNetworkError,
 } from '@opprs/matchplay-api';
+import type { MatchplayStanding } from '@opprs/matchplay-api';
 import type {
   Tournament as CoreTournament,
   PlayerResult,
@@ -87,11 +88,13 @@ export async function importTournament(
 
   let matchplayTournament: CoreTournament;
   let matchplayResults: PlayerResult[];
+  let standings: MatchplayStanding[];
 
   try {
-    [matchplayTournament, matchplayResults] = await Promise.all([
+    [matchplayTournament, matchplayResults, standings] = await Promise.all([
       client.getTournament(matchplayId),
       client.getTournamentResults(matchplayId),
+      client.getStandings(matchplayId),
     ]);
   } catch (error: unknown) {
     if (error instanceof MatchplayNotFoundError) {
@@ -126,19 +129,30 @@ export async function importTournament(
   let playersUpdated = 0;
   const playerIdMap = new Map<string, string>(); // matchplay ID -> database ID
 
+  // Create a map of matchplay user ID -> name for setting player names
+  const playerNameMap = new Map<string, string>();
+  for (const standing of standings) {
+    const id = standing.userId ? String(standing.userId) : String(standing.playerId);
+    playerNameMap.set(id, standing.name);
+  }
+
   for (const player of players) {
     const playerExternalId = `matchplay:${player.id}`;
     let dbPlayer = await findPlayerByExternalId(playerExternalId);
+    const playerName = playerNameMap.get(player.id);
 
     if (dbPlayer) {
+      // Only update name if not already set
       dbPlayer = await updatePlayer(dbPlayer.id, {
         eventCount: player.eventCount,
+        ...(playerName && !dbPlayer.name ? { name: playerName } : {}),
       });
       playersUpdated++;
     } else {
       dbPlayer = await createPlayer({
         externalId: playerExternalId,
         eventCount: player.eventCount,
+        name: playerName,
       });
       playersCreated++;
     }

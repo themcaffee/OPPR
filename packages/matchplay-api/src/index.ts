@@ -24,6 +24,9 @@ export type {
   TournamentRound,
 } from './types/index.js';
 
+// API response types (for consumers who need raw data)
+export type { MatchplayStanding } from './types/api-responses.js';
+
 // Re-export core types for convenience
 export type {
   Player,
