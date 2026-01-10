@@ -74,4 +74,4 @@ For detailed documentation including API reference, configuration options, and c
 
 ## License
 
-MIT
+AGPL-3.0-or-later

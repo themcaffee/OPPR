@@ -181,7 +181,7 @@ pnpm run test:watch        # Watch mode
 
 ## License
 
-MIT License - see LICENSE file for details.
+AGPL-3.0-or-later - see LICENSE file for details.
 
 ## Contributing
 

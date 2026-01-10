@@ -4,7 +4,7 @@
   "private": true,
   "description": "Open Pinball Player Ranking System - Monorepo",
   "author": "Mitch McAffee",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "repository": {
     "type": "git",
     "url": "https://github.com/themcaffee/OPPR"
