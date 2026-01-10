@@ -26,12 +26,21 @@ vi.mock('@opprs/matchplay-api', () => {
     { player: mockTournament.players[2], position: 3 },
   ];
 
+  const mockStandings = [
+    { playerId: 1, position: 1, name: 'Player One', points: 100, wins: 5, losses: 1, ties: 0, userId: Number(mockTournament.players[0].id) },
+    { playerId: 2, position: 2, name: 'Player Two', points: 80, wins: 4, losses: 2, ties: 0, userId: Number(mockTournament.players[1].id) },
+    { playerId: 3, position: 3, name: 'Player Three', points: 60, wins: 3, losses: 3, ties: 0, userId: Number(mockTournament.players[2].id) },
+  ];
+
   class MockMatchplayClient {
     async getTournament() {
       return mockTournament;
     }
     async getTournamentResults() {
       return mockResults;
+    }
+    async getStandings() {
+      return mockStandings;
     }
   }
 

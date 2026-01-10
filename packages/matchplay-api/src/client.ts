@@ -196,6 +196,13 @@ export class MatchplayClient {
   }
 
   /**
+   * Get raw standings data including player names
+   */
+  async getStandings(id: number): Promise<MatchplayStanding[]> {
+    return this.getRawStandings(id);
+  }
+
+  /**
    * Get tournament games
    */
   async getTournamentGames(id: number, params: GameListParams = {}): Promise<TournamentGame[]> {
