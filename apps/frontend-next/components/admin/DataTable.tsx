@@ -39,7 +39,7 @@ export function DataTable<T extends { id: string }>({
             {columns.map((col) => (
               <th
                 key={col.key}
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
                 {col.header}
               </th>
@@ -54,7 +54,7 @@ export function DataTable<T extends { id: string }>({
               className={onRowClick ? 'cursor-pointer hover:bg-gray-50' : ''}
             >
               {columns.map((col) => (
-                <td key={col.key} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td key={col.key} className="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-sm text-gray-900">
                   {col.render
                     ? col.render(row)
                     : ((row as Record<string, unknown>)[col.key] as ReactNode)}

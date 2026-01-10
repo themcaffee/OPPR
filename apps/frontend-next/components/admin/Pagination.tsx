@@ -10,7 +10,10 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200">
+    <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-2 px-3 py-2 md:px-4 md:py-3 bg-white border-t border-gray-200">
+      <span className="text-sm text-gray-700 order-first sm:order-none">
+        Page {currentPage} of {totalPages}
+      </span>
       <div className="flex items-center space-x-2">
         <button
           onClick={() => onPageChange(currentPage - 1)}
@@ -19,9 +22,6 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
         >
           Previous
         </button>
-        <span className="text-sm text-gray-700">
-          Page {currentPage} of {totalPages}
-        </span>
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
