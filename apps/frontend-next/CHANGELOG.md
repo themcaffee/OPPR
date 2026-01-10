@@ -1,5 +1,11 @@
 # frontend-next
 
+## 3.1.0
+
+### Patch Changes
+
+- 50eebd8: Make admin pages mobile-friendly with collapsible sidebar and responsive tables
+
 ## 3.0.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # @opprs/matchplay-api
 
+## 3.1.0
+
+### Minor Changes
+
+- 0b17169: Add getStandings() method to expose raw tournament standings with player names
+
 ## 3.0.0
 
 ### Patch Changes
