@@ -140,6 +140,17 @@ export interface MatchplayUserWithDetails extends MatchplayUser {
 }
 
 /**
+ * Response from /users/{id} endpoint
+ * Note: This endpoint returns a different structure than the list wrapper
+ */
+export interface MatchplayUserResponse {
+  user: MatchplayUser;
+  rating?: MatchplayRatingInfo | null;
+  ifpa?: MatchplayIfpaInfo | null;
+  userCounts?: MatchplayUserCounts | null;
+}
+
+/**
  * Rating search result
  */
 export interface MatchplayRating {
@@ -217,44 +228,6 @@ export interface MatchplayCard {
   arenaId: number;
   name: string;
   status: string;
-}
-
-/**
- * Tournament matchplay statistics
- */
-export interface MatchplayStats {
-  tournamentId: number;
-  totalGames: number;
-  completedGames: number;
-  averageGameDuration: number | null;
-}
-
-/**
- * Round statistics
- */
-export interface MatchplayRoundStats {
-  tournamentId: number;
-  rounds: Array<{
-    roundId: number;
-    name: string;
-    totalGames: number;
-    completedGames: number;
-  }>;
-}
-
-/**
- * Player statistics in tournament
- */
-export interface MatchplayPlayerStats {
-  playerId: number;
-  name: string;
-  userId?: number;
-  gamesPlayed: number;
-  wins: number;
-  losses: number;
-  ties: number;
-  points: number;
-  averagePoints: number;
 }
 
 /**

@@ -9,7 +9,6 @@ export type {
   PlayerTransformOptions,
   TournamentGame,
   TournamentRound,
-  TournamentStats,
 } from './client-options.js';
 
 // Internal API response types (not re-exported from main index)
