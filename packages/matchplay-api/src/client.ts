@@ -2,7 +2,7 @@ import type { Player, PlayerResult, Tournament } from '@opprs/core';
 import type {
   MatchplayTournament,
   MatchplayStanding,
-  MatchplayUserWithDetails,
+  MatchplayUserResponse,
   MatchplayGame,
   MatchplayRound,
   MatchplayStats,
@@ -193,12 +193,10 @@ export class MatchplayClient {
 
   /**
    * Get raw standings from API (internal helper)
+   * Note: The standings endpoint returns a plain array, not wrapped in { data: [...] }
    */
   private async getRawStandings(id: number): Promise<MatchplayStanding[]> {
-    const response = await this.request<MatchplayListResponse<MatchplayStanding>>(
-      `/tournaments/${id}/standings`
-    );
-    return response.data;
+    return this.request<MatchplayStanding[]>(`/tournaments/${id}/standings`);
   }
 
   /**
@@ -270,6 +268,7 @@ export class MatchplayClient {
 
   /**
    * Get a user's profile as OPPR Player
+   * Note: The /users/{id} endpoint returns { user, rating, ifpa, userCounts } not { data: {...} }
    */
   async getPlayer(userId: number, options: PlayerTransformOptions = {}): Promise<Player> {
     // Request user with all available data
@@ -277,18 +276,26 @@ export class MatchplayClient {
       with: 'rating,ifpa,counts',
     });
 
-    const response = await this.request<MatchplaySingleResponse<MatchplayUserWithDetails>>(
+    const response = await this.request<MatchplayUserResponse>(
       `/users/${userId}${queryString}`
     );
 
-    return toOPPRPlayer(response.data, options);
+    // Combine the separate fields into a single user object for transformation
+    const userWithDetails = {
+      ...response.user,
+      rating: response.rating ?? undefined,
+      ifpa: response.ifpa ?? undefined,
+      userCounts: response.userCounts ?? undefined,
+    };
+
+    return toOPPRPlayer(userWithDetails, options);
   }
 
   /**
    * Search for players by name
    */
   async searchPlayers(query: string, options: PlayerTransformOptions = {}): Promise<Player[]> {
-    const queryString = this.buildQueryString({ q: query });
+    const queryString = this.buildQueryString({ query });
     const response = await this.request<MatchplayListResponse<MatchplayRating>>(
       `/ratings/search${queryString}`
     );

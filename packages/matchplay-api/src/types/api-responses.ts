@@ -140,6 +140,17 @@ export interface MatchplayUserWithDetails extends MatchplayUser {
 }
 
 /**
+ * Response from /users/{id} endpoint
+ * Note: This endpoint returns a different structure than the list wrapper
+ */
+export interface MatchplayUserResponse {
+  user: MatchplayUser;
+  rating?: MatchplayRatingInfo | null;
+  ifpa?: MatchplayIfpaInfo | null;
+  userCounts?: MatchplayUserCounts | null;
+}
+
+/**
  * Rating search result
  */
 export interface MatchplayRating {
