@@ -77,7 +77,6 @@ export type {
   // Users (Admin)
   UserWithPlayer,
   UserListParams,
-  UpdateUserRoleRequest,
   UpdateUserRequest,
   // Blog Posts
   PostStatus,

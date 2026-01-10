@@ -38,11 +38,6 @@ export type TournamentFormatType =
 export type QualifyingType = 'unlimited' | 'limited' | 'hybrid' | 'none';
 
 /**
- * Group size for match play formats
- */
-export type GroupSize = 2 | 3 | 4;
-
-/**
  * Event booster classification
  */
 export type EventBoosterType =

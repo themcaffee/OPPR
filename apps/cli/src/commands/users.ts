@@ -89,7 +89,7 @@ export function registerUserCommands(program: Command): void {
         }
 
         const spinner = ora('Updating user...').start();
-        const user = await client.users.updateRole(id, { role: role as 'USER' | 'ADMIN' });
+        const user = await client.users.update(id, { role: role as 'USER' | 'ADMIN' });
         spinner.stop();
 
         success('User updated');
