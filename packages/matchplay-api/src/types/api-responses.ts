@@ -231,44 +231,6 @@ export interface MatchplayCard {
 }
 
 /**
- * Tournament matchplay statistics
- */
-export interface MatchplayStats {
-  tournamentId: number;
-  totalGames: number;
-  completedGames: number;
-  averageGameDuration: number | null;
-}
-
-/**
- * Round statistics
- */
-export interface MatchplayRoundStats {
-  tournamentId: number;
-  rounds: Array<{
-    roundId: number;
-    name: string;
-    totalGames: number;
-    completedGames: number;
-  }>;
-}
-
-/**
- * Player statistics in tournament
- */
-export interface MatchplayPlayerStats {
-  playerId: number;
-  name: string;
-  userId?: number;
-  gamesPlayed: number;
-  wins: number;
-  losses: number;
-  ties: number;
-  points: number;
-  averagePoints: number;
-}
-
-/**
  * Wrapper response for list endpoints
  */
 export interface MatchplayListResponse<T> {

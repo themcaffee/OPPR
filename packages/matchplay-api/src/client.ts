@@ -5,9 +5,6 @@ import type {
   MatchplayUserResponse,
   MatchplayGame,
   MatchplayRound,
-  MatchplayStats,
-  MatchplayRoundStats,
-  MatchplayPlayerStats,
   MatchplayRating,
   MatchplayListResponse,
   MatchplaySingleResponse,
@@ -21,7 +18,6 @@ import type {
   PlayerTransformOptions,
   TournamentGame,
   TournamentRound,
-  TournamentStats,
 } from './types/client-options.js';
 import {
   MatchplayApiError,
@@ -235,33 +231,6 @@ export class MatchplayClient {
       startedAt: round.startedAt ? new Date(round.startedAt) : null,
       completedAt: round.completedAt ? new Date(round.completedAt) : null,
     }));
-  }
-
-  /**
-   * Get tournament statistics
-   */
-  async getTournamentStats(id: number): Promise<TournamentStats> {
-    const [matchplayStats, roundStats] = await Promise.all([
-      this.request<MatchplayStats>(`/tournaments/${id}/stats-matchplay`),
-      this.request<MatchplayRoundStats>(`/tournaments/${id}/stats-rounds`),
-    ]);
-
-    return {
-      totalGames: matchplayStats.totalGames,
-      completedGames: matchplayStats.completedGames,
-      averageGameDuration: matchplayStats.averageGameDuration,
-      rounds: roundStats.rounds,
-    };
-  }
-
-  /**
-   * Get tournament player statistics (raw data, not transformed)
-   */
-  async getTournamentPlayerStats(id: number): Promise<MatchplayPlayerStats[]> {
-    const response = await this.request<MatchplayListResponse<MatchplayPlayerStats>>(
-      `/tournaments/${id}/stats-players`
-    );
-    return response.data;
   }
 
   // ==================== Player/User Methods ====================

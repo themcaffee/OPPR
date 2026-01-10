@@ -172,18 +172,3 @@ export interface TournamentRound {
   startedAt: Date | null;
   completedAt: Date | null;
 }
-
-/**
- * Tournament statistics returned by the client
- */
-export interface TournamentStats {
-  totalGames: number;
-  completedGames: number;
-  averageGameDuration: number | null;
-  rounds: Array<{
-    roundId: number;
-    name: string;
-    totalGames: number;
-    completedGames: number;
-  }>;
-}

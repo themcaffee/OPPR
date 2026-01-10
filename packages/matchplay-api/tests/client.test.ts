@@ -156,10 +156,11 @@ describe('MatchplayClient', () => {
       globalThis.fetch = vi.fn().mockImplementation((url: string) => {
         callCount++;
         if (url.includes('/standings')) {
+          // Standings endpoint returns plain array, not { data: [...] }
           return Promise.resolve({
             ok: true,
             status: 200,
-            json: () => Promise.resolve({ data: sampleStandings }),
+            json: () => Promise.resolve(sampleStandings),
           });
         }
         return Promise.resolve({
@@ -180,7 +181,8 @@ describe('MatchplayClient', () => {
   describe('getTournamentResults', () => {
     it('should fetch and transform standings to results', async () => {
       const client = new MatchplayClient();
-      mockFetch({ ok: true, status: 200, data: { data: sampleStandings } });
+      // Standings endpoint returns plain array, not { data: [...] }
+      mockFetch({ ok: true, status: 200, data: sampleStandings });
 
       const results = await client.getTournamentResults(12345);
 
@@ -219,7 +221,30 @@ describe('MatchplayClient', () => {
   describe('getPlayer', () => {
     it('should fetch and transform user to player', async () => {
       const client = new MatchplayClient();
-      mockFetch({ ok: true, status: 200, data: { data: sampleUserWithDetails } });
+      // /users/{id} endpoint returns { user, rating, ifpa, userCounts } not { data: {...} }
+      mockFetch({
+        ok: true,
+        status: 200,
+        data: {
+          user: {
+            userId: sampleUserWithDetails.userId,
+            name: sampleUserWithDetails.name,
+            ifpaId: sampleUserWithDetails.ifpaId,
+            role: sampleUserWithDetails.role,
+            flag: sampleUserWithDetails.flag,
+            location: sampleUserWithDetails.location,
+            pronouns: sampleUserWithDetails.pronouns,
+            initials: sampleUserWithDetails.initials,
+            avatar: sampleUserWithDetails.avatar,
+            banner: sampleUserWithDetails.banner,
+            tournamentAvatar: sampleUserWithDetails.tournamentAvatar,
+            createdAt: sampleUserWithDetails.createdAt,
+          },
+          rating: sampleUserWithDetails.rating,
+          ifpa: sampleUserWithDetails.ifpa,
+          userCounts: sampleUserWithDetails.userCounts,
+        },
+      });
 
       const player = await client.getPlayer(1001);
 

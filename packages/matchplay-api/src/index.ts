@@ -22,7 +22,6 @@ export type {
   PlayerTransformOptions,
   TournamentGame,
   TournamentRound,
-  TournamentStats,
 } from './types/index.js';
 
 // Re-export core types for convenience
