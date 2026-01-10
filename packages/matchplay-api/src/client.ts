@@ -245,9 +245,7 @@ export class MatchplayClient {
       with: 'rating,ifpa,counts',
     });
 
-    const response = await this.request<MatchplayUserResponse>(
-      `/users/${userId}${queryString}`
-    );
+    const response = await this.request<MatchplayUserResponse>(`/users/${userId}${queryString}`);
 
     // Combine the separate fields into a single user object for transformation
     const userWithDetails = {
