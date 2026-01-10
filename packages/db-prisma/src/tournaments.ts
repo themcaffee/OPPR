@@ -214,32 +214,6 @@ export async function getTournamentWithResults(id: string) {
 }
 
 /**
- * Gets tournament with rounds, matches, and entries
- */
-export async function getTournamentWithMatches(id: string) {
-  return prisma.tournament.findUnique({
-    where: { id },
-    include: {
-      rounds: {
-        include: {
-          matches: {
-            include: {
-              entries: {
-                include: {
-                  player: true,
-                },
-              },
-            },
-            orderBy: { number: 'asc' },
-          },
-        },
-        orderBy: [{ isFinals: 'asc' }, { number: 'asc' }],
-      },
-    },
-  });
-}
-
-/**
  * Searches tournaments by name or location name
  */
 export async function searchTournaments(query: string, limit: number = 20): Promise<Tournament[]> {

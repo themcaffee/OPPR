@@ -27,7 +27,6 @@ model Player {
 
   // Relations
   standings            Standing[]
-  entries              Entry[]
   user                 User?
   organizedTournaments Tournament[] @relation("OrganizedTournaments")
   opprRanking          OpprPlayerRanking?
@@ -76,8 +75,6 @@ model Tournament {
   firstPlaceValue  Float?
 
   // Relations
-  rounds                Round[]
-  matches               Match[]
   standings             Standing[]
   rankingHistoryRecords OpprRankingHistory[]
 
@@ -86,67 +83,6 @@ model Tournament {
   @@index([externalId])
   @@index([locationId])
   @@index([organizerId])
-}
-
-// Round model - groups matches within a tournament stage
-model Round {
-  id            String     @id @default(cuid())
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-
-  tournamentId  String
-  tournament    Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
-
-  number        Int        // Round number within the stage (1, 2, 3...)
-  name          String?    // Optional name (e.g., "Quarterfinals", "Semifinal")
-  isFinals      Boolean    @default(false)
-
-  // Relations
-  matches       Match[]
-
-  @@unique([tournamentId, number, isFinals])
-  @@index([tournamentId])
-  @@index([tournamentId, isFinals])
-}
-
-// Match model - a single game with 1-4 players
-model Match {
-  id            String     @id @default(cuid())
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-
-  tournamentId  String
-  tournament    Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
-  roundId       String?
-  round         Round?     @relation(fields: [roundId], references: [id], onDelete: SetNull)
-
-  number        Int?       // Match number within the round
-  machineName   String?    // Machine played on
-
-  // Relations
-  entries       Entry[]
-
-  @@index([tournamentId])
-  @@index([roundId])
-}
-
-// Entry model - a player's participation in a match
-model Entry {
-  id            String      @id @default(cuid())
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-
-  matchId       String
-  match         Match       @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  playerId      String
-  player        Player      @relation(fields: [playerId], references: [id], onDelete: Cascade)
-
-  result        MatchResult // WIN, LOSS, TIE
-  position      Int?        // Position within the match (1st, 2nd, 3rd, 4th for group games)
-
-  @@unique([matchId, playerId])
-  @@index([matchId])
-  @@index([playerId])
 }
 
 // Standing model - final position for qualifying or finals
@@ -178,13 +114,6 @@ model Standing {
   @@index([tournamentId])
   @@index([tournamentId, isFinals])
   @@index([position])
-}
-
-// Enum for match results
-enum MatchResult {
-  WIN
-  LOSS
-  TIE
 }
 
 // Enum for event booster types

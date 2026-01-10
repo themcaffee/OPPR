@@ -31,10 +31,7 @@ describe('API Keys endpoints', () => {
   beforeEach(async () => {
     // Clean up all tables (order matters due to foreign keys)
     await prisma.apiKey.deleteMany();
-    await prisma.entry.deleteMany();
     await prisma.standing.deleteMany();
-    await prisma.match.deleteMany();
-    await prisma.round.deleteMany();
     await prisma.tournament.deleteMany();
     await prisma.location.deleteMany();
     await prisma.user.deleteMany();

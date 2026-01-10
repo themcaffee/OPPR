@@ -4,11 +4,7 @@
 export type {
   Player,
   Tournament,
-  Round,
-  Match,
-  Entry,
   Standing,
-  MatchResult,
   User,
   Location,
   EventBoosterType,
@@ -30,12 +26,6 @@ export type {
   UpdateTournamentInput,
   FindTournamentsOptions,
 } from './tournaments.js';
-
-export type { CreateRoundInput, UpdateRoundInput, FindRoundsOptions } from './rounds.js';
-
-export type { CreateMatchInput, UpdateMatchInput, FindMatchesOptions } from './matches.js';
-
-export type { CreateEntryInput, UpdateEntryInput, FindEntriesOptions } from './entries.js';
 
 export type {
   CreateStandingInput,
