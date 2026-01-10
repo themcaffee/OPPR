@@ -1,5 +1,16 @@
 # rest-api
 
+## 3.0.0
+
+### Patch Changes
+
+- Updated dependencies [af4b6cf]
+- Updated dependencies [3a435d6]
+- Updated dependencies [e9f4d2b]
+  - @opprs/matchplay-api@3.0.0
+  - @opprs/core@3.0.0
+  - @opprs/db-prisma@3.0.0
+
 ## 2.6.0
 
 ### Minor Changes

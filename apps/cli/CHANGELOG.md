@@ -1,5 +1,17 @@
 # @opprs/cli
 
+## 1.1.6
+
+### Patch Changes
+
+- 3a435d6: Remove unused exports and deprecated methods
+  - Remove unused `GroupSize` type export from @opprs/core
+  - Remove deprecated `updateRole()` method from @opprs/rest-api-client (use `update()` instead)
+  - Update @opprs/cli to use `update()` instead of deprecated `updateRole()`
+
+- Updated dependencies [3a435d6]
+  - @opprs/rest-api-client@3.0.0
+
 ## 1.1.5
 
 ### Patch Changes

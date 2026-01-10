@@ -1,5 +1,12 @@
 # demo
 
+## 3.0.0
+
+### Patch Changes
+
+- Updated dependencies [3a435d6]
+  - @opprs/core@3.0.0
+
 ## 2.2.1
 
 ### Patch Changes
